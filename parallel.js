@@ -1,14 +1,4 @@
-// data
-/*
-var data = [
-  [-2,2],
-  [-1,1],
-  [0,0],
-  [1,-1],
-  [2,-2],
-  [3,-3]
-]
-*/
+// random data
 var data = _.map(_.range(400), function() {
   return _.map(_.range(10), function() {
     return Math.random();
@@ -56,6 +46,7 @@ _(data).each(function(point) {
   polyline(point, X, Y);
 });
 
+// rendering
 function polyline(point, X, Y) {
   ctx.beginPath();
   _(point).each(function(val,i) {
