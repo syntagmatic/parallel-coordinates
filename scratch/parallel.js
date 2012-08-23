@@ -43,17 +43,17 @@ function xscale(numcols,range) {
   };
 };
 
-// return min and max for each dimension in a set of coordinates
-function extents(coords) {
-  return _.map(coords[0], function(__,i) {
-    return extent(coords,i);
+// return min and max for each dimension in a set of data
+function extents(data) {
+  return _.map(data[0], function(__,i) {
+    return extent(data,i);
   });
 };
 
-// return min and max for one dimension in a set of coordinates
-function extent(coords, i) {
+// return min and max for one dimension in a set of data 
+function extent(data, i) {
   return {
-    "min": _.min(coords, function(d) { return d[i] })[i],
-    "max": _.max(coords, function(d) { return d[i] })[i]
+    "min": _.min(data, function(d) { return d[i] })[i],
+    "max": _.max(data, function(d) { return d[i] })[i]
   };
 };

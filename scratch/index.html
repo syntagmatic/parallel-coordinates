@@ -1,0 +1,46 @@
+<style>
+body {
+  background: #111;
+  margin: 0;
+}
+</style>
+
+<div id="parallel-coordinates"></div>
+
+<script src="zepto.js"></script>
+<script src="underscore.js"></script>
+<script src="parallel.js"></script>
+<script>
+var data = _.map(_.range(400), function() {
+  return _.map(_.range(10), function() {
+    return Math.random();
+  });
+});
+
+var numcols = data[0].length;             // number of dimensions
+
+// domain of dimensions
+var domain = extents(data);
+
+// y scales
+var Y = _(domain).map(function(dom) {
+  return yscale(dom, {
+    "min": 0,
+    "max": h
+  })
+});
+
+// x scale (even)
+var X = _(domain).map(function(dom,i) {
+  return xscale(numcols, {
+    "min": 0,
+    "max": w
+  })(i);
+});
+
+// demo code
+_(data).each(function(point) {
+  polyline(point, X, Y);
+});
+
+</script>

@@ -1,46 +1,44 @@
+<!doctype html>
 <style>
-body {
-  background: #111;
-  margin: 0;
-}
+  body {
+    background: #f4f4f4;
+  }
+  #parcoords {
+    height: 200px;
+    background: #ddd;
+  }
+  #parcoords > svg, #parcoords > canvas { 
+    position: absolute;
+  }
+  #parcoords > canvas {
+    pointer-events: none;
+  }
 </style>
-
-<div id="parallel-coordinates"></div>
-
-<script src="zepto.js"></script>
+<div id="parcoords"></div>
+<script src="d3.v2.js"></script>
 <script src="underscore.js"></script>
-<script src="parallel.js"></script>
+<script src="parcoords.js"></script>
 <script>
-var data = _.map(_.range(400), function() {
-  return _.map(_.range(10), function() {
-    return Math.random();
-  });
+var pc = parcoords("parcoords");
+pc.foreground.globalCompositeOperation = "destination-over";
+pc.foreground.strokeStyle = "rgba(0,100,160,0.1)";
+pc.foreground.lineWidth = 1.7;
+pc.foreground.fillText("Loading...",100,100);
+
+var columns,
+    dimensions;
+
+d3.csv('data/movies.csv', function(data) {
+  window.data = data;
+
+  columns = _.keys(data[0]);
+
+  // get quantitative dimensions
+  dimensions = _(columns)
+    .filter(function(col) {
+      return !_.isNaN(data[0][col] - 0);
+    });
+
+  pc.dimensions( dimensions );
 });
-
-var numcols = data[0].length;             // number of dimensions
-
-// domain of dimensions
-var domain = extents(data);
-
-// y scales
-var Y = _(domain).map(function(dom) {
-  return yscale(dom, {
-    "min": 0,
-    "max": h
-  })
-});
-
-// x scale (even)
-var X = _(domain).map(function(dom,i) {
-  return xscale(numcols, {
-    "min": 0,
-    "max": w
-  })(i);
-});
-
-// demo code
-_(data).each(function(point) {
-  polyline(point, X, Y);
-});
-
 </script>
