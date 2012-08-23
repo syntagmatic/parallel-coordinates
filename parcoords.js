@@ -76,3 +76,15 @@ function parcoords(container) {
 
   return pc;
 };
+
+
+// Utility functions
+
+function adjacent_pairs(arr) {
+  var ret = [];
+  for (var i = 0; i < arr.length-1; i++) {
+    console.log(i);
+    ret.push([arr[i],arr[i+1]]);
+  };
+  return ret;
+};
