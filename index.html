@@ -1,28 +1,21 @@
 <!doctype html>
+<link rel="stylesheet" type="text/css" href="parcoords.css">
+<script src="d3.v2.js"></script>
+<script src="underscore.js"></script>
+<script src="parcoords.js"></script>
+
 <style>
   body {
     background: #f4f4f4;
   }
-  #parcoords {
-    height: 200px;
+  #example {
+    height: 300px;
     background: #ddd;
   }
-  #parcoords > svg, #parcoords > canvas { 
-    position: absolute;
-  }
-  #parcoords > canvas {
-    pointer-events: none;
-  }
 </style>
-<div id="parcoords"></div>
-<script src="d3.v2.js"></script>
-<script src="underscore.js"></script>
-<script src="parcoords.js"></script>
+<div id="example" class="parcoords"></div>
 <script>
-var pc = parcoords("parcoords");
-pc.ctx.foreground.globalCompositeOperation = "destination-over";
-pc.ctx.foreground.strokeStyle = "rgba(0,100,160,0.1)";
-pc.ctx.foreground.lineWidth = 1.7;
+var pc = parcoords("example");
 pc.ctx.foreground.fillText("Loading...",100,100);
 
 var columns,
@@ -42,6 +35,7 @@ d3.csv('data/movies.csv', function(data) {
   pc.dimensions( dimensions )
     .data( data )
     .autoscale()
+    .brushable()
     .render();
 });
 </script>
