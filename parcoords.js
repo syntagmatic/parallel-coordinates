@@ -34,7 +34,7 @@ function parcoords(container) {
   // default styles
   ctx.foreground.strokeStyle = "rgba(0,100,160,0.5)";
   ctx.foreground.lineWidth = 1.7;
-  ctx.background.strokeStyle = "rgba(140,140,140,0.6)";
+  ctx.background.strokeStyle = "rgba(140,140,140,0.2)";
   ctx.background.fillStyle = "rgba(255,255,255,0.3)";
 
   // svg tick and brush layers

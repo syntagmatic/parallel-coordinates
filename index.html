@@ -64,6 +64,8 @@ var data2 = d3.range(80).map(function(i) {
 
 var dimensions2 = d3.keys(data2[0]);
 
+pc2.ctx.foreground.strokeStyle = "rgba(0,80,0,0.26)";
+
 pc2.dimensions( dimensions2 )
   .data( data2 )
   .autoscale()
