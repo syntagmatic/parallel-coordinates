@@ -7,16 +7,21 @@
 <style>
   body {
     background: #f4f4f4;
+    margin: 0;
   }
-  #example {
+  #example1,
+  #example2 {
     height: 300px;
     background: #ddd;
+    margin: 12px;
   }
 </style>
-<div id="example" class="parcoords"></div>
+<div id="example1" class="parcoords"></div>
+<div id="example2" class="parcoords"></div>
 <script>
-var pc = parcoords("example");
-pc.ctx.foreground.fillText("Loading...",100,100);
+// example 1
+var pc1 = parcoords("example1");
+pc1.ctx.foreground.fillText("Loading...",100,100);
 
 var columns,
     dimensions;
@@ -32,10 +37,37 @@ d3.csv('data/movies.csv', function(data) {
       return !_.isNaN(data[0][col] - 0);
     });
 
-  pc.dimensions( dimensions )
+  pc1.dimensions( dimensions )
     .data( data )
     .autoscale()
     .brushable()
     .render();
 });
+
+// example 2
+var pc2 = parcoords("example2");
+
+var data2 = d3.range(120).map(function(i) {
+  var x = 2*Math.PI*i/120
+  return {
+    x: x,
+    sin: Math.sin(x),
+    cos: Math.cos(x),
+    atan: Math.atan(x),
+    random: Math.random(),
+    exp: Math.exp(x),
+    sqrt: Math.sqrt(x),
+    square: x*x,
+    round: Math.round(x),
+    rounded_square: Math.round(x*x)
+  };
+});
+
+var dimensions2 = d3.keys(data2[0]);
+
+pc2.dimensions( dimensions2 )
+  .data( data2 )
+  .autoscale()
+  .brushable()
+  .render();
 </script>
