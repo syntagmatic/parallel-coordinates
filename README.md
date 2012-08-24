@@ -1,9 +1,11 @@
     // create parallel coordinates
-    parcoords(container)
+    pc = parcoords(container)
       .dimensions( d3.keys(data[0] )
-
+      .data( data )
+      .autoscale()
+      .render();
 
     // foreground element
-    parcoords.canvas
+    pc.canvas
 
-    parcoords.data( _.shuffle(data) )
+    pc.data( _.shuffle(data) )

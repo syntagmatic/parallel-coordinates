@@ -20,10 +20,10 @@
 <script src="parcoords.js"></script>
 <script>
 var pc = parcoords("parcoords");
-pc.foreground.globalCompositeOperation = "destination-over";
-pc.foreground.strokeStyle = "rgba(0,100,160,0.1)";
-pc.foreground.lineWidth = 1.7;
-pc.foreground.fillText("Loading...",100,100);
+pc.ctx.foreground.globalCompositeOperation = "destination-over";
+pc.ctx.foreground.strokeStyle = "rgba(0,100,160,0.1)";
+pc.ctx.foreground.lineWidth = 1.7;
+pc.ctx.foreground.fillText("Loading...",100,100);
 
 var columns,
     dimensions;
@@ -39,6 +39,9 @@ d3.csv('data/movies.csv', function(data) {
       return !_.isNaN(data[0][col] - 0);
     });
 
-  pc.dimensions( dimensions );
+  pc.dimensions( dimensions )
+    .data( data )
+    .autoscale()
+    .render();
 });
 </script>
