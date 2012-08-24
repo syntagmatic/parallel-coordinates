@@ -47,14 +47,13 @@ d3.csv('data/movies.csv', function(data) {
 // example 2
 var pc2 = parcoords("example2");
 
-var data2 = d3.range(120).map(function(i) {
-  var x = 2*Math.PI*i/120
+var data2 = d3.range(80).map(function(i) {
+  var x = 2*Math.PI*i/80
   return {
     x: x,
     sin: Math.sin(x),
     cos: Math.cos(x),
     atan: Math.atan(x),
-    random: Math.random(),
     exp: Math.exp(x),
     sqrt: Math.sqrt(x),
     square: x*x,
