@@ -11,6 +11,7 @@ function parcoords(container) {
       xscale = d3.scale.ordinal().rangePoints([0, w], 1),
       yscale = {},
       dragging = {},
+      color = function() { return "rgba(0,100,160,0.5)" },
       line = d3.svg.line(),
       axis = d3.svg.axis().orient("left").ticks(1+height/50),
       data,
@@ -33,7 +34,7 @@ function parcoords(container) {
   });
 
   // default styles
-  ctx.foreground.strokeStyle = "rgba(0,100,160,0.5)";
+  ctx.foreground.strokeStyle = color;
   ctx.foreground.lineWidth = 1.7;
   ctx.background.strokeStyle = "rgba(140,140,140,0.25)";
   ctx.background.fillStyle = "rgba(255,255,255,0.4)";
@@ -143,6 +144,7 @@ function parcoords(container) {
         .attr("x", 0)
         .attr("class", "label")
         .text(String)
+    return this;
   };
 
   pc.brushable = function() {
@@ -186,6 +188,16 @@ function parcoords(container) {
     return this;
   };
 
+  pc.color = function(x) {
+    if (typeof x == "string") {
+      color = function() { return x; };
+    }
+    if (typeof x == "function") {
+      color = x;
+    }
+    return this;
+  };
+
   // Get data within brushes
   function brush() {
     brushed = selected();  
@@ -204,6 +216,7 @@ function parcoords(container) {
 
   // Create a single polyline
   function path(d, ctx) {
+    ctx.strokeStyle = color(d);
     ctx.beginPath();
     dimensions.map(function(p,i) {
       if (i == 0) {

@@ -16,7 +16,8 @@
   #example,
   #example-axes,
   #example1,
-  #example2 {
+  #example2,
+  #example3 {
     height: 300px;
     background: #eee;
     border: 1px solid #d0d0d0;
@@ -184,7 +185,6 @@ var data2 = d3.range(0,2*Math.PI,Math.PI/40)
       "atan(x)": Math.atan(x),
       "sin(x)-cos(x)": Math.sin(x)-Math.cos(x),
       "sin(x)+atan(x)": Math.sin(x)+Math.atan(x),
-      "cos(x)": Math.cos(x),
       "exp(x)": Math.exp(x),
       "sqrt(x)": Math.sqrt(x),
       "square(x)": x*x
@@ -195,13 +195,60 @@ var data2 = d3.range(0,2*Math.PI,Math.PI/40)
 var dimensions2 = d3.keys(data2[0]);
 var pc2 = parcoords("example2");
 
-// let's go with green
-pc2.ctx.foreground.strokeStyle = "rgba(0,80,0,0.26)";
-
 pc2.dimensions( dimensions2 )
   .data( data2 )
   .autoscale()
   .reorderable()
+  .color("rgba(0,80,0,0.26)")
+  .render();
+</script>
+<h2>Coloring</h2>
+<div id="example3" class="parcoords"></div>
+<p>Set the <strong>color()</strong> to a function to color polylines based on the data</p>
+<pre>
+var data3 = d3.range(0,4*Math.PI,Math.PI/40)
+  .map(function(x) {
+    return {
+      x: x,
+      "sin(x)": Math.sin(x),
+      "cos(x)": Math.cos(x),
+      "atan(x)": Math.atan(x)
+    };
+  });
+
+var color = function(d) {
+  return d3.hcl(Math.round(180*d["x"])/Math.PI, 50, 55).toString();
+};
+
+parcoords("example3")
+  .dimensions( d3.keys(data3[0]) )
+  .data( data3 )
+  .autoscale()
+  .brushable()
+  .color( color )
+  .render();
+</pre>
+<script>
+var data3 = d3.range(0,4*Math.PI,Math.PI/40)
+  .map(function(x) {
+    return {
+      x: x,
+      "sin(x)": Math.sin(x),
+      "cos(x)": Math.cos(x),
+      "atan(x)": Math.atan(x)
+    };
+  });
+
+var color = function(d) {
+  return d3.hcl(Math.round(180*d["x"])/Math.PI, 50, 55).toString();
+};
+
+parcoords("example3")
+  .dimensions( d3.keys(data3[0]) )
+  .data( data3 )
+  .autoscale()
+  .brushable()
+  .color( color )
   .render();
 </script>
 </div>
