@@ -5,7 +5,7 @@ function parcoords(container) {
       events = d3.dispatch("render", "resize"),
       width = container.clientWidth,
       height = container.clientHeight,
-      padding = [60, 10, 24, 10],
+      padding = [24, 0, 24, 0],
       w = width - padding[1] - padding[3],
       h = height - padding[0] - padding[2],
       xscale = d3.scale.ordinal().rangePoints([0, w], 1),
@@ -70,11 +70,18 @@ function parcoords(container) {
     return this;
   };
 
+  // BROKEN!
   pc.padding = function(x) {
     if (!x) return padding;
     padding = x;
     w = width - padding[1] - padding[3];
     h = height - padding[0] - padding[2];
+
+    d3.select(container).selectAll("canvas")
+        .style("margin-top", padding[0] + "px")
+        .style("margin-left", padding[3] + "px") 
+    svg
+      .attr("transform", "translate(" + padding[3] + "," + padding[0] + ")");
     xscale = d3.scale.ordinal().rangePoints([0, w], 1);
     return this;
   };
@@ -93,7 +100,16 @@ function parcoords(container) {
     return this;
   };
 
+  pc.detectDimensions = function() {
+    dimensions = quantitative_dimensions(data);
+    return this;
+  };
+
   pc.render = function() {
+    // try to autodetect dimensions and create scales
+    if (!dimensions) pc.detectDimensions();
+    if (pc.xscale.domain().length == 0) pc.autoscale();
+
     pc.clear('foreground');
     if (brushed) {
       brushed.forEach(path_foreground);
@@ -262,6 +278,13 @@ function parcoords(container) {
 
 
 // Global utility functions
+
+function quantitative_dimensions(data) {
+  return d3.keys(data)
+    .filter(function(col) {
+      return !!(data[0][col] - 0);
+    });
+};
 
 // Get pairs of adjacent dimensions
 function adjacent_pairs(arr) {
