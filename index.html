@@ -3,36 +3,43 @@
 <script src="d3.v2.js"></script>
 <script src="underscore.js"></script>
 <script src="parcoords.js"></script>
-
 <style>
   body {
-    background: #f4f4f4;
+    background: #f7f7f7;
     margin: 0;
+    font-size: 14px;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+  #container {
+    width: 960px;
+    margin: 0 auto;
   }
   #example1,
   #example2 {
     height: 300px;
-    background: #ddd;
-    margin: 12px;
+    background: #eee;
+    box-shadow: 0px 0px 12px #ccc;
+    border: 1px solid #d0d0d0;
+    margin: 12px 0;
+  }
+  pre {
+    color: #555;
   }
 </style>
+<div id="container">
+<h2>Brushable</h2>
 <div id="example1" class="parcoords"></div>
-<div id="example2" class="parcoords"></div>
-<script>
-// example 1
+<pre>
 var pc1 = parcoords("example1");
-pc1.ctx.foreground.fillText("Loading...",100,100);
 
-var columns,
-    dimensions;
-
+// load external data with csv file
 d3.csv('data/movies.csv', function(data) {
   window.data = data;
 
-  columns = _.keys(data[0]);
+  var columns = _.keys(data[0]);
 
   // get quantitative dimensions
-  dimensions = _(columns)
+  var dimensions = _(columns)
     .filter(function(col) {
       return !_.isNaN(data[0][col] - 0);
     });
@@ -43,32 +50,91 @@ d3.csv('data/movies.csv', function(data) {
     .brushable()
     .render();
 });
+</pre>
+<script>
+var pc1 = parcoords("example1");
 
-// example 2
+// load external data with csv file
+d3.csv('data/movies.csv', function(data) {
+  window.data = data;
+
+  var columns = _.keys(data[0]);
+
+  // get quantitative dimensions
+  var dimensions = _(columns)
+    .filter(function(col) {
+      return !_.isNaN(data[0][col] - 0);
+    });
+
+  pc1.dimensions( dimensions )
+    .data( data )
+    .autoscale()
+    .brushable()
+    .render();
+});
+</script>
+<h2>Reorderable</h2>
+<div id="example2" class="parcoords"></div>
+<p>Generate some data</p>
+<pre>
+var data2 = d3.range(0,2*Math.PI,Math.PI/30)
+  .map(function(x) {
+    return {
+      x: x,
+      sin: Math.sin(x),
+      cos: Math.cos(x),
+      atan: Math.atan(x),
+      exp: Math.exp(x),
+      sqrt: Math.sqrt(x),
+      square: x*x,
+      round: Math.round(x),
+      rounded_square: Math.round(x*x)
+    };
+  });
+
+// get list of dimensions
+var dimensions2 = d3.keys(data2[0]);
+</pre>
+<p>Set up the chart, with reordering enabled</p>
+<pre>
 var pc2 = parcoords("example2");
 
-var data2 = d3.range(80).map(function(i) {
-  var x = 2*Math.PI*i/80
-  return {
-    x: x,
-    sin: Math.sin(x),
-    cos: Math.cos(x),
-    atan: Math.atan(x),
-    exp: Math.exp(x),
-    sqrt: Math.sqrt(x),
-    square: x*x,
-    round: Math.round(x),
-    rounded_square: Math.round(x*x)
-  };
-});
-
-var dimensions2 = d3.keys(data2[0]);
-
+// let's go with green
 pc2.ctx.foreground.strokeStyle = "rgba(0,80,0,0.26)";
 
 pc2.dimensions( dimensions2 )
   .data( data2 )
   .autoscale()
-  .brushable()
+  .reorderable()
+  .render();
+</pre>
+<script>
+var data2 = d3.range(0,2*Math.PI,Math.PI/40)
+  .map(function(x) {
+    return {
+      x: x,
+      sin: Math.sin(x),
+      cos: Math.cos(x),
+      atan: Math.atan(x),
+      exp: Math.exp(x),
+      sqrt: Math.sqrt(x),
+      square: x*x,
+      round: Math.round(x),
+      rounded_square: Math.round(x*x)
+    };
+  });
+
+// get list of dimensions
+var dimensions2 = d3.keys(data2[0]);
+var pc2 = parcoords("example2");
+
+// let's go with green
+pc2.ctx.foreground.strokeStyle = "rgba(0,80,0,0.26)";
+
+pc2.dimensions( dimensions2 )
+  .data( data2 )
+  .autoscale()
+  .reorderable()
   .render();
 </script>
+</div>

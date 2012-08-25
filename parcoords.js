@@ -5,7 +5,7 @@ function parcoords(container) {
       events = d3.dispatch("render", "resize"),
       width = container.clientWidth,
       height = container.clientHeight,
-      padding = [60, 10, 10, 10],
+      padding = [60, 10, 24, 10],
       w = width - padding[1] - padding[3],
       h = height - padding[0] - padding[2],
       xscale = d3.scale.ordinal().rangePoints([0, w], 1),
@@ -15,6 +15,7 @@ function parcoords(container) {
       axis = d3.svg.axis().orient("left").ticks(1+height/50),
       data,
       brushed,
+      g,                            // groups for axes, brushes
       ctx = {},
       dimensions,
       excluded_groups = [];
@@ -34,8 +35,8 @@ function parcoords(container) {
   // default styles
   ctx.foreground.strokeStyle = "rgba(0,100,160,0.5)";
   ctx.foreground.lineWidth = 1.7;
-  ctx.background.strokeStyle = "rgba(140,140,140,0.2)";
-  ctx.background.fillStyle = "rgba(255,255,255,0.3)";
+  ctx.background.strokeStyle = "rgba(140,140,140,0.25)";
+  ctx.background.fillStyle = "rgba(255,255,255,0.4)";
 
   // svg tick and brush layers
   var svg = pc.svg = d3.select(container)
@@ -106,9 +107,9 @@ function parcoords(container) {
     ctx[layer].clearRect(0,0,w+1,h+1);
   };
 
-  pc.brushable = function() {
+  pc.createAxes = function() {
     // Add a group element for each dimension.
-    var g = svg.selectAll(".dimension")
+    g = svg.selectAll(".dimension")
         .data(dimensions)
       .enter().append("svg:g")
         .attr("class", "dimension")
@@ -126,6 +127,10 @@ function parcoords(container) {
         .attr("x", 0)
         .attr("class", "label")
         .text(String)
+  };
+
+  pc.brushable = function() {
+    if (!g) pc.createAxes(); 
 
     // Add and store a brush for each axis.
     g.append("svg:g")
@@ -135,6 +140,32 @@ function parcoords(container) {
         .style("visibility", null)
         .attr("x", -15)
         .attr("width", 30)
+
+    return this;
+  };
+
+  // Jason Davies, http://bl.ocks.org/1341281
+  pc.reorderable = function() {
+    if (!g) pc.createAxes(); 
+
+    g.style("cursor", "move")
+      .call(d3.behavior.drag()
+        .on("dragstart", function(d) {
+          dragging[d] = this.__origin__ = xscale(d);
+        })
+        .on("drag", function(d) {
+          dragging[d] = Math.min(w, Math.max(0, this.__origin__ += d3.event.dx));
+          dimensions.sort(function(a, b) { return position(a) - position(b); });
+          xscale.domain(dimensions);
+          pc.render();
+          g.attr("transform", function(d) { return "translate(" + position(d) + ")"; })
+        })
+        .on("dragend", function(d) {
+          delete this.__origin__;
+          delete dragging[d];
+          d3.select(this).transition().attr("transform", "translate(" + xscale(d) + ")");
+          pc.render();
+        }))
 
     return this;
   };
@@ -160,9 +191,9 @@ function parcoords(container) {
     ctx.beginPath();
     dimensions.map(function(p,i) {
       if (i == 0) {
-        ctx.moveTo(xscale(p),yscale[p](d[p]));
+        ctx.moveTo(position(p),yscale[p](d[p]));
       } else { 
-        ctx.lineTo(xscale(p),yscale[p](d[p]));
+        ctx.lineTo(position(p),yscale[p](d[p]));
       }
     });
     ctx.stroke();
@@ -203,6 +234,11 @@ function parcoords(container) {
   function brush_min(p) {
     return is_brushed(p) ? yscale[p](yscale[p].brush.extent()[0]) : h;
   };
+
+  function position(d) {
+    var v = dragging[d];
+    return v == null ? xscale(d) : v;
+  }
 
   // Data within extents;
   function selected() {
