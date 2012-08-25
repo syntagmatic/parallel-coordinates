@@ -1,10 +1,10 @@
 function parcoords(container) {
   var pc = {};
 
-  var container = document.getElementById(container),
+  var container = d3.select("#" + container),
       events = d3.dispatch("render", "resize"),
-      width = container.clientWidth,
-      height = container.clientHeight,
+      width = container[0][0].clientWidth,
+      height = container[0][0].clientHeight,
       padding = [24, 0, 24, 0],
       w = width - padding[1] - padding[3],
       h = height - padding[0] - padding[2],
@@ -23,7 +23,7 @@ function parcoords(container) {
 
   // canvas data layers
   ["background", "foreground", "highlight"].forEach(function(layer) {
-    ctx[layer] = d3.select(container)
+    ctx[layer] = container
       .append("canvas")
         .attr("class", "foreground")
         .style("margin-top", padding[0] + "px")
@@ -40,7 +40,7 @@ function parcoords(container) {
   ctx.background.fillStyle = "rgba(255,255,255,0.4)";
 
   // svg tick and brush layers
-  var svg = pc.svg = d3.select(container)
+  var svg = pc.svg = container
     .append("svg")
       .attr("width", width)
       .attr("height", height)
@@ -78,7 +78,7 @@ function parcoords(container) {
     w = width - padding[1] - padding[3];
     h = height - padding[0] - padding[2];
 
-    d3.select(container).selectAll("canvas")
+    container.selectAll("canvas")
         .style("margin-top", padding[0] + "px")
         .style("margin-left", padding[3] + "px") 
     svg
@@ -102,7 +102,7 @@ function parcoords(container) {
   };
 
   pc.detectDimensions = function() {
-    dimensions = quantitative_dimensions(data);
+    dimensions = parcoords.quantitative(data);
     return this;
   };
 
@@ -289,18 +289,18 @@ function parcoords(container) {
   return pc;
 };
 
-
 // Global utility functions
 
-function quantitative_dimensions(data) {
+// Get quantitative dimensions based on numerical or null values in the first row
+parcoords.quantitative = function(data) {
   return d3.keys(data)
     .filter(function(col) {
-      return !!(data[0][col] - 0);
+      return (parseFloat(col) == col) && (col != null);
     });
 };
 
 // Get pairs of adjacent dimensions
-function adjacent_pairs(arr) {
+parcoords.adjacent_pairs = function(arr) {
   var ret = [];
   for (var i = 0; i < arr.length-1; i++) {
     console.log(i);
