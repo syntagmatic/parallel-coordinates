@@ -21,7 +21,6 @@
     height: 300px;
     background: #eee;
     border: 1px solid #d0d0d0;
-    box-shadow: 0 0 8px #d0d0d0;
     margin: 12px 0;
   }
   pre {
@@ -31,15 +30,18 @@
 <div id="container">
 <h2>Basics</h2>
 <h3>Minimal</h3>
+<p>
+Getting started is easy.
+</p>
 <div id="example" class="parcoords" style="width:300px;height:150px"></div>
 <p>
-Make a container div
+Make a container div in HTML
 </p>
 <pre>
 &lt;div id="example" class="parcoords" style="width:300px;height:150px"&gt;&lt;/div&gt;
 </pre>
 <p>
-Make some data
+Make some data in JavaScript
 </p>
 <pre>
 var data = [
@@ -217,7 +219,8 @@ var data3 = d3.range(0,4*Math.PI,Math.PI/40)
   });
 
 var color = function(d) {
-  return d3.hcl(Math.round(180*d["x"])/Math.PI, 50, 55).toString();
+  var c = d3.hcl(Math.round(180*d["x"])/Math.PI, 50, 55).rgb();
+  return "rgba(" + c.r + "," + c.g + "," + c.b + ",0.5)" ;
 };
 
 parcoords("example3")
@@ -240,7 +243,8 @@ var data3 = d3.range(0,4*Math.PI,Math.PI/40)
   });
 
 var color = function(d) {
-  return d3.hcl(Math.round(180*d["x"])/Math.PI, 50, 55).toString();
+  var c = d3.hcl(Math.round(180*d["x"])/Math.PI, 50, 55).rgb();
+  return "rgba(" + c.r + "," + c.g + "," + c.b + ",0.5)" ;
 };
 
 parcoords("example3")
