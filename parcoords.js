@@ -48,33 +48,33 @@ function parcoords(container) {
     .append("svg:g")
       .attr("transform", "translate(" + padding[3] + "," + padding[0] + ")");
 
-  pc.dimensions = function(x) {
-    if (!x) return dimensions;
-    dimensions = x;
+  pc.dimensions = function(_) {
+    if (!arguments.length) return dimensions;
+    dimensions = _;
     return this;
   };
 
-  pc.data = function(x) {
-    if (!x) return data;
-    data = x;
+  pc.data = function(_) {
+    if (!arguments.length) return data;
+    data = _;
     return this;
   };
 
-  pc.height = function(x) {
-    if (!x) return height;
-    height = x;
+  pc.height = function(_) {
+    if (!arguments.length) return height;
+    height = _;
     return this;
   };
 
-  pc.width = function(x) {
-    if (!x) return width;
-    width = x;
+  pc.width = function(_) {
+    if (!arguments.length) return width;
+    width = _;
     return this;
   };
 
-  pc.color = function(x) {
-    if (!x) return x;
-    color = x;
+  pc.color = function(_) {
+    if (!arguments.length) return _;
+    color = _;
     return this;
   };
 
