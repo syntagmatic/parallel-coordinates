@@ -6,9 +6,9 @@ function parcoords(container) {
       events = d3.dispatch("render", "resize"),
       width = container[0][0].clientWidth,
       height = container[0][0].clientHeight,
-      padding = [24, 0, 24, 0],
-      w = width - padding[1] - padding[3],
-      h = height - padding[0] - padding[2],
+      margin = { top: 24, right: 0, bottom: 12, left: 0 },
+      w = width - margin.right - margin.left,
+      h = height - margin.top - margin.bottom,
       xscale = d3.scale.ordinal().rangePoints([0, w], 1),
       yscale = {},
       dragging = {},
@@ -19,16 +19,15 @@ function parcoords(container) {
       brushed,
       g,                            // groups for axes, brushes
       ctx = {},
-      dimensions,
-      excluded_groups = [];
+      dimensions;
 
   // canvas data layers
   ["background", "foreground", "highlight"].forEach(function(layer) {
     ctx[layer] = container
       .append("canvas")
         .attr("class", "foreground")
-        .style("margin-top", padding[0] + "px")
-        .style("margin-left", padding[3] + "px") 
+        .style("margin-top", margin.top + "px")
+        .style("margin-left", margin.left + "px") 
         .attr("width", width)
         .attr("height", height)
         [0][0].getContext("2d");
@@ -46,7 +45,7 @@ function parcoords(container) {
       .attr("width", width)
       .attr("height", height)
     .append("svg:g")
-      .attr("transform", "translate(" + padding[3] + "," + padding[0] + ")");
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   pc.dimensions = function(_) {
     if (!arguments.length) return dimensions;
@@ -84,23 +83,23 @@ function parcoords(container) {
       data: data,
       width: width,
       height: height,
-      padding: padding,
+      margin: margin,
       color: color
     };
   };
 
   // BROKEN!
-  pc.padding = function(x) {
-    if (!x) return padding;
-    padding = x;
-    w = width - padding[1] - padding[3];
-    h = height - padding[0] - padding[2];
+  pc.margin = function(_) {
+    if (!arguments.length) return margin;
+    margin = _;
+    w = width - margin.right - margin.left;
+    h = height - margin.top - margin.bottom;
 
     container.selectAll("canvas")
-        .style("margin-top", padding[0] + "px")
-        .style("margin-left", padding[3] + "px") 
+        .style("margin-top", margin.top + "px")
+        .style("margin-left", margin.left + "px") 
     svg
-      .attr("transform", "translate(" + padding[3] + "," + padding[0] + ")");
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     xscale = d3.scale.ordinal().rangePoints([0, w], 1);
     return this;
   };
