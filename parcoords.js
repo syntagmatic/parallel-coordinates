@@ -138,11 +138,13 @@ function parcoords(container) {
         .attr("transform", "translate(0,0)")
         .each(function(d) { d3.select(this).call(axis.scale(yscale[d])); })
       .append("svg:text")
-        .attr("text-anchor", "left")
-        .attr("y", 0)
-        .attr("transform", "rotate(-30) translate(-6,-8)")
-        .attr("x", 0)
-        .attr("class", "label")
+        .attr({
+          "text-anchor": "left",
+          "y": 0,
+          "transform": "rotate(-30) translate(-6,-8)",
+          "x": 0,
+          "class": "label"
+        })
         .text(String)
     return this;
   };

@@ -4,30 +4,50 @@
 <script src="parcoords.js"></script>
 <style>
   body {
-    background: #f4f4f4;
-    margin: 0;
-    font-size: 14px;
-    font-family: Helvetica, Arial, sans-serif;
-  }
-  #container {
-    width: 960px;
+    font-size: 15px;
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
     margin: 0 auto;
+    width: 720px;
+    background: #f2f1f0;
+  }
+  img {
+    border: 1px solid #ccc;
+    box-shadow: 0px 2px 10px #aaa;
+    margin-bottom: 20px;
+    background: rgba(255,255,255,0.9);
+    padding: 20px;
+    width: 520px;
+  }
+  a {
+    text-decoration: none;
+  }
+  ul {
+    margin: 0 20px;
+    padding: 0;
+  }
+  li {
+    list-style: none;
+    padding: 6px 3px;
+    border-bottom: 1px solid #ddd;
   }
   #example,
   #example-axes,
   #example1,
   #example2,
   #example3 {
-    height: 300px;
+    height: 200px;
     background: #eee;
     border: 1px solid #d0d0d0;
     margin: 12px 0;
   }
   pre {
-    color: #555;
+    color: #444;
+    font-family: Ubuntu Mono, Monaco, monospace;
+    padding: 4px 8px;
+    background: #f6f6f6;
+    border: 1px solid #e4e4e4;
   }
 </style>
-<div id="container">
 <h2>Basics</h2>
 <h3>Minimal</h3>
 <p>
@@ -38,13 +58,13 @@ Getting started is easy.
 Make a container div in HTML
 </p>
 <pre>
-&lt;div id="example" class="parcoords" style="width:300px;height:150px"&gt;&lt;/div&gt;
+&lt;div id="<strong>example</strong>" class="parcoords" style="width:300px;height:150px"&gt;&lt;/div&gt;
 </pre>
 <p>
 Make some data in JavaScript
 </p>
 <pre>
-var data = [
+var <strong>data</strong> = [
   [1, 0.7, 2, 42],
   [0.4, 0.9, 1, 20],
   [0.9, 0.2, 3, 19],
@@ -55,8 +75,8 @@ var data = [
 Create a parallel coordinates plot
 </p>
 <pre>
-parcoords("example")
-  .data(data)
+parcoords("<strong>example</strong>")
+  .data(<strong>data</strong>)
   .render();
 </pre>
 <script>
@@ -80,7 +100,7 @@ parcoords("example")
 parcoords("example-axes")
   .data(data)
   .render()
-  .createAxes();
+  .<strong>createAxes()</strong>;
 </pre>
 <script>
 parcoords("example-axes")
@@ -108,7 +128,7 @@ d3.csv('data/movies.csv', function(data) {
   pc1.dimensions( dimensions )
     .data( data )
     .autoscale()
-    .brushable()
+    .<strong>brushable()</strong>
     .render();
 });
 </pre>
@@ -153,10 +173,8 @@ var data2 = d3.range(0,2*Math.PI,Math.PI/30)
       cos: Math.cos(x),
       atan: Math.atan(x),
       exp: Math.exp(x),
+      "square(x)": x*x,
       sqrt: Math.sqrt(x),
-      square: x*x,
-      round: Math.round(x),
-      rounded_square: Math.round(x*x)
     };
   });
 
@@ -173,7 +191,7 @@ pc2.ctx.foreground.strokeStyle = "rgba(0,80,0,0.26)";
 pc2.dimensions( dimensions2 )
   .data( data2 )
   .autoscale()
-  .reorderable()
+  .<strong>reorderable()</strong>
   .render();
 </pre>
 <script>
@@ -185,11 +203,9 @@ var data2 = d3.range(0,2*Math.PI,Math.PI/40)
       "sin(x)": Math.sin(x),
       "cos(x)": Math.cos(x),
       "atan(x)": Math.atan(x),
-      "sin(x)-cos(x)": Math.sin(x)-Math.cos(x),
-      "sin(x)+atan(x)": Math.sin(x)+Math.atan(x),
       "exp(x)": Math.exp(x),
+      "square(x)": x*x,
       "sqrt(x)": Math.sqrt(x),
-      "square(x)": x*x
     };
   });
 
@@ -204,11 +220,11 @@ pc2.dimensions( dimensions2 )
   .color("rgba(0,80,0,0.26)")
   .render();
 </script>
-<h2>Coloring</h2>
+<h2>Color</h2>
 <div id="example3" class="parcoords"></div>
 <p>Set the <strong>color()</strong> to a function to color polylines based on the data</p>
 <pre>
-var data3 = d3.range(0,4*Math.PI,Math.PI/40)
+var data3 = d3.range(-2*Math.PI,4*Math.PI,Math.PI/40)
   .map(function(x) {
     return {
       x: x,
@@ -232,13 +248,12 @@ parcoords("example3")
   .render();
 </pre>
 <script>
-var data3 = d3.range(0,4*Math.PI,Math.PI/40)
+var data3 = d3.range(-2*Math.PI,2*Math.PI,Math.PI/40)
   .map(function(x) {
     return {
       x: x,
       "sin(x)": Math.sin(x),
       "cos(x)": Math.cos(x),
-      "atan(x)": Math.atan(x)
     };
   });
 
@@ -255,4 +270,3 @@ parcoords("example3")
   .color( color )
   .render();
 </script>
-</div>
