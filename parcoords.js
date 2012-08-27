@@ -11,7 +11,7 @@ function parcoords(container) {
       xscale = d3.scale.ordinal().rangePoints([0, w], 1),
       yscale = {},
       dragging = {},
-      color = function() { return "rgba(0,100,160,0.5)" },
+      color = "rgba(0,100,160,0.5)",
       line = d3.svg.line(),
       axis = d3.svg.axis().orient("left").ticks(1+height/50),
       data,
@@ -189,7 +189,8 @@ function parcoords(container) {
   };
 
   pc.color = function(x) {
-    color = d3.functor(x);
+    if (!x) return x;
+    color = x;
     return this;
   };
 
@@ -211,7 +212,7 @@ function parcoords(container) {
 
   // Create a single polyline
   function path(d, ctx) {
-    ctx.strokeStyle = color(d);
+    ctx.strokeStyle = d3.functor(color)(d);
     ctx.beginPath();
     dimensions.map(function(p,i) {
       if (i == 0) {
