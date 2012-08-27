@@ -47,8 +47,13 @@
     background: #f6f6f6;
     border: 1px solid #e4e4e4;
   }
+  h1 small {
+    font-weight: normal;
+    font-size: 0.5em;
+  }
 </style>
-<h2>Basics</h2>
+<h1>Parallel Coordinates <small>(beta)</small></h1>
+<p>A JavaScript implementation of <a href="http://en.wikipedia.org/wiki/Parallel_coordinates">parallel coordinates</a> using <a href="http://d3js.org/">d3</a></p>
 <h3>Minimal</h3>
 <p>
 Getting started is easy.
@@ -108,53 +113,26 @@ parcoords("example-axes")
   .render()
   .createAxes();
 </script>
-<h2>Brushable</h2>
+<h3>Brushable</h3>
 <div id="example1" class="parcoords"></div>
+<p>
+Load external data from a csv file. Enable brushing by clicking and dragging on the axis lines.
+</p>
 <pre>
-var pc1 = parcoords("example1");
-
-// load external data with csv file
 d3.csv('data/movies.csv', function(data) {
-  window.data = data;
-
-  var columns = d3.keys(data[0]);
-
-  // get quantitative dimensions
-  var dimensions = columns
-    .filter(function(col) {
-      return !!(data[0][col] - 0);
-    });
-
-  pc1.dimensions( dimensions )
-    .data( data )
-    .autoscale()
-    .<strong>brushable()</strong>
-    .render();
+  parcoords("example1").data( data )
+    .render()
+    .brushable();
 });
 </pre>
 <script>
-var pc1 = parcoords("example1");
-
-// load external data with csv file
 d3.csv('data/movies.csv', function(data) {
-  window.data = data;
-
-  var columns = d3.keys(data[0]);
-
-  // get quantitative dimensions
-  var dimensions = columns
-    .filter(function(col) {
-      return !!(data[0][col] - 0);
-    });
-
-  pc1.dimensions( dimensions )
-    .data( data )
-    .autoscale()
-    .brushable()
-    .render();
+  parcoords("example1").data( data )
+    .render()
+    .brushable();
 });
 </script>
-<h2>Reorderable</h2>
+<h3>Reorderable</h3>
 <p>
 Parallel coordinates isn't just for exploring data. You can see properties of mathematical functions as well.
 </p>
@@ -185,14 +163,11 @@ var dimensions2 = d3.keys(data2[0]);
 <pre>
 var pc2 = parcoords("example2");
 
-// let's go with green
-pc2.ctx.foreground.strokeStyle = "rgba(0,80,0,0.26)";
-
 pc2.dimensions( dimensions2 )
   .data( data2 )
-  .autoscale()
-  .<strong>reorderable()</strong>
-  .render();
+  .color("rgba(0,80,0,0.26)")
+  .render()
+  .<strong>reorderable()</strong>;
 </pre>
 <script>
 var data2 = d3.range(0,2*Math.PI,Math.PI/40)
@@ -215,12 +190,11 @@ var pc2 = parcoords("example2");
 
 pc2.dimensions( dimensions2 )
   .data( data2 )
-  .autoscale()
-  .reorderable()
   .color("rgba(0,80,0,0.26)")
-  .render();
+  .render()
+  .reorderable();
 </script>
-<h2>Color</h2>
+<h3>Color</h3>
 <div id="example3" class="parcoords"></div>
 <p>Set the <strong>color()</strong> to a function to color polylines based on the data</p>
 <pre>
@@ -242,10 +216,9 @@ var color = function(d) {
 parcoords("example3")
   .dimensions( d3.keys(data3[0]) )
   .data( data3 )
-  .autoscale()
+  .render()
   .brushable()
-  .color( color )
-  .render();
+  .color(color);
 </pre>
 <script>
 var data3 = d3.range(-2*Math.PI,2*Math.PI,Math.PI/40)
@@ -265,8 +238,7 @@ var color = function(d) {
 parcoords("example3")
   .dimensions( d3.keys(data3[0]) )
   .data( data3 )
-  .autoscale()
-  .brushable()
   .color( color )
-  .render();
+  .render()
+  .brushable();
 </script>

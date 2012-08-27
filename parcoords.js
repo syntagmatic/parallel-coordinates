@@ -1,4 +1,5 @@
 function parcoords(container) {
+
   var pc = {};
 
   var container = d3.select("#" + container),
@@ -287,13 +288,16 @@ function parcoords(container) {
   return pc;
 };
 
+parcoords.version = "beta";
+
 // Global utility functions
 
 // Get quantitative dimensions based on numerical or null values in the first row
 parcoords.quantitative = function(data) {
-  return d3.keys(data)
+  return d3.keys(data[0])
     .filter(function(col) {
-      return (parseFloat(col) == col) && (col != null);
+      var v = data[0][col];
+      return (parseFloat(v) == v) && (v != null);
     });
 };
 
