@@ -72,6 +72,23 @@ function parcoords(container) {
     return this;
   };
 
+  pc.color = function(x) {
+    if (!x) return x;
+    color = x;
+    return this;
+  };
+
+  pc.state = function() {
+    return {
+      dimensions: dimensions,
+      data: data,
+      width: width,
+      height: height,
+      padding: padding,
+      color: color
+    };
+  };
+
   // BROKEN!
   pc.padding = function(x) {
     if (!x) return padding;
@@ -188,12 +205,6 @@ function parcoords(container) {
           pc.render();
         }))
 
-    return this;
-  };
-
-  pc.color = function(x) {
-    if (!x) return x;
-    color = x;
     return this;
   };
 
