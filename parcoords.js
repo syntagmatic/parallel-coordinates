@@ -189,12 +189,7 @@ function parcoords(container) {
   };
 
   pc.color = function(x) {
-    if (typeof x == "string") {
-      color = function() { return x; };
-    }
-    if (typeof x == "function") {
-      color = x;
-    }
+    color = d3.functor(x);
     return this;
   };
 
