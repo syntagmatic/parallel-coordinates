@@ -81,6 +81,7 @@ function parcoords(container) {
     return {
       dimensions: dimensions,
       data: data,
+      brushed: brushed,
       width: width,
       height: height,
       margin: margin,
@@ -278,7 +279,7 @@ function parcoords(container) {
     return v == null ? xscale(d) : v;
   }
 
-  // Data within extents;
+  // Data within extents
   function selected() {
     var actives = dimensions.filter(is_brushed),
         extents = actives.map(function(p) { return yscale[p].brush.extent(); });
