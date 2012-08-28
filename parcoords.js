@@ -59,12 +59,14 @@ function parcoords(container) {
     return this;
   };
 
+  // BROKEN
   pc.height = function(_) {
     if (!arguments.length) return height;
     height = _;
     return this;
   };
 
+  // BROKEN
   pc.width = function(_) {
     if (!arguments.length) return width;
     width = _;
