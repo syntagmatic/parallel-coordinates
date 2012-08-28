@@ -51,4 +51,33 @@ If *dimensions* is specified, sets the quantitative dimensions to be visualized.
 var dimensions = ['protein', 'calcium', 'sodium'];
 ```
 
-If no dimensions are specified, then it returns the currently set dimensions.
+If no *dimensions* are specified, then it returns the currently set dimensions.
+
+<a name="parcoords_color" href="#parcoords_color">#</a> parcoords.<b>color</b>(*color*)
+
+If a *color* is a string, polylines will be rendered as that color. If *color* is a function, that function will be run for each data element and the polyline color will be the return value.
+
+To set all lines to a transparent green:
+
+```javascript
+parcoords.color("rgba(0,200,0,0.3)");
+```
+
+TODO: function example
+
+If no *color* is specified, then it returns the currently set color.
+
+<a name="parcoords_state" href="#parcoords_state">#</a> parcoords.<b>state</b>()
+
+Returns an object which contains the state of the chart. This is particularly useful for debugging with a JavaScript console.
+
+<a name="parcoords_createAxes" href="#parcoords_createAxes">#</a> parcoords.<b>createAxes</b>()
+<a name="parcoords_brushable" href="#parcoords_brushable">#</a> parcoords.<b>brushable</b>()
+<a name="parcoords_reorderable" href="#parcoords_reorderable">#</a> parcoords.<b>reorderable</b>()
+<a name="parcoords_width" href="#parcoords_width">#</a> parcoords.<b>width</b>()
+<a name="parcoords_height" href="#parcoords_height">#</a> parcoords.<b>height</b>()
+<a name="parcoords_margin" href="#parcoords_margin">#</a> parcoords.<b>margin</b>()
+<a name="parcoords_autoscale" href="#parcoords_autoscale">#</a> parcoords.<b>autoscale</b>()
+<a name="parcoords_detectDimensions" href="#parcoords_detectDimensions">#</a> parcoords.<b>detectDimensions</b>()
+<a name="parcoords_clear" href="#parcoords_clear">#</a> parcoords.<b>clear</b>()
+<a name="parcoords_ctx" href="#parcoords_ctx">#</a> parcoords.<b>ctx</b>
