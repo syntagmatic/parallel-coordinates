@@ -25,7 +25,7 @@ function parcoords(container) {
     dimensions: [],
   };
 
-  // e
+  // expose the state of the chart
   pc.__ = __;
   
   d3.getset.call(pc, __);
