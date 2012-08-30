@@ -47,66 +47,6 @@ function parcoords(container) {
     .append("svg:g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  pc.dimensions = function(_) {
-    if (!arguments.length) return dimensions;
-    dimensions = _;
-    return this;
-  };
-
-  pc.data = function(_) {
-    if (!arguments.length) return data;
-    data = _;
-    return this;
-  };
-
-  // BROKEN
-  pc.height = function(_) {
-    if (!arguments.length) return height;
-    height = _;
-    return this;
-  };
-
-  // BROKEN
-  pc.width = function(_) {
-    if (!arguments.length) return width;
-    width = _;
-    return this;
-  };
-
-  pc.color = function(_) {
-    if (!arguments.length) return _;
-    color = _;
-    return this;
-  };
-
-  pc.state = function() {
-    return {
-      dimensions: dimensions,
-      data: data,
-      brushed: brushed,
-      width: width,
-      height: height,
-      margin: margin,
-      color: color
-    };
-  };
-
-  // BROKEN!
-  pc.margin = function(_) {
-    if (!arguments.length) return margin;
-    margin = _;
-    w = width - margin.right - margin.left;
-    h = height - margin.top - margin.bottom;
-
-    container.selectAll("canvas")
-        .style("margin-top", margin.top + "px")
-        .style("margin-left", margin.left + "px") 
-    svg
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    xscale = d3.scale.ordinal().rangePoints([0, w], 1);
-    return this;
-  };
-
   pc.autoscale = function() {
     // xscale
     xscale.domain(dimensions);
@@ -222,6 +162,66 @@ function parcoords(container) {
   pc.yscale = yscale;
   pc.ctx = ctx;
   pc.brushed = function() { return brushed };
+
+  pc.dimensions = function(_) {
+    if (!arguments.length) return dimensions;
+    dimensions = _;
+    return this;
+  };
+
+  pc.data = function(_) {
+    if (!arguments.length) return data;
+    data = _;
+    return this;
+  };
+
+  // BROKEN
+  pc.height = function(_) {
+    if (!arguments.length) return height;
+    height = _;
+    return this;
+  };
+
+  // BROKEN
+  pc.width = function(_) {
+    if (!arguments.length) return width;
+    width = _;
+    return this;
+  };
+
+  pc.color = function(_) {
+    if (!arguments.length) return _;
+    color = _;
+    return this;
+  };
+
+  pc.state = function() {
+    return {
+      dimensions: dimensions,
+      data: data,
+      brushed: brushed,
+      width: width,
+      height: height,
+      margin: margin,
+      color: color
+    };
+  };
+
+  // BROKEN!
+  pc.margin = function(_) {
+    if (!arguments.length) return margin;
+    margin = _;
+    w = width - margin.right - margin.left;
+    h = height - margin.top - margin.bottom;
+
+    container.selectAll("canvas")
+        .style("margin-top", margin.top + "px")
+        .style("margin-left", margin.left + "px") 
+    svg
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    xscale = d3.scale.ordinal().rangePoints([0, w], 1);
+    return this;
+  };
 
 
   // Internal Utility Functions
