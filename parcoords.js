@@ -1,40 +1,61 @@
+d3.getset = function(_)  {
+  var self = this
+  Object.keys(_).forEach(function(key) {   
+    self[key] = function(x) {
+      if (!arguments.length) return _[key];
+      _[key] = x;
+      return self;
+    }
+  });
+}
+
 function parcoords(container) {
 
   var pc = {};
 
-  var container = d3.select("#" + container),
-      events = d3.dispatch("render", "resize"),
-      width = container[0][0].clientWidth,
-      height = container[0][0].clientHeight,
-      margin = { top: 24, right: 0, bottom: 12, left: 0 },
-      w = width - margin.right - margin.left,
-      h = height - margin.top - margin.bottom,
-      xscale = d3.scale.ordinal().rangePoints([0, w], 1),
+  var container = d3.select("#" + container);
+
+  // an experimental object suggested by Ziggy Jonsson
+  var __ = {
+    width: container[0][0].clientWidth,
+    height: container[0][0].clientHeight,
+    margin: { top: 24, right: 0, bottom: 12, left: 0 },
+    color: "rgba(0,100,160,0.5)",
+    data: [],
+    dimensions: [],
+  };
+
+  // e
+  pc.__ = __;
+  
+  d3.getset.call(pc, __);
+
+  var events = d3.dispatch("render", "resize"),
+      w = function() { return __.width - __.margin.right - __.margin.left; },
+      h = function() { return __.height - __.margin.top - __.margin.bottom },
+      xscale = d3.scale.ordinal().rangePoints([0, w()], 1),
       yscale = {},
       dragging = {},
-      color = "rgba(0,100,160,0.5)",
       line = d3.svg.line(),
-      axis = d3.svg.axis().orient("left").ticks(1+height/50),
-      data,
+      axis = d3.svg.axis().orient("left").ticks(1+__.height/50),
       brushed,
       g,                            // groups for axes, brushes
-      ctx = {},
-      dimensions;
+      ctx = {};
 
   // canvas data layers
   ["background", "foreground", "highlight"].forEach(function(layer) {
     ctx[layer] = container
       .append("canvas")
         .attr("class", "foreground")
-        .style("margin-top", margin.top + "px")
-        .style("margin-left", margin.left + "px") 
-        .attr("width", width)
-        .attr("height", height)
+        .style("margin-top", __.margin.top + "px")
+        .style("margin-left", __.margin.left + "px") 
+        .attr("width", __.width)
+        .attr("height", __.height)
         [0][0].getContext("2d");
   });
 
   // default styles
-  ctx.foreground.strokeStyle = color;
+  ctx.foreground.strokeStyle = __.color;
   ctx.foreground.lineWidth = 1.7;
   ctx.background.strokeStyle = "rgba(140,140,140,0.25)";
   ctx.background.fillStyle = "rgba(255,255,255,0.4)";
@@ -42,52 +63,52 @@ function parcoords(container) {
   // svg tick and brush layers
   var svg = pc.svg = container
     .append("svg")
-      .attr("width", width)
-      .attr("height", height)
+      .attr("width", __.width)
+      .attr("height", __.height)
     .append("svg:g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      .attr("transform", "translate(" + __.margin.left + "," + __.margin.top + ")");
 
   pc.autoscale = function() {
     // xscale
-    xscale.domain(dimensions);
+    xscale.domain(__.dimensions);
 
     // yscale
-    dimensions.forEach(function(k) {
+    __.dimensions.forEach(function(k) {
       yscale[k] = d3.scale.linear()
-        .domain(d3.extent(data, function(d) { return +d[k]; }))
-        .range([h, 0])
+        .domain(d3.extent(__.data, function(d) { return +d[k]; }))
+        .range([h(), 0])
     });
 
     return this;
   };
 
   pc.detectDimensions = function() {
-    dimensions = parcoords.quantitative(data);
+    __.dimensions = parcoords.quantitative(__.data);
     return this;
   };
 
   pc.render = function() {
     // try to autodetect dimensions and create scales
-    if (!dimensions) pc.detectDimensions();
-    if (pc.xscale.domain().length == 0) pc.autoscale();
+    if (!__.dimensions.length) pc.detectDimensions();
+    if (!pc.xscale.domain().length) pc.autoscale();
 
     pc.clear('foreground');
     if (brushed) {
       brushed.forEach(path_foreground);
     } else {
-      data.forEach(path_foreground);
+      __.data.forEach(path_foreground);
     }
     return this;
   };
 
   pc.clear = function(layer) {
-    ctx[layer].clearRect(0,0,w+1,h+1);
+    ctx[layer].clearRect(0,0,w()+1,h()+1);
   };
 
   pc.createAxes = function() {
     // Add a group element for each dimension.
     g = svg.selectAll(".dimension")
-        .data(dimensions)
+        .data(__.dimensions)
       .enter().append("svg:g")
         .attr("class", "dimension")
         .attr("transform", function(d) { return "translate(" + xscale(d) + ")"; })
@@ -134,9 +155,9 @@ function parcoords(container) {
           dragging[d] = this.__origin__ = xscale(d);
         })
         .on("drag", function(d) {
-          dragging[d] = Math.min(w, Math.max(0, this.__origin__ += d3.event.dx));
-          dimensions.sort(function(a, b) { return position(a) - position(b); });
-          xscale.domain(dimensions);
+          dragging[d] = Math.min(w(), Math.max(0, this.__origin__ += d3.event.dx));
+          __.dimensions.sort(function(a, b) { return position(a) - position(b); });
+          xscale.domain(__.dimensions);
           pc.render();
           g.attr("transform", function(d) { return "translate(" + position(d) + ")"; })
         })
@@ -163,74 +184,27 @@ function parcoords(container) {
   pc.ctx = ctx;
   pc.brushed = function() { return brushed };
 
-  pc.dimensions = function(_) {
-    if (!arguments.length) return dimensions;
-    dimensions = _;
-    return this;
-  };
-
-  pc.data = function(_) {
-    if (!arguments.length) return data;
-    data = _;
-    return this;
-  };
-
-  // BROKEN
-  pc.height = function(_) {
-    if (!arguments.length) return height;
-    height = _;
-    return this;
-  };
-
-  // BROKEN
-  pc.width = function(_) {
-    if (!arguments.length) return width;
-    width = _;
-    return this;
-  };
-
-  pc.color = function(_) {
-    if (!arguments.length) return _;
-    color = _;
-    return this;
-  };
-
-  pc.state = function() {
-    return {
-      dimensions: dimensions,
-      data: data,
-      brushed: brushed,
-      width: width,
-      height: height,
-      margin: margin,
-      color: color
-    };
-  };
-
   // BROKEN!
   pc.margin = function(_) {
-    if (!arguments.length) return margin;
-    margin = _;
-    w = width - margin.right - margin.left;
-    h = height - margin.top - margin.bottom;
-
+    if (!arguments.length) return __.margin;
+    __.margin = _;
     container.selectAll("canvas")
         .style("margin-top", margin.top + "px")
         .style("margin-left", margin.left + "px") 
     svg
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    xscale = d3.scale.ordinal().rangePoints([0, w], 1);
+    xscale = d3.scale.ordinal().rangePoints([0, w()], 1);
     return this;
   };
 
 
-  // Internal Utility Functions
+  // utility Functions
 
-  // Create a single polyline
+  // draw single polyline
   function path(d, ctx) {
-    ctx.strokeStyle = d3.functor(color)(d);
+    ctx.strokeStyle = d3.functor(__.color)(d);
     ctx.beginPath();
-    dimensions.map(function(p,i) {
+    __.dimensions.map(function(p,i) {
       if (i == 0) {
         ctx.moveTo(position(p),yscale[p](d[p]));
       } else { 
@@ -244,20 +218,20 @@ function parcoords(container) {
     pc.clear('background');
 
     // no active brushes
-    var actives = dimensions.filter(is_brushed);
+    var actives = __.dimensions.filter(is_brushed);
     if (actives.length == 0) return;
 
     // create envelope
     var ctx = pc.ctx.background;
     ctx.beginPath();
-    dimensions.map(function(p,i) {
+    __.dimensions.map(function(p,i) {
       if (i == 0) {
         ctx.moveTo(xscale(p), brush_max(p));
       } else { 
         ctx.lineTo(xscale(p), brush_max(p));
       }
     });
-    dimensions.reverse().map(function(p,i) {
+    __.dimensions.reverse().map(function(p,i) {
       ctx.lineTo(xscale(p), brush_min(p));
     });
     ctx.fill();
@@ -273,7 +247,7 @@ function parcoords(container) {
   };
 
   function brush_min(p) {
-    return is_brushed(p) ? yscale[p](yscale[p].brush.extent()[0]) : h;
+    return is_brushed(p) ? yscale[p](yscale[p].brush.extent()[0]) : h();
   };
 
   function position(d) {
@@ -281,9 +255,9 @@ function parcoords(container) {
     return v == null ? xscale(d) : v;
   }
 
-  // Data within extents
+  // data within extents
   function selected() {
-    var actives = dimensions.filter(is_brushed),
+    var actives = __.dimensions.filter(is_brushed),
         extents = actives.map(function(p) { return yscale[p].brush.extent(); });
 
     return data
@@ -303,9 +277,7 @@ function parcoords(container) {
 
 parcoords.version = "beta";
 
-// Global utility functions
-
-// Get quantitative dimensions based on numerical or null values in the first row
+// quantitative dimensions based on numerical or null values in the first row
 parcoords.quantitative = function(data) {
   return d3.keys(data[0])
     .filter(function(col) {
@@ -314,11 +286,10 @@ parcoords.quantitative = function(data) {
     });
 };
 
-// Get pairs of adjacent dimensions
+// pairs of adjacent dimensions
 parcoords.adjacent_pairs = function(arr) {
   var ret = [];
   for (var i = 0; i < arr.length-1; i++) {
-    console.log(i);
     ret.push([arr[i],arr[i+1]]);
   };
   return ret;

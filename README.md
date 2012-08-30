@@ -71,13 +71,49 @@ If no *color* is specified, then it returns the currently set color.
 
 Returns an object which contains the state of the chart. This is particularly useful for debugging with a JavaScript console.
 
+<a name="parcoords___" href="#parcoords___">#</a> parcoords.<b>__</b>
+
+Exposes the public state of parallel coordinates. Useful for debugging in a JavaScript console. Avoid modifying values directly, instead use methods such as <a href="#parcoords_data">parcoords.data()</a> to update the state.
+
+The design of this object is experimental and contributed by Ziggy Jonsson. Read more at this (d3-js mailing list discussion)[https://groups.google.com/forum/?fromgroups=#!topic/d3-js/F2IspJnDbEs].
+
 <a name="parcoords_createAxes" href="#parcoords_createAxes">#</a> parcoords.<b>createAxes</b>()
+
+TODO
+
 <a name="parcoords_brushable" href="#parcoords_brushable">#</a> parcoords.<b>brushable</b>()
+
+TODO
+
 <a name="parcoords_reorderable" href="#parcoords_reorderable">#</a> parcoords.<b>reorderable</b>()
+
+TODO
+
 <a name="parcoords_width" href="#parcoords_width">#</a> parcoords.<b>width</b>()
+
+TODO
+
 <a name="parcoords_height" href="#parcoords_height">#</a> parcoords.<b>height</b>()
+
+TODO
+
 <a name="parcoords_margin" href="#parcoords_margin">#</a> parcoords.<b>margin</b>()
+
+TODO
+
 <a name="parcoords_autoscale" href="#parcoords_autoscale">#</a> parcoords.<b>autoscale</b>()
+
+TODO
+
 <a name="parcoords_detectDimensions" href="#parcoords_detectDimensions">#</a> parcoords.<b>detectDimensions</b>()
+
+TODO
+
 <a name="parcoords_clear" href="#parcoords_clear">#</a> parcoords.<b>clear</b>()
+
+TODO
+
 <a name="parcoords_ctx" href="#parcoords_ctx">#</a> parcoords.<b>ctx</b>
+
+TODO
+
