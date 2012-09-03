@@ -49,7 +49,7 @@ function parcoords(container) {
   ["background", "foreground", "highlight"].forEach(function(layer) {
     ctx[layer] = container
       .append("canvas")
-        .attr("class", jayer)
+        .attr("class", layer)
         .style("margin-top", __.margin.top + "px")
         .style("margin-left", __.margin.left + "px") 
         .attr("width", w())
