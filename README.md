@@ -4,7 +4,7 @@ An implementation of parallel coordinates in d3 as a [reusable chart](http://bos
 
 ## Resources 
 
-Tutorials
+### Tutorials
 
 * [Wikipedia](http://en.wikipedia.org/wiki/Parallel_coordinates)
 * [Parallel Coordinates](http://eagereyes.org/techniques/parallel-coordinates), Robert Kosara
@@ -12,31 +12,31 @@ Tutorials
 * [Multivariate Analysis Using Parallel Coordinates](http://www.b-eye-network.com/view/3355), Stephen Few
 * [Edward Tufte's "Slopegraphs"](http://charliepark.org/slopegraphs/), Charlie Park
 
-Papers
+### Papers
 
 * [Parallel Coordinates: a tool for visualizing mult-dimensional geometry](http://astrostatistics.psu.edu/su06/inselberg061006.pdf), Alfred Inselberg
 * [Hyperdimensional Data Analysis Using Parallel Coordinates](https://www.cs.ubc.ca/~tmm/courses/cpsc533c-04-fall/readings/wegman.pdf), Edward Wegman [2](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.15.1902&rep=rep1&type=pdf)
-* [On Some Mathametica for Visualizing High Dimensional Data](http://sankhya.isical.ac.in/search/64a2/64a2031.pdf)
+* [On Some Mathametics for Visualizing High Dimensional Data](http://sankhya.isical.ac.in/search/64a2/64a2031.pdf), Edward Wegman, Jeffrey Solka
 
-Books
+### Books
 
 * [Parallel Coordinates: Visual Multidimensional Geometry and Its Applications](http://www.amazon.com/Parallel-Coordinates-Multidimensional-Geometry-Applications/dp/0387215077/), Alfred Inselberg. This book contains an Interactive Learning Module (ILM) with interactive examples of the mathematical properties of parallel coordinates.
 
-Videos
+### Videos
 
 * [Graph theory applied to data visualization playlist](http://www.youtube.com/playlist?list=PL35C0D424A858AE69), Wayne Oldford
 
-Software
+### Software
 
 * [Protovis Parallel Coordinates](http://mbostock.github.com/protovis/ex/cars.html), Mike Bostock
-* [d3.js Parallel Coordinates](http://bl.ocks.org/1341021), Mike Bostock and Jason Davies
-* [GGobi](http://www.ggobi.org/), Debby Swayne, Di Cook, Duncan Temple Lang, Andres Buja, Nicholas Lewin-Koh, Heike Hofmann, Michael Lawrence and Hadley Wickham
+* [d3.js Parallel Coordinates](http://bl.ocks.org/1341021), Mike Bostock, Jason Davies
+* [GGobi](http://www.ggobi.org/), Debby Swayne, Di Cook, Duncan Temple Lang, Andres Buja, Nicholas Lewin-Koh, Heike Hofmann, Michael Lawrence, Hadley Wickham
 * [VizApp](http://vangjee.wordpress.com/2009/04/07/visualizing-massive-and-high-dimensional-data-in-parallel-coordinates-using-vizapp/), Jee Vang
 * [XDAT](http://www.xdat.org/)
 * [Mondrian](http://www.theusrus.de/Mondrian/), Martin Theus
 * [Parvis](http://www.mediavirus.org/parvis/), flo ledermann
-* [Parallel Coordinate Graphics using MATLAB](http://people.ece.cornell.edu/land/PROJECTS/Inselberg/)
-* [Parallel Coordinates in pandas, Python](http://pandasplotting.blogspot.com/2012/06/parallel-coordinates.html)
+* [Parallel Coordinate Graphics using MATLAB](http://people.ece.cornell.edu/land/PROJECTS/Inselberg/), Bruce R. Land
+* [Parallel Coordinates in pandas, Python](http://pandasplotting.blogspot.com/2012/06/parallel-coordinates.html), Vytautas Jančauskas
 
 ## API
 
