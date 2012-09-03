@@ -17,8 +17,8 @@ function parcoords(container) {
 
   // an experimental object suggested by Ziggy Jonsson
   var __ = {
-    width: container[0][0].clientWidth,
-    height: container[0][0].clientHeight,
+    width: 600,
+    height: 300,
     margin: { top: 24, right: 0, bottom: 12, left: 0 },
     color: "rgba(0,100,160,0.5)",
     data: [],
@@ -27,8 +27,11 @@ function parcoords(container) {
 
   // expose the state of the chart
   pc.__ = __;
-  
   d3.getset.call(pc, __);
+
+  // set width and height
+  pc.width(container[0][0].clientWidth);
+  pc.height(container[0][0].clientHeight);
 
   var events = d3.dispatch("render", "resize"),
       w = function() { return __.width - __.margin.right - __.margin.left; },
@@ -46,11 +49,11 @@ function parcoords(container) {
   ["background", "foreground", "highlight"].forEach(function(layer) {
     ctx[layer] = container
       .append("canvas")
-        .attr("class", "foreground")
+        .attr("class", jayer)
         .style("margin-top", __.margin.top + "px")
         .style("margin-left", __.margin.left + "px") 
-        .attr("width", __.width)
-        .attr("height", __.height)
+        .attr("width", w())
+        .attr("height", h())
         [0][0].getContext("2d");
   });
 
@@ -136,7 +139,13 @@ function parcoords(container) {
     // Add and store a brush for each axis.
     g.append("svg:g")
         .attr("class", "brush")
-        .each(function(d) { d3.select(this).call(yscale[d].brush = d3.svg.brush().y(yscale[d]).on("brush", brush)); })
+        .each(function(d) {
+          d3.select(this).call(
+            yscale[d].brush = d3.svg.brush()
+              .y(yscale[d])
+              .on("brush", brush)
+          );
+        })
       .selectAll("rect")
         .style("visibility", null)
         .attr("x", -15)
@@ -189,10 +198,12 @@ function parcoords(container) {
     if (!arguments.length) return __.margin;
     __.margin = _;
     container.selectAll("canvas")
-        .style("margin-top", margin.top + "px")
-        .style("margin-left", margin.left + "px") 
+        .style("margin-left", __.margin.left + "px") 
+        .style("margin-left", __.margin.left + "px") 
+        .attr("width", w())
+        .attr("height", h())
     svg
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      .attr("transform", "translate(" + __.margin.left + "," + __.margin.top + ")");
     xscale = d3.scale.ordinal().rangePoints([0, w()], 1);
     return this;
   };
