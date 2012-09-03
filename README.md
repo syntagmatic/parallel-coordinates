@@ -91,6 +91,10 @@ To delete an axis, click the axis line (behind the brush extent).
 
 The behavior is identical to that of the [original d3.js parallel coordinates](http://bl.ocks.org/1341021).
 
+<a name="parcoords_brushed" href="#parcoords_brushed">#</a> parcoords.<b>brushed</b>()
+
+For <a href="#parcoords_brushable">brushable</a> plots, returns the selected data.
+
 <a name="parcoords_reorderable" href="#parcoords_reorderable">#</a> parcoords.<b>reorderable</b>()
 
 Enable reordering of axes. Automatically creates axes if they don't exist.
@@ -128,9 +132,17 @@ Set the xscale, yscale, and canvas sizes. Usually this is called automatically, 
 
 Set the quantative dimensions using based on the first row of data.
 
+<a name="parcoords_highlight" href="#parcoords_highlight">#</a> parcoords.<b>highlight</b>([<i>values</i>])
+
+Pass an array of data to overlay the data on the chart, masking the background.
+
+<a name="parcoords_unhighlight" href="#parcoords_unhighlight">#</a> parcoords.<b>unhighlight</b>([<i>values</i>])
+
+Clear the highlighting layer. This is equivalent to calling <a href="#parcoords_clear">parcoords.clear("highlight")</a>.
+
 <a name="parcoords_clear" href="#parcoords_clear">#</a> parcoords.<b>clear</b>(*layer*)
 
-Clear the *layer*, which could be *foreground*, *background* or *highlight*.
+Clear the *layer*, which could be *"foreground"*, *"background"* or *"highlight"*.
 
 <a name="parcoords_ctx" href="#parcoords_ctx">#</a> parcoords.<b>ctx</b>
 

@@ -83,6 +83,7 @@ function parcoords(container) {
     // default styles
     ctx.foreground.strokeStyle = __.color;
     ctx.foreground.lineWidth = 1.4;
+    ctx.highlight.lineWidth = 3;
     ctx.background.strokeStyle = "rgba(140,140,140,0.25)";
     ctx.background.fillStyle = "rgba(255,255,255,0.4)";
 
@@ -218,6 +219,19 @@ function parcoords(container) {
     pc.render();
   };
 
+  // highlight an array of data
+  pc.highlight = function(data) {
+    pc.clear("highlight");
+    ctx.highlight.fillStyle = "rgba(255,255,255,0.8)";
+    ctx.highlight.fillRect(-1,-1,w()+2,h()+2);
+    data.forEach(path_highlight);
+  };
+
+  // clear highlighting
+  pc.unhighlight = function(data) {
+    pc.clear("highlight");
+  };
+
   // custom getsets
   pc.height = function(_) {
     if (!arguments.length) return __.height;
@@ -310,6 +324,10 @@ function parcoords(container) {
 
   function path_foreground(d) {
     return path(d, ctx.foreground);
+  };
+
+  function path_highlight(d) {
+    return path(d, ctx.highlight);
   };
 
   return pc;
