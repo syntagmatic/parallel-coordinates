@@ -128,8 +128,9 @@ d3.csv('data/movies.csv', function(data) {
 });
 </pre>
 <script>
+var pc1;
 d3.csv('data/movies.csv', function(data) {
-  parcoords("example1").data( data )
+  pc1 = parcoords("example1").data( data )
     .render()
     .brushable();
 });

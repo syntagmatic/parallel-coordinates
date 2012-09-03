@@ -53,7 +53,6 @@ function parcoords(container) {
         [0][0].getContext("2d");
   });
 
-  // default styles
   // svg tick and brush layers
   var svg = pc.svg = container
     .append("svg")
@@ -80,6 +79,12 @@ function parcoords(container) {
         .style("margin-left", __.margin.left + "px") 
         .attr("width", w())
         .attr("height", h())
+
+    // default styles
+    ctx.foreground.strokeStyle = __.color;
+    ctx.foreground.lineWidth = 1.4;
+    ctx.background.strokeStyle = "rgba(140,140,140,0.25)";
+    ctx.background.fillStyle = "rgba(255,255,255,0.4)";
 
     return this;
   };
@@ -295,7 +300,7 @@ function parcoords(container) {
     var actives = __.dimensions.filter(is_brushed),
         extents = actives.map(function(p) { return yscale[p].brush.extent(); });
 
-    return data
+    return __.data
       .filter(function(d) {
         return actives.every(function(p, dimension) {
           return extents[dimension][0] <= d[p] && d[p] <= extents[dimension][1];
