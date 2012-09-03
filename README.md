@@ -75,19 +75,27 @@ Returns an object which contains the state of the chart. This is particularly us
 
 Exposes the public state of parallel coordinates. Useful for debugging in a JavaScript console. Avoid modifying values directly, instead use methods such as <a href="#parcoords_data">parcoords.data()</a> to update the state.
 
-The design of this object is experimental and contributed by Ziggy Jonsson. Read more at this (d3-js mailing list discussion)[https://groups.google.com/forum/?fromgroups=#!topic/d3-js/F2IspJnDbEs].
+The design of this object is experimental and contributed by Ziggy Jonsson. Read more at this [d3-js mailing list discussion](https://groups.google.com/forum/?fromgroups=#!topic/d3-js/F2IspJnDbEs).
 
 <a name="parcoords_createAxes" href="#parcoords_createAxes">#</a> parcoords.<b>createAxes</b>()
 
-TODO
+Create static SVG axes with dimension names, ticks, and labels.
 
 <a name="parcoords_brushable" href="#parcoords_brushable">#</a> parcoords.<b>brushable</b>()
 
-TODO
+Enable brushing of axes. Automatically creates axes if they don't exist.
+
+Click and drag vertically on an axis line to create a brush. The brush is both draggable and resizeable. 
+
+To delete an axis, click the axis line (behind the brush extent).
+
+The behavior is identical to that of the [original d3.js parallel coordinates](http://bl.ocks.org/1341021).
 
 <a name="parcoords_reorderable" href="#parcoords_reorderable">#</a> parcoords.<b>reorderable</b>()
 
-TODO
+Enable reordering of axes. Automatically creates axes if they don't exist.
+
+The behavior is identical to that of the [original reorderable d3.js parallel coordinates](http://bl.ocks.org/1341281).
 
 <a name="parcoords_width" href="#parcoords_width">#</a> parcoords.<b>width</b>()
 
@@ -114,17 +122,16 @@ parcoords.margin({
 
 <a name="parcoords_autoscale" href="#parcoords_autoscale">#</a> parcoords.<b>autoscale</b>()
 
-TODO
+Set the xscale, yscale, and canvas sizes. Usually this is called automatically, such as on render() or resize() events 
 
 <a name="parcoords_detectDimensions" href="#parcoords_detectDimensions">#</a> parcoords.<b>detectDimensions</b>()
 
-TODO
+Set the quantative dimensions using based on the first row of data.
 
-<a name="parcoords_clear" href="#parcoords_clear">#</a> parcoords.<b>clear</b>()
+<a name="parcoords_clear" href="#parcoords_clear">#</a> parcoords.<b>clear</b>(*layer*)
 
-TODO
+Clear the *layer*, which could be *foreground*, *background* or *highlight*.
 
 <a name="parcoords_ctx" href="#parcoords_ctx">#</a> parcoords.<b>ctx</b>
 
-TODO
-
+An object containing the [canvas 2d rendering contexts](https://developer.mozilla.org/en-US/docs/DOM/CanvasRenderingContext2D). Use this to modify canvas rendering styles, except for the foreground stroke which is controlled by <a href="#parcoords_autoscale">parcoords.color()</a>.
