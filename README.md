@@ -91,15 +91,26 @@ TODO
 
 <a name="parcoords_width" href="#parcoords_width">#</a> parcoords.<b>width</b>()
 
-TODO
+```javascript
+parcoords.width(300)
+```
 
 <a name="parcoords_height" href="#parcoords_height">#</a> parcoords.<b>height</b>()
 
-TODO
+```javascript
+parcoords.height(300)
+```
 
 <a name="parcoords_margin" href="#parcoords_margin">#</a> parcoords.<b>margin</b>()
 
-TODO
+```javascript
+parcoords.margin({
+  top: 100,
+  left: 0,
+  right: 0,
+  bottom: 20
+})
+```
 
 <a name="parcoords_autoscale" href="#parcoords_autoscale">#</a> parcoords.<b>autoscale</b>()
 

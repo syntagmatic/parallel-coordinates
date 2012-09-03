@@ -20,7 +20,7 @@ function parcoords(container) {
     width: 600,
     height: 300,
     margin: { top: 24, right: 0, bottom: 12, left: 0 },
-    color: "rgba(0,100,160,0.5)",
+    color: "rgba(0,100,160,0.7)",
     data: [],
     dimensions: [],
   };
@@ -36,7 +36,7 @@ function parcoords(container) {
   var events = d3.dispatch("render", "resize"),
       w = function() { return __.width - __.margin.right - __.margin.left; },
       h = function() { return __.height - __.margin.top - __.margin.bottom },
-      xscale = d3.scale.ordinal().rangePoints([0, w()], 1),
+      xscale = d3.scale.ordinal(),
       yscale = {},
       dragging = {},
       line = d3.svg.line(),
@@ -50,19 +50,10 @@ function parcoords(container) {
     ctx[layer] = container
       .append("canvas")
         .attr("class", layer)
-        .style("margin-top", __.margin.top + "px")
-        .style("margin-left", __.margin.left + "px") 
-        .attr("width", w())
-        .attr("height", h())
         [0][0].getContext("2d");
   });
 
   // default styles
-  ctx.foreground.strokeStyle = __.color;
-  ctx.foreground.lineWidth = 1.7;
-  ctx.background.strokeStyle = "rgba(140,140,140,0.25)";
-  ctx.background.fillStyle = "rgba(255,255,255,0.4)";
-
   // svg tick and brush layers
   var svg = pc.svg = container
     .append("svg")
@@ -73,7 +64,8 @@ function parcoords(container) {
 
   pc.autoscale = function() {
     // xscale
-    xscale.domain(__.dimensions);
+    xscale.rangePoints([0, w()], 1)
+      .domain(__.dimensions);
 
     // yscale
     __.dimensions.forEach(function(k) {
@@ -81,6 +73,13 @@ function parcoords(container) {
         .domain(d3.extent(__.data, function(d) { return +d[k]; }))
         .range([h(), 0])
     });
+
+    // canvas sizes 
+    container.selectAll("canvas")
+        .style("margin-top", __.margin.top + "px") 
+        .style("margin-left", __.margin.left + "px") 
+        .attr("width", w())
+        .attr("height", h())
 
     return this;
   };
@@ -130,6 +129,7 @@ function parcoords(container) {
           "class": "label"
         })
         .text(String)
+
     return this;
   };
 
@@ -193,23 +193,47 @@ function parcoords(container) {
   pc.ctx = ctx;
   pc.brushed = function() { return brushed };
 
-  // BROKEN!
-  pc.margin = function(_) {
-    if (!arguments.length) return __.margin;
-    __.margin = _;
-    container.selectAll("canvas")
-        .style("margin-left", __.margin.left + "px") 
-        .style("margin-left", __.margin.left + "px") 
-        .attr("width", w())
-        .attr("height", h())
-    svg
-      .attr("transform", "translate(" + __.margin.left + "," + __.margin.top + ")");
-    xscale = d3.scale.ordinal().rangePoints([0, w()], 1);
+  // rescale for height, width and margins
+  pc.resize = function() {
+    // container size
+    container.select("svg") 
+      .attr("width", __.width)
+      .attr("height", __.height)
+    svg.attr("transform", "translate(" + __.margin.left + "," + __.margin.top + ")");
+
+    // scales
+    pc.autoscale();
+
+    // axes
+    if (g) {
+      g.attr("transform", function(d) { return "translate(" + xscale(d) + ")"; })
+      g.selectAll("g.axis").each(function(d) { d3.select(this).call(axis.scale(yscale[d])); })
+    };
+ 
+    pc.render();
+  };
+
+  // custom getsets
+  pc.height = function(_) {
+    if (!arguments.length) return __.height;
+    __.height  = _;
+    pc.resize();
     return this;
   };
 
+  pc.width = function(_) {
+    if (!arguments.length) return __.width;
+    __.width = _;
+    pc.resize();
+    return this;
+  };
 
-  // utility Functions
+  pc.margin = function(_) {
+    if (!arguments.length) return __.margin;
+    __.margin = _;
+    pc.resize();
+    return this;
+  };
 
   // draw single polyline
   function path(d, ctx) {
