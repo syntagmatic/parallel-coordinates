@@ -256,23 +256,24 @@ parcoords("example3")
 <pre>
 var composite_modes = [
   "source-over",
-  "source-out",
-  "destination-over",
-  "destination-atop",
   "lighter",
   "darker",
+  "destination-over",
+  "source-out",
+  "destination-atop",
   "xor",
   "copy",
 ];
 
-d3.range(4,12).forEach(function(i,mode) {
-  parcoords("example" + i)
+d3.range(0,8).forEach(function(i) {
+  parcoords("example-compositing-" + i)
     .data( data3 )
-    .color( color )
-    .composite(composite_modes[mode])
+    .color( "#029" )
+    .alpha( 0.34 )
+    .composite(composite_modes[i])
     .margin({ top: 20, left: -50, bottom: 0, right: -50 })
     .render()
-    .ctx.highlight.fillText(composite_modes[mode], 95, 10);
+    .ctx.highlight.fillText(composite_modes[i], 95, 10);
 });
 </pre>
 <script>
