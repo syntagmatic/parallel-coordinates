@@ -1,4 +1,5 @@
 <!doctype html>
+<title>Parallel Coordinates</title>
 <link rel="stylesheet" type="text/css" href="parcoords.css">
 <script src="d3.v2.js"></script>
 <script src="parcoords.js"></script>
@@ -268,8 +269,7 @@ var composite_modes = [
 d3.range(0,8).forEach(function(i) {
   parcoords("example-compositing-" + i)
     .data(data3)
-    .color("#029")
-    .alpha(0.34)
+    .alpha(0.4)
     .composite(composite_modes[i])
     .margin({ top: 20, left: -50, bottom: 0, right: -50 })
     .render()
@@ -292,8 +292,7 @@ var composite_modes = [
 d3.range(0,8).forEach(function(i) {
   parcoords("example-compositing-" + i)
     .data(data3)
-    .color("#029")
-    .alpha(0.34)
+    .alpha(0.4)
     .composite(composite_modes[i])
     .margin({ top: 20, left: -50, bottom: 0, right: -50 })
     .render()

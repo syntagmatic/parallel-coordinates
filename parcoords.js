@@ -22,7 +22,7 @@ function parcoords(container) {
     width: 600,
     height: 300,
     margin: { top: 24, right: 0, bottom: 12, left: 0 },
-    color: "steelblue",
+    color: "#069",
     compositing: "source-over",
     alpha: "0.7"
   };
