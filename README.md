@@ -160,6 +160,27 @@ parcoords.margin({
 })
 ```
 
+<a name="parcoords_composite" href="#parcoords_composite">#</a> parcoords.<b>composite</b>()
+
+Change foreground context's [globalCompositeOperation](https://developer.mozilla.org/en-US/docs/Canvas_tutorial/Compositing)
+
+* source-over
+* source-in
+* source-out
+* source-atop
+* destination-over
+* destination-in
+* destination-out
+* destination-atop
+* lighter
+* darker
+* xor
+* copy
+
+<a name="parcoords_alpha" href="#parcoords_alpha">#</a> parcoords.<b>alpha</b>()
+
+Change the opacity of the polylines, also the foreground context's globalAlpha. 
+
 <a name="parcoords_autoscale" href="#parcoords_autoscale">#</a> parcoords.<b>autoscale</b>()
 
 Set the xscale, yscale, and canvas sizes. Usually this is called automatically, such as on render() or resize() events 

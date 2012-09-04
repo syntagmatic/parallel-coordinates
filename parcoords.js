@@ -17,12 +17,14 @@ function parcoords(container) {
 
   // an experimental object suggested by Ziggy Jonsson
   var __ = {
+    dimensions: [],
+    data: [],
     width: 600,
     height: 300,
     margin: { top: 24, right: 0, bottom: 12, left: 0 },
-    color: "rgba(0,100,160,0.7)",
-    data: [],
-    dimensions: [],
+    color: "steelblue",
+    compositing: "source-over",
+    alpha: "0.7"
   };
 
   // expose the state of the chart
@@ -83,6 +85,8 @@ function parcoords(container) {
     // default styles
     ctx.foreground.strokeStyle = __.color;
     ctx.foreground.lineWidth = 1.4;
+    ctx.foreground.globalCompositeOperation = __.composite;
+    ctx.foreground.globalAlpha = __.alpha;
     ctx.highlight.lineWidth = 3;
     ctx.background.strokeStyle = "rgba(140,140,140,0.25)";
     ctx.background.fillStyle = "rgba(255,255,255,0.4)";
@@ -251,6 +255,20 @@ function parcoords(container) {
     if (!arguments.length) return __.margin;
     __.margin = _;
     pc.resize();
+    return this;
+  };
+
+  pc.composite = function(_) {
+    if (!arguments.length) return __.composite;
+    __.composite = _;
+    ctx.foreground.globalCompositeOperation = __.composite;
+    return this;
+  };
+
+  pc.alpha = function(_) {
+    if (!arguments.length) return __.alpha;
+    __.alpha = _;
+    ctx.foreground.globalAlpha = __.alpha;
     return this;
   };
 

@@ -43,6 +43,9 @@
     font-weight: normal;
     font-size: 0.5em;
   }
+  .float {
+    float: left;
+  }
 </style>
 <a href="https://github.com/syntagmatic/parallel-coordinates"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
 <h1>Parallel Coordinates <small>(beta)</small></h1>
@@ -53,7 +56,7 @@
 <p>
 Getting started is easy.
 </p>
-<div id="example" class="parcoords" style="width:300px;height:150px"></div>
+<div id="example" class="parcoords" style="width:360px;height:150px"></div>
 <p>
 Make a container div in HTML
 </p>
@@ -161,7 +164,7 @@ var pc2 = parcoords("example2");
 
 pc2.dimensions( dimensions2 )
   .data( data2 )
-  .color("rgba(0,80,0,0.26)")
+  .color("olive")
   .margin({ top: 40, left: 0, bottom: 12, right: 0 })
   .render()
   .<strong>reorderable()</strong>;
@@ -187,7 +190,8 @@ var pc2 = parcoords("example2");
 
 pc2.dimensions( dimensions2 )
   .data( data2 )
-  .color("rgba(0,80,0,0.26)")
+  .color("#000")
+  .alpha(0.2)
   .margin({ top: 40, left: 0, bottom: 12, right: 0 })
   .render()
   .reorderable();
@@ -207,8 +211,7 @@ var data3 = d3.range(-2*Math.PI,4*Math.PI,Math.PI/40)
   });
 
 var color = function(d) {
-  var c = d3.hcl(Math.round(180*d["x"])/Math.PI, 50, 55).rgb();
-  return "rgba(" + c.r + "," + c.g + "," + c.b + ",0.5)" ;
+  return d3.hcl(Math.round(180*d["x"])/Math.PI, 50, 55).toString();
 };
 
 parcoords("example3")
@@ -229,8 +232,7 @@ var data3 = d3.range(-2*Math.PI,2*Math.PI,Math.PI/40)
   });
 
 var color = function(d) {
-  var c = d3.hcl(Math.round(180*d["x"])/Math.PI, 50, 55).rgb();
-  return "rgba(" + c.r + "," + c.g + "," + c.b + ",0.5)" ;
+  return d3.hcl(Math.round(180*d["x"])/Math.PI, 50, 55).toString();
 };
 
 parcoords("example3")
@@ -239,4 +241,60 @@ parcoords("example3")
   .color( color )
   .render()
   .brushable();
+</script>
+<h3>Composite and Opacity</h3>
+<p>Control <a href="https://developer.mozilla.org/en-US/docs/Canvas_tutorial/Compositing">compositing<a> and opacity with <b>composite()</b> and <b>alpha()</b>.</p>
+<div id="example-compositing-0" class="parcoords float" style="width:360px;height:150px"></div>
+<div id="example-compositing-1" class="parcoords float" style="width:360px;height:150px"></div>
+<div id="example-compositing-2" class="parcoords float" style="width:360px;height:150px"></div>
+<div id="example-compositing-3" class="parcoords float" style="width:360px;height:150px"></div>
+<div id="example-compositing-4" class="parcoords float" style="width:360px;height:150px"></div>
+<div id="example-compositing-5" class="parcoords float" style="width:360px;height:150px"></div>
+<div id="example-compositing-6" class="parcoords float" style="width:360px;height:150px"></div>
+<div id="example-compositing-7" class="parcoords float" style="width:360px;height:150px"></div>
+<div style="clear:both"></div>
+<pre>
+var composite_modes = [
+  "source-over",
+  "source-out",
+  "destination-over",
+  "destination-atop",
+  "lighter",
+  "darker",
+  "xor",
+  "copy",
+];
+
+d3.range(4,12).forEach(function(i,mode) {
+  parcoords("example" + i)
+    .data( data3 )
+    .color( color )
+    .composite(composite_modes[mode])
+    .margin({ top: 20, left: -50, bottom: 0, right: -50 })
+    .render()
+    .ctx.highlight.fillText(composite_modes[mode], 95, 10);
+});
+</pre>
+<script>
+var composite_modes = [
+  "source-over",
+  "lighter",
+  "darker",
+  "destination-over",
+  "source-out",
+  "destination-atop",
+  "xor",
+  "copy",
+];
+
+d3.range(0,8).forEach(function(i) {
+  parcoords("example-compositing-" + i)
+    .data( data3 )
+    .color( "#029" )
+    .alpha( 0.34 )
+    .composite(composite_modes[i])
+    .margin({ top: 20, left: -50, bottom: 0, right: -50 })
+    .render()
+    .ctx.highlight.fillText(composite_modes[i], 95, 10);
+});
 </script>
