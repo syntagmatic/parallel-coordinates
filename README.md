@@ -20,7 +20,7 @@ An implementation of parallel coordinates in d3 as a [reusable chart](http://bos
 
 ### Books
 
-* [Parallel Coordinates: Visual Multidimensional Geometry and Its Applications](http://www.amazon.com/Parallel-Coordinates-Multidimensional-Geometry-Applications/dp/0387215077/), Alfred Inselberg. This book contains an Interactive Learning Module (ILM) with interactive examples of the mathematical properties of parallel coordinates.
+* [Parallel Coordinates: Visual Multidimensional Geometry and Its Applications](http://www.amazon.com/Parallel-Coordinates-Multidimensional-Geometry-Applications/dp/0387215077/), Alfred Inselberg.
 
 ### Videos
 
