@@ -92,7 +92,7 @@ var data = [
 ];
 
 // create a parallel coordinates plot
-parcoords("example")
+var pc_simple = parcoords("example")
   .data(data)
   .render();
 </script>
@@ -267,13 +267,14 @@ var composite_modes = [
 
 d3.range(0,8).forEach(function(i) {
   parcoords("example-compositing-" + i)
-    .data( data3 )
-    .color( "#029" )
-    .alpha( 0.34 )
+    .data(data3)
+    .color("#029")
+    .alpha(0.34)
     .composite(composite_modes[i])
     .margin({ top: 20, left: -50, bottom: 0, right: -50 })
     .render()
-    .ctx.highlight.fillText(composite_modes[i], 95, 10);
+    .axisDots()
+    .ctx.highlight.fillText(composite_modes[i], 110, 10);
 });
 </pre>
 <script>
@@ -290,12 +291,13 @@ var composite_modes = [
 
 d3.range(0,8).forEach(function(i) {
   parcoords("example-compositing-" + i)
-    .data( data3 )
-    .color( "#029" )
-    .alpha( 0.34 )
+    .data(data3)
+    .color("#029")
+    .alpha(0.34)
     .composite(composite_modes[i])
     .margin({ top: 20, left: -50, bottom: 0, right: -50 })
     .render()
-    .ctx.highlight.fillText(composite_modes[i], 95, 10);
+    .axisDots()
+    .ctx.highlight.fillText(composite_modes[i], 110, 10);
 });
 </script>

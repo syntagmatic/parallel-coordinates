@@ -48,7 +48,7 @@ function parcoords(container) {
       ctx = {};
 
   // canvas data layers
-  ["background", "foreground", "highlight"].forEach(function(layer) {
+  ["background", "marks", "foreground", "highlight"].forEach(function(layer) {
     ctx[layer] = container
       .append("canvas")
         .attr("class", layer)
@@ -113,8 +113,20 @@ function parcoords(container) {
     return this;
   };
 
+  pc.axisDots = function() {
+    var ctx = pc.ctx.marks;
+    ctx.globalAlpha = d3.min([1/Math.pow(data.length, 1/2), 1]);
+    __.data.forEach(function(d) {
+      __.dimensions.map(function(p,i) {
+        ctx.fillRect(position(p)-0.75,yscale[p](d[p])-0.75,1.5,1.5);
+      });
+    });
+    return this;
+  };
+
   pc.clear = function(layer) {
     ctx[layer].clearRect(0,0,w()+1,h()+1);
+    return this;
   };
 
   pc.createAxes = function() {
