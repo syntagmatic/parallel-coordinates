@@ -18,11 +18,6 @@
     margin: 0 20px;
     padding: 0;
   }
-  li {
-    list-style: none;
-    padding: 6px 3px;
-    border-bottom: 1px solid #ddd;
-  }
   #example,
   #example-axes,
   #example1,
@@ -243,8 +238,14 @@ parcoords("example3")
   .render()
   .brushable();
 </script>
-<h3>Composite and Opacity</h3>
+<h3>Compositing and Opacity</h3>
 <p>Control <a href="https://developer.mozilla.org/en-US/docs/Canvas_tutorial/Compositing">compositing<a> and opacity with <b>composite()</b> and <b>alpha()</b>.</p>
+<ul>
+  <li>source-over is the default, drawing new lines over rendered lines</li>
+  <li>lighter makes dense intersections glow</li>
+  <li>darker makes dense intersections darken</li>
+  <li>destination-over new lines underneath rendered lines</li>
+</ul>
 <div id="example-compositing-0" class="parcoords float" style="width:360px;height:150px"></div>
 <div id="example-compositing-1" class="parcoords float" style="width:360px;height:150px"></div>
 <div id="example-compositing-2" class="parcoords float" style="width:360px;height:150px"></div>
@@ -266,11 +267,17 @@ var composite_modes = [
   "copy",
 ];
 
+var color = d3.scale.linear()
+  .domain([-1, 1])
+  .range(["cadetblue", "#049"])
+  .interpolate(d3.interpolateLab);
+
 d3.range(0,8).forEach(function(i) {
   parcoords("example-compositing-" + i)
     .data(data3)
-    .alpha(0.4)
+    .alpha(0.5)
     .composite(composite_modes[i])
+    .color(function(d) { return color(Math.sin(d.x*10)); })
     .margin({ top: 20, left: -50, bottom: 0, right: -50 })
     .render()
     .axisDots()
@@ -289,11 +296,17 @@ var composite_modes = [
   "copy",
 ];
 
+var color = d3.scale.linear()
+  .domain([-1, 1])
+  .range(["cadetblue", "#049"])
+  .interpolate(d3.interpolateLab);
+
 d3.range(0,8).forEach(function(i) {
   parcoords("example-compositing-" + i)
     .data(data3)
-    .alpha(0.4)
+    .alpha(0.5)
     .composite(composite_modes[i])
+    .color(function(d) { return color(Math.sin(d.x*10)); })
     .margin({ top: 20, left: -50, bottom: 0, right: -50 })
     .render()
     .axisDots()
