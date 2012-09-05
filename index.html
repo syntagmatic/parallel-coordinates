@@ -77,21 +77,11 @@ var <strong>data</strong> = [
 Create a parallel coordinates plot
 </p>
 <pre>
-// make some data
-var data = [
-  [1, 0.7, 2, 42],
-  [0.4, 0.9, 1, 20],
-  [0.9, 0.2, 3, 19],
-  [0.1, 0, 1, 25]
-];
-
-// create a parallel coordinates plot
 var pc_simple = d3.parcoords()("#example")
   .data(data)
   .render();
 </pre>
 <script>
-// make some data
 var data = [
   [1, 0.7, 2, 42],
   [0.4, 0.9, 1, 20],
@@ -99,7 +89,6 @@ var data = [
   [0.1, 0, 1, 25]
 ];
 
-// create a parallel coordinates plot
 var pc_simple = d3.parcoords()("#example")
   .data(data)
   .render();

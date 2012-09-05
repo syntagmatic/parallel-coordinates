@@ -234,3 +234,7 @@ Custom values must be passed into the original chart config to register events.
 * *"color"*
 * *"composite"*
 * *"alpha"*
+
+## Credits
+
+This library created with examples and suggestions from Mike Bostock, Jason Davies, Alfred Inselberg, Mary Becica, Stephen Boak, Ziggy Jonsson, Ger Hobbelt, Johan Sundström, Raffael Marty and Bob Monteverde.
