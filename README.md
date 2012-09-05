@@ -40,9 +40,13 @@ An implementation of parallel coordinates in d3 as a [reusable chart](http://bos
 
 ## API
 
-<a name="parcoords" href="#parcoords">#</a> <b>parcoords</b>(<i>container_id</i>)
+<a name="d3_parcoords" href="#d3_parcoords">#</a> d3.<b>parcoords</b>(<i>config</i>)
 
-Creates a new parallel coordinates chart within the container. By default the chart will fill the container with margins on the top and bottom. There will also be margins on the left and right equal to half a column width.
+Setup a new parallel coordinates chart.
+
+<a name="parcoords" href="#parcoords">#</a> <b>parcoords</b>(<i>selector</i>)
+
+Create the chart within a container. The selector can also be a [d3 selection](https://github.com/mbostock/d3/wiki/Selections).
 
 <a name="parcoords_data" href="#parcoords_data">#</a> parcoords.<b>data</b>([<i>values</i>])
 

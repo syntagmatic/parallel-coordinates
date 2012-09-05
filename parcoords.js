@@ -9,12 +9,7 @@ d3.getset = function(_)  {
   });
 }
 
-function parcoords(container) {
-
-  var pc = {};
-
-  var container = d3.select("#" + container);
-
+d3.parcoords = function(config) {
   // an experimental object suggested by Ziggy Jonsson
   var __ = {
     dimensions: [],
@@ -27,13 +22,38 @@ function parcoords(container) {
     alpha: "0.7"
   };
 
+  extend(__, config);
+
+  var pc = function(selection) {
+    selection = pc.selection = d3.select(selection);
+
+    // set width and height
+    __.width = selection[0][0].clientWidth;
+    __.height = selection[0][0].clientHeight;
+
+    // canvas data layers
+    ["background", "marks", "foreground", "highlight"].forEach(function(layer) {
+      ctx[layer] = selection
+        .append("canvas")
+          .attr("class", layer)
+          [0][0].getContext("2d");
+    });
+
+    // svg tick and brush layers
+    var svg = pc.svg = selection
+      .append("svg")
+        .attr("width", __.width)
+        .attr("height", __.height)
+      .append("svg:g")
+        .attr("transform", "translate(" + __.margin.left + "," + __.margin.top + ")");
+
+    return pc;
+  };
+
+
   // expose the state of the chart
   pc.__ = __;
   d3.getset.call(pc, __);
-
-  // set width and height
-  pc.width(container[0][0].clientWidth);
-  pc.height(container[0][0].clientHeight);
 
   var events = d3.dispatch("render", "resize"),
       w = function() { return __.width - __.margin.right - __.margin.left; },
@@ -46,22 +66,6 @@ function parcoords(container) {
       brushed,
       g,                            // groups for axes, brushes
       ctx = {};
-
-  // canvas data layers
-  ["background", "marks", "foreground", "highlight"].forEach(function(layer) {
-    ctx[layer] = container
-      .append("canvas")
-        .attr("class", layer)
-        [0][0].getContext("2d");
-  });
-
-  // svg tick and brush layers
-  var svg = pc.svg = container
-    .append("svg")
-      .attr("width", __.width)
-      .attr("height", __.height)
-    .append("svg:g")
-      .attr("transform", "translate(" + __.margin.left + "," + __.margin.top + ")");
 
   pc.autoscale = function() {
     // xscale
@@ -76,7 +80,7 @@ function parcoords(container) {
     });
 
     // canvas sizes 
-    container.selectAll("canvas")
+    pc.selection.selectAll("canvas")
         .style("margin-top", __.margin.top + "px") 
         .style("margin-left", __.margin.left + "px") 
         .attr("width", w())
@@ -95,7 +99,7 @@ function parcoords(container) {
   };
 
   pc.detectDimensions = function() {
-    __.dimensions = parcoords.quantitative(__.data);
+    __.dimensions = d3.parcoords.quantitative(__.data);
     return this;
   };
 
@@ -131,7 +135,7 @@ function parcoords(container) {
 
   pc.createAxes = function() {
     // Add a group element for each dimension.
-    g = svg.selectAll(".dimension")
+    g = pc.svg.selectAll(".dimension")
         .data(__.dimensions)
       .enter().append("svg:g")
         .attr("class", "dimension")
@@ -217,11 +221,11 @@ function parcoords(container) {
 
   // rescale for height, width and margins
   pc.resize = function() {
-    // container size
-    container.select("svg") 
+    // selection size
+    pc.selection.select("svg") 
       .attr("width", __.width)
       .attr("height", __.height)
-    svg.attr("transform", "translate(" + __.margin.left + "," + __.margin.top + ")");
+    pc.svg.attr("transform", "translate(" + __.margin.left + "," + __.margin.top + ")");
 
     // scales
     pc.autoscale();
@@ -233,6 +237,7 @@ function parcoords(container) {
     };
  
     pc.render();
+    return this;
   };
 
   // highlight an array of data
@@ -241,11 +246,13 @@ function parcoords(container) {
     ctx.highlight.fillStyle = "rgba(255,255,255,0.8)";
     ctx.highlight.fillRect(-1,-1,w()+2,h()+2);
     data.forEach(path_highlight);
+    return this;
   };
 
   // clear highlighting
   pc.unhighlight = function(data) {
     pc.clear("highlight");
+    return this;
   };
 
   // custom getsets
@@ -360,13 +367,20 @@ function parcoords(container) {
     return path(d, ctx.highlight);
   };
 
+  function extend(target, source) {
+    for (key in source) {
+      target[key] = source[key];
+    }
+    return target;
+  };
+
   return pc;
 };
 
-parcoords.version = "beta";
+d3.parcoords.version = "beta";
 
 // quantitative dimensions based on numerical or null values in the first row
-parcoords.quantitative = function(data) {
+d3.parcoords.quantitative = function(data) {
   return d3.keys(data[0])
     .filter(function(col) {
       var v = data[0][col];
@@ -375,7 +389,7 @@ parcoords.quantitative = function(data) {
 };
 
 // pairs of adjacent dimensions
-parcoords.adjacent_pairs = function(arr) {
+d3.parcoords.adjacent_pairs = function(arr) {
   var ret = [];
   for (var i = 0; i < arr.length-1; i++) {
     ret.push([arr[i],arr[i+1]]);

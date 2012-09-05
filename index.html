@@ -77,8 +77,17 @@ var <strong>data</strong> = [
 Create a parallel coordinates plot
 </p>
 <pre>
-parcoords("<strong>example</strong>")
-  .data(<strong>data</strong>)
+// make some data
+var data = [
+  [1, 0.7, 2, 42],
+  [0.4, 0.9, 1, 20],
+  [0.9, 0.2, 3, 19],
+  [0.1, 0, 1, 25]
+];
+
+// create a parallel coordinates plot
+var pc_simple = d3.parcoords()("#example")
+  .data(data)
   .render();
 </pre>
 <script>
@@ -91,7 +100,7 @@ var data = [
 ];
 
 // create a parallel coordinates plot
-var pc_simple = parcoords("example")
+var pc_simple = d3.parcoords()("#example")
   .data(data)
   .render();
 </script>
@@ -99,13 +108,13 @@ var pc_simple = parcoords("example")
 <p>Add axes to the plot with <strong>createAxes()</strong></p>
 <div id="example-axes" class="parcoords" style="width:300px;height:150px"></div>
 <pre>
-var pc = parcoords("example-axes")
+var pc = d3.parcoords()("#example-axes")
   .data(data)
   .render()
-  .<strong>createAxes()</strong>;
+  .createAxes();
 </pre>
 <script>
-var pc = parcoords("example-axes")
+var pc = d3.parcoords()("#example-axes")
   .data(data)
   .render()
   .createAxes();
@@ -116,8 +125,9 @@ var pc = parcoords("example-axes")
 Load external data from a csv file. Enable brushing by clicking and dragging on the axis lines.
 </p>
 <pre>
+var pc1;
 d3.csv('data/movies.csv', function(data) {
-  parcoords("example1")
+  pc1 = d3.parcoords()("#example1")
     .data(data)
     .render()
     .brushable();
@@ -126,7 +136,7 @@ d3.csv('data/movies.csv', function(data) {
 <script>
 var pc1;
 d3.csv('data/movies.csv', function(data) {
-  pc1 = parcoords("example1")
+  pc1 = d3.parcoords()("#example1")
     .data(data)
     .render()
     .brushable();
@@ -161,14 +171,15 @@ var dimensions2 = d3.keys(data2[0]);
 </pre>
 <p>Set up the chart, with reordering enabled</p>
 <pre>
-var pc2 = parcoords("example2");
+var pc2 = d3.parcoords()("#example2");
 
 pc2.dimensions(dimensions2)
   .data(data2)
-  .color("olive")
+  .color("#000")
+  .alpha(0.2)
   .margin({ top: 40, left: 0, bottom: 12, right: 0 })
   .render()
-  .<strong>reorderable()</strong>;
+  .reorderable();
 </pre>
 <script>
 var data2 = d3.range(0,2*Math.PI,Math.PI/40)
@@ -187,7 +198,7 @@ var data2 = d3.range(0,2*Math.PI,Math.PI/40)
 
 // get list of dimensions
 var dimensions2 = d3.keys(data2[0]);
-var pc2 = parcoords("example2");
+var pc2 = d3.parcoords()("#example2");
 
 pc2.dimensions(dimensions2)
   .data(data2)
@@ -201,13 +212,12 @@ pc2.dimensions(dimensions2)
 <div id="example3" class="parcoords"></div>
 <p>Set the <strong>color()</strong> to a function to color polylines based on the data</p>
 <pre>
-var data3 = d3.range(-2*Math.PI,4*Math.PI,Math.PI/40)
+var data3 = d3.range(-2*Math.PI,2*Math.PI,Math.PI/40)
   .map(function(x) {
     return {
       x: x,
       "sin(x)": Math.sin(x),
       "cos(x)": Math.cos(x),
-      "atan(x)": Math.atan(x)
     };
   });
 
@@ -215,12 +225,12 @@ var color = function(d) {
   return d3.hcl(Math.round(180*d["x"])/Math.PI, 50, 55).toString();
 };
 
-parcoords("example3")
+d3.parcoords()("#example3")
   .dimensions(d3.keys(data3[0]))
   .data(data3)
+  .color(color)
   .render()
-  .brushable()
-  .color(color);
+  .brushable();
 </pre>
 <script>
 var data3 = d3.range(-2*Math.PI,2*Math.PI,Math.PI/40)
@@ -236,7 +246,7 @@ var color = function(d) {
   return d3.hcl(Math.round(180*d["x"])/Math.PI, 50, 55).toString();
 };
 
-parcoords("example3")
+d3.parcoords()("#example3")
   .dimensions(d3.keys(data3[0]))
   .data(data3)
   .color(color)
@@ -251,14 +261,14 @@ parcoords("example3")
   <li>darker makes dense intersections darken</li>
   <li>destination-over new lines underneath rendered lines</li>
 </ul>
-<div id="example-compositing-0" class="parcoords float" style="width:360px;height:150px"></div>
-<div id="example-compositing-1" class="parcoords float" style="width:360px;height:150px"></div>
-<div id="example-compositing-2" class="parcoords float" style="width:360px;height:150px"></div>
-<div id="example-compositing-3" class="parcoords float" style="width:360px;height:150px"></div>
-<div id="example-compositing-4" class="parcoords float" style="width:360px;height:150px"></div>
-<div id="example-compositing-5" class="parcoords float" style="width:360px;height:150px"></div>
-<div id="example-compositing-6" class="parcoords float" style="width:360px;height:150px"></div>
-<div id="example-compositing-7" class="parcoords float" style="width:360px;height:150px"></div>
+<div id="example-compositing-0" class="parcoords parcoords-compositing float" style="width:360px;height:150px"></div>
+<div id="example-compositing-1" class="parcoords parcoords-compositing float" style="width:360px;height:150px"></div>
+<div id="example-compositing-2" class="parcoords parcoords-compositing float" style="width:360px;height:150px"></div>
+<div id="example-compositing-3" class="parcoords parcoords-compositing float" style="width:360px;height:150px"></div>
+<div id="example-compositing-4" class="parcoords parcoords-compositing float" style="width:360px;height:150px"></div>
+<div id="example-compositing-5" class="parcoords parcoords-compositing float" style="width:360px;height:150px"></div>
+<div id="example-compositing-6" class="parcoords parcoords-compositing float" style="width:360px;height:150px"></div>
+<div id="example-compositing-7" class="parcoords parcoords-compositing float" style="width:360px;height:150px"></div>
 <div style="clear:both"></div>
 <p class="centered">
 Use this slider to change opacity!<br/>
@@ -268,8 +278,8 @@ Use this slider to change opacity!<br/>
 var composite_modes = [
   "source-over",
   "lighter",
-  "darker",
   "destination-over",
+  "darker",
   "source-out",
   "destination-atop",
   "xor",
@@ -283,19 +293,20 @@ var color = d3.scale.linear()
 
 var pc_compositing = {};
 
-d3.range(0,8).forEach(function(i) {
-  var mode = composite_modes[i];
-  pc_compositing[mode] = parcoords("example-compositing-" + i)
-    .data(data3)
-    .alpha(0.5)
-    .composite(mode)
-    .color(function(d) { return color(Math.sin(d.x*10)); })
-    .margin({ top: 20, left: -50, bottom: 0, right: -50 })
-    .render()
-    .axisDots();
+d3.selectAll(".parcoords-compositing")
+  .each(function(d,i) {
+    var mode = composite_modes[i];
+    pc_compositing[mode] = d3.parcoords()(this)
+      .data(data3)
+      .alpha(0.5)
+      .composite(mode)
+      .color(function(d) { return color(Math.sin(d.x*10)); })
+      .margin({ top: 20, left: -50, bottom: 0, right: -50 })
+      .render()
+      .axisDots();
 
-  pc_compositing[mode].ctx.highlight.fillText(mode, 110, 10);
-});
+    pc_compositing[mode].ctx.highlight.fillText(mode, 110, 10);
+  });
 
 d3.select("#compositing-opacity").on("change", function() {
   for (mode in pc_compositing) {
@@ -322,19 +333,20 @@ var color = d3.scale.linear()
 
 var pc_compositing = {};
 
-d3.range(0,8).forEach(function(i) {
-  var mode = composite_modes[i];
-  pc_compositing[mode] = parcoords("example-compositing-" + i)
-    .data(data3)
-    .alpha(0.5)
-    .composite(mode)
-    .color(function(d) { return color(Math.sin(d.x*10)); })
-    .margin({ top: 20, left: -50, bottom: 0, right: -50 })
-    .render()
-    .axisDots();
+d3.selectAll(".parcoords-compositing")
+  .each(function(d,i) {
+    var mode = composite_modes[i];
+    pc_compositing[mode] = d3.parcoords()(this)
+      .data(data3)
+      .alpha(0.5)
+      .composite(mode)
+      .color(function(d) { return color(Math.sin(d.x*10)); })
+      .margin({ top: 20, left: -50, bottom: 0, right: -50 })
+      .render()
+      .axisDots();
 
-  pc_compositing[mode].ctx.highlight.fillText(mode, 110, 10);
-});
+    pc_compositing[mode].ctx.highlight.fillText(mode, 110, 10);
+  });
 
 d3.select("#compositing-opacity").on("change", function() {
   for (mode in pc_compositing) {
