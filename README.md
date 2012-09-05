@@ -214,7 +214,7 @@ Clear the *layer*, which could be *"foreground"*, *"background"* or *"highlight"
 
 An object containing the [canvas 2d rendering contexts](https://developer.mozilla.org/en-US/docs/DOM/CanvasRenderingContext2D). Use this to modify canvas rendering styles, except for the foreground stroke which is controlled by <a href="#parcoords_autoscale">parcoords.color()</a>.
 
-<a name="parcoords_on" href="#parcoords_ctx">#</a> parcoords.<b>on</b>(*event*, *callback*)
+<a name="parcoords_on" href="#parcoords_on">#</a> parcoords.<b>on</b>(*event*, *callback*)
 
 * render
 * resize
