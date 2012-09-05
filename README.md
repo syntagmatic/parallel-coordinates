@@ -112,7 +112,7 @@ If no *color* is specified, then it returns the currently set color.
 
 Returns an object which contains the state of the chart. This is particularly useful for debugging with a JavaScript console.
 
-<a name="parcoords___" href="#parcoords___">#</a> parcoords.<b>__</b>
+<a name="parcoords_state" href="#parcoords_state">#</a> parcoords.<b>state</b>
 
 Exposes the public state of parallel coordinates. Useful for debugging in a JavaScript console. Avoid modifying values directly, instead use methods such as <a href="#parcoords_data">parcoords.data()</a> to update the state.
 
@@ -222,13 +222,15 @@ Trigger a callback when an event fires. The value of *this* in the callback refe
 
 * *render* returns no data
 * *resize* returns an object containing the width, height and margin
-* highlight returns the highlighted data
-* brush returns the brushed data
+* *highlight* returns the highlighted data
+* *brush* returns the brushed data
 
-When values in <a href="#parcoords___">parcoords.__</a> are updated through methods, an event of the same name fires (except *height*, *width* and *margin* which fire *resize*). The data passed into the callback is an object containing the new value, *value*, and the old value, *previous*.
+When values in the <a href="#parcoords_state">state</a> are updated through methods, an event of the same name fires (except *height*, *width* and *margin* which fire *resize*). The data passed into the callback is an object containing the new value, *value*, and the old value, *previous*.
 
-* dimensions
-* data
-* color
-* composite
-* alpha
+Custom values must be passed into the original chart config to register events.
+
+* *dimensions*
+* *data*
+* *color*
+* *composite*
+* *alpha*

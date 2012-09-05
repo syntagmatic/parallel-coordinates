@@ -15,7 +15,6 @@ d3.parcoords = function(config) {
   var pc = function(selection) {
     selection = pc.selection = d3.select(selection);
 
-    // set width and height
     __.width = selection[0][0].clientWidth;
     __.height = selection[0][0].clientHeight;
 
@@ -47,12 +46,14 @@ d3.parcoords = function(config) {
       line = d3.svg.line(),
       axis = d3.svg.axis().orient("left").ticks(1+__.height/50),
       brushed,
-      g,                            // groups for axes, brushes
+      g, // groups for axes, brushes
       ctx = {};
 
   // expose the state of the chart
-  pc.__ = __;
+  pc.state = __;
+  // create getter/setters
   getset(pc, __, events);
+  // expose events
   d3.rebind(pc, events, "on");
 
   pc.autoscale = function() {
@@ -74,7 +75,7 @@ d3.parcoords = function(config) {
         .attr("width", w())
         .attr("height", h())
 
-    // default styles
+    // default styles, needs to be set when canvas width changes
     ctx.foreground.strokeStyle = __.color;
     ctx.foreground.lineWidth = 1.4;
     ctx.foreground.globalCompositeOperation = __.composite;
@@ -144,7 +145,6 @@ d3.parcoords = function(config) {
           "class": "label"
         })
         .text(String)
-
     return this;
   };
 
@@ -165,7 +165,6 @@ d3.parcoords = function(config) {
         .style("visibility", null)
         .attr("x", -15)
         .attr("width", 30)
-
     return this;
   };
 
@@ -190,8 +189,7 @@ d3.parcoords = function(config) {
           delete dragging[d];
           d3.select(this).transition().attr("transform", "translate(" + xscale(d) + ")");
           pc.render();
-        }))
-
+        }));
     return this;
   };
 
@@ -228,7 +226,6 @@ d3.parcoords = function(config) {
  
     pc.render();
     events.resize.call(this, {width: __.width, height: __.height, margin: __.margin});
-
     return this;
   };
 
