@@ -11,6 +11,7 @@ An implementation of parallel coordinates in d3 as a [reusable chart](http://bos
 * [Better Know a Visualization: Parallel Coordinates](http://www.juiceanalytics.com/writing/parallel-coordinates/), Zach Gemignani
 * [Multivariate Analysis Using Parallel Coordinates](http://www.b-eye-network.com/view/3355), Stephen Few
 * [Edward Tufte's "Slopegraphs"](http://charliepark.org/slopegraphs/), Charlie Park
+* [Data Visualization's Final Frontier](http://smartdatacollective.com/j-kevin-byrne/52031/data-visualizations-final-frontier), J. Kevin Byrne
 
 ### Papers
 
