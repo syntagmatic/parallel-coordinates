@@ -114,7 +114,8 @@ Load external data from a csv file. Enable brushing by clicking and dragging on 
 </p>
 <pre>
 d3.csv('data/movies.csv', function(data) {
-  parcoords("example1").data( data )
+  parcoords("example1")
+    .data(data)
     .render()
     .brushable();
 });
@@ -122,7 +123,8 @@ d3.csv('data/movies.csv', function(data) {
 <script>
 var pc1;
 d3.csv('data/movies.csv', function(data) {
-  pc1 = parcoords("example1").data( data )
+  pc1 = parcoords("example1")
+    .data(data)
     .render()
     .brushable();
 });
@@ -158,8 +160,8 @@ var dimensions2 = d3.keys(data2[0]);
 <pre>
 var pc2 = parcoords("example2");
 
-pc2.dimensions( dimensions2 )
-  .data( data2 )
+pc2.dimensions(dimensions2)
+  .data(data2)
   .color("olive")
   .margin({ top: 40, left: 0, bottom: 12, right: 0 })
   .render()
@@ -184,8 +186,8 @@ var data2 = d3.range(0,2*Math.PI,Math.PI/40)
 var dimensions2 = d3.keys(data2[0]);
 var pc2 = parcoords("example2");
 
-pc2.dimensions( dimensions2 )
-  .data( data2 )
+pc2.dimensions(dimensions2)
+  .data(data2)
   .color("#000")
   .alpha(0.2)
   .margin({ top: 40, left: 0, bottom: 12, right: 0 })
@@ -211,8 +213,8 @@ var color = function(d) {
 };
 
 parcoords("example3")
-  .dimensions( d3.keys(data3[0]) )
-  .data( data3 )
+  .dimensions(d3.keys(data3[0]))
+  .data(data3)
   .render()
   .brushable()
   .color(color);
@@ -232,9 +234,9 @@ var color = function(d) {
 };
 
 parcoords("example3")
-  .dimensions( d3.keys(data3[0]) )
-  .data( data3 )
-  .color( color )
+  .dimensions(d3.keys(data3[0]))
+  .data(data3)
+  .color(color)
   .render()
   .brushable();
 </script>
@@ -275,8 +277,8 @@ var color = d3.scale.linear()
 d3.range(0,8).forEach(function(i) {
   parcoords("example-compositing-" + i)
     .data(data3)
-    .alpha(0.5)
-    .composite(composite_modes[i])
+    .<strong>alpha(0.5)</strong>
+    .<strong>composite(composite_modes[i])</strong>
     .color(function(d) { return color(Math.sin(d.x*10)); })
     .margin({ top: 20, left: -50, bottom: 0, right: -50 })
     .render()
