@@ -50,12 +50,7 @@ d3.parcoords = function(config) {
     return pc;
   };
 
-
-  // expose the state of the chart
-  pc.__ = __;
-  d3.getset.call(pc, __);
-
-  var events = d3.dispatch("render", "resize"),
+  var events = d3.dispatch("render", "resize", "highlight", "brush"),
       w = function() { return __.width - __.margin.right - __.margin.left; },
       h = function() { return __.height - __.margin.top - __.margin.bottom },
       xscale = d3.scale.ordinal(),
@@ -66,6 +61,11 @@ d3.parcoords = function(config) {
       brushed,
       g,                            // groups for axes, brushes
       ctx = {};
+
+  // expose the state of the chart
+  pc.__ = __;
+  d3.getset.call(pc, __);
+  d3.rebind(pc, events, "on");
 
   pc.autoscale = function() {
     // xscale
@@ -114,6 +114,8 @@ d3.parcoords = function(config) {
     } else {
       __.data.forEach(path_foreground);
     }
+    events.render();
+
     return this;
   };
 
@@ -211,6 +213,7 @@ d3.parcoords = function(config) {
     brushed = selected();  
     pc.render();
     extent_area();
+    events.brush(pc.brushed());
   };
 
   // expose a few objects
@@ -237,6 +240,8 @@ d3.parcoords = function(config) {
     };
  
     pc.render();
+    events.resize();
+
     return this;
   };
 
@@ -246,6 +251,7 @@ d3.parcoords = function(config) {
     ctx.highlight.fillStyle = "rgba(255,255,255,0.8)";
     ctx.highlight.fillRect(-1,-1,w()+2,h()+2);
     data.forEach(path_highlight);
+    events.highlight();
     return this;
   };
 
