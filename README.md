@@ -216,21 +216,21 @@ Clear the *layer*, which could be *"foreground"*, *"background"* or *"highlight"
 
 An object containing the [canvas 2d rendering contexts](https://developer.mozilla.org/en-US/docs/DOM/CanvasRenderingContext2D). Use this to modify canvas rendering styles, except for the foreground stroke which is controlled by <a href="#parcoords_autoscale">parcoords.color()</a>.
 
-<a name="parcoords_on" href="#parcoords_on">#</a> parcoords.<b>on</b>(*event*, *callback*)
+<a name="parcoords_on" href="#parcoords_on">#</a> parcoords.<b>on</b>(*event*, *listener*)
 
-Trigger a callback when an event fires. The value of *this* in the callback refers to parcoords. The data passed into the callback depends on the event.
+Trigger a *listener* when an event fires. The value of *this* in the listener refers to parcoords. The data passed into the listener depends on type of event:
 
-* *render* returns no data
-* *resize* returns an object containing the width, height and margin
-* *highlight* returns the highlighted data
-* *brush* returns the brushed data
+* *"render"* returns no data
+* *"resize"* returns an object containing the width, height and margin
+* *"highlight"* returns the highlighted data
+* *"brush"* returns the brushed data
 
-When values in the <a href="#parcoords_state">state</a> are updated through methods, an event of the same name fires (except *height*, *width* and *margin* which fire *resize*). The data passed into the callback is an object containing the new value, *value*, and the old value, *previous*.
+When values in the <a href="#parcoords_state">state</a> are updated through methods, an event of the same name fires (except *height*, *width* and *margin* which fire *resize*). The data passed into the listener is an object containing the new value, *value*, and the old value, *previous*.
 
 Custom values must be passed into the original chart config to register events.
 
-* *dimensions*
-* *data*
-* *color*
-* *composite*
-* *alpha*
+* *"dimensions"*
+* *"data"*
+* *"color"*
+* *"composite"*
+* *"alpha"*
