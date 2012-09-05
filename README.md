@@ -118,6 +118,8 @@ Exposes the public state of parallel coordinates. Useful for debugging in a Java
 
 The design of this object is experimental and contributed by Ziggy Jonsson. Read more at this [d3-js mailing list discussion](https://groups.google.com/forum/?fromgroups=#!topic/d3-js/F2IspJnDbEs).
 
+When the public state is updated through a method, an <a href="#parcoords_on">event</a> will fire.
+
 <a name="parcoords_createAxes" href="#parcoords_createAxes">#</a> parcoords.<b>createAxes</b>()
 
 Create static SVG axes with dimension names, ticks, and labels.
@@ -216,7 +218,17 @@ An object containing the [canvas 2d rendering contexts](https://developer.mozill
 
 <a name="parcoords_on" href="#parcoords_on">#</a> parcoords.<b>on</b>(*event*, *callback*)
 
-* render
-* resize
-* highlight
-* brush
+Trigger a callback when an event fires. The value of *this* in the callback refers to parcoords. The data passed into the callback depends on the event.
+
+* *render* returns no data
+* *resize* returns an object containing the width, height and margin
+* highlight returns the highlighted data
+* brush returns the brushed data
+
+When values in <a href="#parcoords___">parcoords.__</a> are updated through methods, an event of the same name fires (except *height*, *width* and *margin* which fire *resize*). The data passed into the callback is an object containing the new value, *value*, and the old value, *previous*.
+
+* dimensions
+* data
+* color
+* composite
+* alpha

@@ -1,16 +1,4 @@
-d3.getset = function(_)  {
-  var self = this
-  Object.keys(_).forEach(function(key) {   
-    self[key] = function(x) {
-      if (!arguments.length) return _[key];
-      _[key] = x;
-      return self;
-    }
-  });
-}
-
 d3.parcoords = function(config) {
-  // an experimental object suggested by Ziggy Jonsson
   var __ = {
     dimensions: [],
     data: [],
@@ -18,7 +6,7 @@ d3.parcoords = function(config) {
     height: 300,
     margin: { top: 24, right: 0, bottom: 12, left: 0 },
     color: "#069",
-    compositing: "source-over",
+    composite: "source-over",
     alpha: "0.7"
   };
 
@@ -50,7 +38,7 @@ d3.parcoords = function(config) {
     return pc;
   };
 
-  var events = d3.dispatch("render", "resize", "highlight", "brush"),
+  var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush"].concat(d3.keys(__))),
       w = function() { return __.width - __.margin.right - __.margin.left; },
       h = function() { return __.height - __.margin.top - __.margin.bottom },
       xscale = d3.scale.ordinal(),
@@ -64,7 +52,7 @@ d3.parcoords = function(config) {
 
   // expose the state of the chart
   pc.__ = __;
-  d3.getset.call(pc, __);
+  getset(pc, __, events);
   d3.rebind(pc, events, "on");
 
   pc.autoscale = function() {
@@ -114,8 +102,7 @@ d3.parcoords = function(config) {
     } else {
       __.data.forEach(path_foreground);
     }
-    events.render();
-
+    events.render.call(this);
     return this;
   };
 
@@ -213,7 +200,7 @@ d3.parcoords = function(config) {
     brushed = selected();  
     pc.render();
     extent_area();
-    events.brush(pc.brushed());
+    events.brush.call(pc,brushed);
   };
 
   // expose a few objects
@@ -240,7 +227,7 @@ d3.parcoords = function(config) {
     };
  
     pc.render();
-    events.resize();
+    events.resize.call(this, {width: __.width, height: __.height, margin: __.margin});
 
     return this;
   };
@@ -251,7 +238,7 @@ d3.parcoords = function(config) {
     ctx.highlight.fillStyle = "rgba(255,255,255,0.8)";
     ctx.highlight.fillRect(-1,-1,w()+2,h()+2);
     data.forEach(path_highlight);
-    events.highlight();
+    events.highlight.call(this,data);
     return this;
   };
 
@@ -286,14 +273,16 @@ d3.parcoords = function(config) {
   pc.composite = function(_) {
     if (!arguments.length) return __.composite;
     __.composite = _;
-    ctx.foreground.globalCompositeOperation = __.composite;
+    ctx.foreground.globalCompositeOperation = _;
+    events.composite.call(this, _);
     return this;
   };
 
   pc.alpha = function(_) {
     if (!arguments.length) return __.alpha;
     __.alpha = _;
-    ctx.foreground.globalAlpha = __.alpha;
+    ctx.foreground.globalAlpha = _;
+    events.alpha.call(this,_);
     return this;
   };
 
@@ -371,6 +360,19 @@ d3.parcoords = function(config) {
 
   function path_highlight(d) {
     return path(d, ctx.highlight);
+  };
+
+  // getter/setter with event firing
+  function getset(obj,state,events)  {
+    d3.keys(state).forEach(function(key) {   
+      obj[key] = function(x) {
+        if (!arguments.length) return state[key];
+        var old = state[key];
+        state[key] = x;
+        events[key].call(pc,{"value": x, "previous": old});
+        return obj;
+      };
+    });
   };
 
   function extend(target, source) {
