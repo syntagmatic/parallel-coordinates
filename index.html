@@ -42,6 +42,9 @@
   .float {
     float: left;
   }
+  .centered {
+    text-align: center;
+  }
 </style>
 <a href="https://github.com/syntagmatic/parallel-coordinates"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
 <h1>Parallel Coordinates <small>(beta)</small></h1>
@@ -257,6 +260,10 @@ parcoords("example3")
 <div id="example-compositing-6" class="parcoords float" style="width:360px;height:150px"></div>
 <div id="example-compositing-7" class="parcoords float" style="width:360px;height:150px"></div>
 <div style="clear:both"></div>
+<p class="centered">
+Use this slider to change opacity!<br/>
+0 <input type="range" min="0" max="1" value="0.5" step="0.01" id="compositing-opacity"/> 1
+</p>
 <pre>
 var composite_modes = [
   "source-over",
@@ -274,16 +281,26 @@ var color = d3.scale.linear()
   .range(["cadetblue", "#049"])
   .interpolate(d3.interpolateLab);
 
+var pc_compositing = {};
+
 d3.range(0,8).forEach(function(i) {
-  parcoords("example-compositing-" + i)
+  var mode = composite_modes[i];
+  pc_compositing[mode] = parcoords("example-compositing-" + i)
     .data(data3)
-    .<strong>alpha(0.5)</strong>
-    .<strong>composite(composite_modes[i])</strong>
+    .alpha(0.5)
+    .composite(mode)
     .color(function(d) { return color(Math.sin(d.x*10)); })
     .margin({ top: 20, left: -50, bottom: 0, right: -50 })
     .render()
-    .axisDots()
-    .ctx.highlight.fillText(composite_modes[i], 110, 10);
+    .axisDots();
+
+  pc_compositing[mode].ctx.highlight.fillText(mode, 110, 10);
+});
+
+d3.select("#compositing-opacity").on("change", function() {
+  for (mode in pc_compositing) {
+    pc_compositing[mode].alpha(this.value).render();
+  };
 });
 </pre>
 <script>
@@ -303,15 +320,25 @@ var color = d3.scale.linear()
   .range(["cadetblue", "#049"])
   .interpolate(d3.interpolateLab);
 
+var pc_compositing = {};
+
 d3.range(0,8).forEach(function(i) {
-  parcoords("example-compositing-" + i)
+  var mode = composite_modes[i];
+  pc_compositing[mode] = parcoords("example-compositing-" + i)
     .data(data3)
     .alpha(0.5)
-    .composite(composite_modes[i])
+    .composite(mode)
     .color(function(d) { return color(Math.sin(d.x*10)); })
     .margin({ top: 20, left: -50, bottom: 0, right: -50 })
     .render()
-    .axisDots()
-    .ctx.highlight.fillText(composite_modes[i], 110, 10);
+    .axisDots();
+
+  pc_compositing[mode].ctx.highlight.fillText(mode, 110, 10);
+});
+
+d3.select("#compositing-opacity").on("change", function() {
+  for (mode in pc_compositing) {
+    pc_compositing[mode].alpha(this.value).render();
+  };
 });
 </script>
