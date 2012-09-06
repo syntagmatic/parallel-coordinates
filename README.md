@@ -235,6 +235,10 @@ Custom values must be passed into the original chart config to register events.
 * *"composite"*
 * *"alpha"*
 
+### Axes
+
+The following methods are available from [d3.svg.axis](https://github.com/mbostock/d3/wiki/SVG-Axes): ticks, orient, tickValues, tickSubdivide, tickSize, tickPadding, tickFormat.
+
 ## Credits
 
 This library created with examples and suggestions from Mike Bostock, Jason Davies, Alfred Inselberg, Mary Becica, Stephen Boak, Ziggy Jonsson, Ger Hobbelt, Johan Sundström, Raffael Marty and Bob Monteverde.

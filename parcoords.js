@@ -44,17 +44,22 @@ d3.parcoords = function(config) {
       yscale = {},
       dragging = {},
       line = d3.svg.line(),
-      axis = d3.svg.axis().orient("left").ticks(1+__.height/50),
+      axis = d3.svg.axis().orient("left").ticks(5),
       brushed,
       g, // groups for axes, brushes
       ctx = {};
 
   // expose the state of the chart
   pc.state = __;
+
   // create getter/setters
   getset(pc, __, events);
+
   // expose events
   d3.rebind(pc, events, "on");
+
+  // tick formatting
+  d3.rebind(pc, axis, "ticks", "orient", "tickValues", "tickSubdivide", "tickSize", "tickPadding", "tickFormat");
 
   pc.autoscale = function() {
     // xscale

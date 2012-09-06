@@ -18,6 +18,9 @@
     margin: 0 20px;
     padding: 0;
   }
+  .dark {
+    background: #222;
+  }
   #example,
   #example-axes,
   #example1,
@@ -77,9 +80,10 @@ var <strong>data</strong> = [
 Create a parallel coordinates plot
 </p>
 <pre>
-var pc_simple = d3.parcoords()("#example")
+var pc = d3.parcoords()("#example")
   .data(data)
-  .render();
+  .render()
+  .createAxes();
 </pre>
 <script>
 var data = [
@@ -89,23 +93,11 @@ var data = [
   [0.1, 0, 1, 25]
 ];
 
-var pc_simple = d3.parcoords()("#example")
-  .data(data)
-  .render();
-</script>
-<h3>Axes</h3>
-<p>Add axes to the plot with <strong>createAxes()</strong></p>
-<div id="example-axes" class="parcoords" style="width:300px;height:150px"></div>
-<pre>
-var pc = d3.parcoords()("#example-axes")
+var pc = d3.parcoords()("#example")
   .data(data)
   .render()
-  .createAxes();
-</pre>
-<script>
-var pc = d3.parcoords()("#example-axes")
-  .data(data)
-  .render()
+  .ticks(2)
+  .tickSubdivide(true)
   .createAxes();
 </script>
 <h3>Brushable</h3>
@@ -204,75 +196,75 @@ pc2.dimensions(dimensions2)
 var data3 = d3.range(-2*Math.PI,2*Math.PI,Math.PI/40)
   .map(function(x) {
     return {
-      x: x,
       "sin(x)": Math.sin(x),
       "cos(x)": Math.cos(x),
+      "sin(x/2)": Math.sin(x/2),
+      "sin(x*2)": Math.sin(x*2),
+      "cos(x/2)": Math.cos(x/2),
     };
   });
 
 var color = function(d) {
-  return d3.hcl(Math.round(180*d["x"])/Math.PI, 50, 55).toString();
+  return d3.hcl(Math.round(180*d["sin(x)"]+180), 50, 55).toString();
 };
 
 d3.parcoords()("#example3")
   .dimensions(d3.keys(data3[0]))
   .data(data3)
   .color(color)
+  .alpha(0.5)
   .render()
+  .margin({top: 40, left: 0, right: 0, bottom: 12})
   .brushable();
 </pre>
 <script>
 var data3 = d3.range(-2*Math.PI,2*Math.PI,Math.PI/40)
   .map(function(x) {
     return {
-      x: x,
       "sin(x)": Math.sin(x),
       "cos(x)": Math.cos(x),
+      "sin(x/2)": Math.sin(x/2),
+      "sin(x*2)": Math.sin(x*2),
+      "cos(x/2)": Math.cos(x/2),
     };
   });
 
 var color = function(d) {
-  return d3.hcl(Math.round(180*d["x"])/Math.PI, 50, 55).toString();
+  return d3.hcl(Math.round(180*d["sin(x)"]+180), 50, 55).toString();
 };
 
 d3.parcoords()("#example3")
   .dimensions(d3.keys(data3[0]))
   .data(data3)
   .color(color)
+  .alpha(0.5)
   .render()
+  .margin({top: 40, left: 0, right: 0, bottom: 12})
   .brushable();
 </script>
 <h3>Compositing and Opacity</h3>
 <p>Control <a href="https://developer.mozilla.org/en-US/docs/Canvas_tutorial/Compositing">compositing<a> and opacity with <b>composite()</b> and <b>alpha()</b>.</p>
 <ul>
-  <li>source-over is the default, drawing new lines over rendered lines</li>
-  <li>lighter makes dense intersections glow</li>
-  <li>darker makes dense intersections darken</li>
-  <li>destination-over new lines underneath rendered lines</li>
+  <li><strong>source-over</strong> (default), new lines drawn over rendered lines</li>
+  <li><strong>lighter</strong>, dense intersections glow</li>
+  <li><strong>darker</strong>, dense intersections darken</li>
+  <li><strong>destination-over</strong>, new lines drawn underneath rendered lines</li>
 </ul>
 <div id="example-compositing-0" class="parcoords parcoords-compositing float" style="width:360px;height:150px"></div>
 <div id="example-compositing-1" class="parcoords parcoords-compositing float" style="width:360px;height:150px"></div>
 <div id="example-compositing-2" class="parcoords parcoords-compositing float" style="width:360px;height:150px"></div>
 <div id="example-compositing-3" class="parcoords parcoords-compositing float" style="width:360px;height:150px"></div>
-<div id="example-compositing-4" class="parcoords parcoords-compositing float" style="width:360px;height:150px"></div>
-<div id="example-compositing-5" class="parcoords parcoords-compositing float" style="width:360px;height:150px"></div>
-<div id="example-compositing-6" class="parcoords parcoords-compositing float" style="width:360px;height:150px"></div>
-<div id="example-compositing-7" class="parcoords parcoords-compositing float" style="width:360px;height:150px"></div>
 <div style="clear:both"></div>
 <p class="centered">
 Use this slider to change opacity!<br/>
-0 <input type="range" min="0" max="1" value="0.5" step="0.01" id="compositing-opacity"/> 1
+0 <input type="range" min="0" max="1" value="0.3" step="0.01" id="compositing-opacity"/> 1
 </p>
 <pre>
 var composite_modes = [
   "source-over",
   "lighter",
   "destination-over",
-  "darker",
-  "source-out",
-  "destination-atop",
-  "xor",
-  "copy",
+  "darker"
 ];
 
 var color = d3.scale.linear()
@@ -280,21 +272,21 @@ var color = d3.scale.linear()
   .range(["cadetblue", "#049"])
   .interpolate(d3.interpolateLab);
 
-var pc_compositing = {};
+var pc_compositing = [];
 
 d3.selectAll(".parcoords-compositing")
   .each(function(d,i) {
     var mode = composite_modes[i];
-    pc_compositing[mode] = d3.parcoords()(this)
+    pc_compositing[i] = d3.parcoords()(this)
       .data(data3)
-      .alpha(0.5)
+      .alpha(0.3)
       .composite(mode)
-      .color(function(d) { return color(Math.sin(d.x*10)); })
-      .margin({ top: 20, left: -50, bottom: 0, right: -50 })
+      .color(function(d) { return color(Math.sin(d["sin(x)"]*10)); })
+      .margin({ top: 20, left: -10, bottom: 0, right: -10 })
       .render()
       .axisDots();
 
-    pc_compositing[mode].ctx.highlight.fillText(mode, 110, 10);
+    pc_compositing[i].ctx.highlight.fillText(mode, 110, 10);
   });
 
 d3.select("#compositing-opacity").on("change", function() {
@@ -308,11 +300,7 @@ var composite_modes = [
   "source-over",
   "lighter",
   "destination-over",
-  "darker",
-  "source-out",
-  "destination-atop",
-  "xor",
-  "copy",
+  "darker"
 ];
 
 var color = d3.scale.linear()
@@ -320,21 +308,21 @@ var color = d3.scale.linear()
   .range(["cadetblue", "#049"])
   .interpolate(d3.interpolateLab);
 
-var pc_compositing = {};
+var pc_compositing = [];
 
 d3.selectAll(".parcoords-compositing")
   .each(function(d,i) {
     var mode = composite_modes[i];
-    pc_compositing[mode] = d3.parcoords()(this)
+    pc_compositing[i] = d3.parcoords()(this)
       .data(data3)
-      .alpha(0.5)
+      .alpha(0.3)
       .composite(mode)
-      .color(function(d) { return color(Math.sin(d.x*10)); })
-      .margin({ top: 20, left: -50, bottom: 0, right: -50 })
+      .color(function(d) { return color(Math.sin(d["sin(x)"]*10)); })
+      .margin({ top: 20, left: -10, bottom: 0, right: -10 })
       .render()
       .axisDots();
 
-    pc_compositing[mode].ctx.highlight.fillText(mode, 110, 10);
+    pc_compositing[i].ctx.highlight.fillText(mode, 110, 10);
   });
 
 d3.select("#compositing-opacity").on("change", function() {
