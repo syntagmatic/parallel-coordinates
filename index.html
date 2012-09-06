@@ -154,8 +154,8 @@ pc2.dimensions(dimensions2)
   .reorderable();
 </script>
 <h3>Coloring</h3>
-<div id="example3" class="parcoords"></div>
 <p>Set the <strong>color()</strong> to a function to color polylines based on the data</p>
+<div id="example3" class="parcoords"></div>
 <pre><a href="#" class="show-code" data-code="coloring">Show code</a></pre>
 <script id="coloring">var data3 = d3.range(-2*Math.PI,2*Math.PI,Math.PI/40)
   .map(function(x) {
@@ -181,6 +181,58 @@ d3.parcoords()("#example3")
   .margin({top: 40, left: 0, right: 0, bottom: 12})
   .brushable();
 </script>
+<p>For static coloring, just pass in a a color string . This group of plots is colored with <a href="https://github.com/mbostock/d3/wiki/Ordinal-Scales#wiki-category10">d3.scale.category20b()</a></p>
+<div id="example-coloring-0" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-1" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-2" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-3" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-4" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-5" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-6" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-7" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-8" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-9" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-10" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-11" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-12" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-13" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-14" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-15" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-16" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-17" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-18" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-19" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div style="clear:both"></div>
+<pre><a href="#" class="show-code" data-code="coloring-basic">Show code</a></pre>
+<script id="coloring-basic">var colors = d3.scale.category20b(); 
+
+d3.selectAll(".parcoords-coloring")
+  .each(function(d,i) {
+    var color = colors(i);
+
+    var chart = d3.parcoords()(this)
+      .data(data3)
+      .alpha(0.3)
+      .color(color)
+      .margin({ top: 0, left: 0, bottom: 24, right: 0 })
+      .render();
+
+    var text = chart.svg.append("text")
+      .attr("x", 118)
+      .attr("y", 64)
+      .attr("text-anchor", "right")
+      .style("font-weight", "bold")
+      .style("font-size", "11px")
+      .style("fill", "#ddd")
+      .text(colors(i))
+
+    d3.select(this).on("mouseover", function() { text.style("fill", "#222"); });
+    d3.select(this).on("mouseout", function() { text.style("fill", "#ddd"); });
+  });
+</script>
+
+
+
 <h3>Compositing and Opacity</h3>
 <p>Control <a href="https://developer.mozilla.org/en-US/docs/Canvas_tutorial/Compositing">compositing<a> and opacity with <b>composite()</b> and <b>alpha()</b>.</p>
 <ul>
