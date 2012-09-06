@@ -38,6 +38,7 @@ An implementation of parallel coordinates in d3 as a [reusable chart](http://bos
 * [Parvis](http://www.mediavirus.org/parvis/), flo ledermann
 * [Parallel Coordinate Graphics using MATLAB](http://people.ece.cornell.edu/land/PROJECTS/Inselberg/), Bruce R. Land
 * [Parallel Coordinates in pandas, Python](http://pandasplotting.blogspot.com/2012/06/parallel-coordinates.html), Vytautas Jančauskas
+* [PointCloudXplore](http://vis.lbl.gov/Vignettes/Drosophila/index.html)
 
 ## API
 
@@ -123,6 +124,14 @@ When the public state is updated through a method, an <a href="#parcoords_on">ev
 <a name="parcoords_createAxes" href="#parcoords_createAxes">#</a> parcoords.<b>createAxes</b>()
 
 Create static SVG axes with dimension names, ticks, and labels.
+
+<a name="parcoords_removeAxes" href="#parcoords_removeAxes">#</a> parcoords.<b>removeAxes</b>()
+
+Remove SVG axes.
+
+<a name="parcoords_reorderAxes" href="#parcoords_reorderAxes">#</a> parcoords.<b>reorderAxes</b>()
+
+Reorder SVG axes. Call this after updating the dimension order.
 
 <a name="parcoords_brushable" href="#parcoords_brushable">#</a> parcoords.<b>brushable</b>()
 

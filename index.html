@@ -33,6 +33,9 @@
     height: 200px;
     margin: 12px 0;
   }
+  p {
+    width: 560px;
+  }
   pre {
     color: #444;
     font-family: Ubuntu Mono, Monaco, monospace;
@@ -52,7 +55,7 @@
   }
 </style>
 <a href="https://github.com/syntagmatic/parallel-coordinates"><img style="position: absolute; top: 0; right: 0; border: 0;" src="forkme.png" alt="Fork me on GitHub"></a>
-<h1>Parallel Coordinates <small>(beta)</small></h1>
+<h1>Parallel Coordinates <small>(0.1)</small></h1>
 <p>A visual toolkit for <a href="http://www.cs.ucdavis.edu/~ma/ECS289H/papers/Inselberg1997.pdf">multidimensional detectives</a>.</p>
 <p><strong><a href="d3.parcoords.js">d3.parcoords.js</a></strong> <small> - requires <strong><a href="http://d3js.org/">D3.js</a></strong></small></p>
 <p>This library is unstable and in development, but you're welcome to try it out.</p>
@@ -62,7 +65,7 @@
   <li><a href="https://github.com/syntagmatic/parallel-coordinates/issues">Issues</a></li>
 </ul>
 
-<h3>Getting Started</h3>
+<h3>Let's dive in!</h3>
 <div id="example" class="parcoords" style="width:360px;height:150px"></div>
 <p>
 Make a container div in HTML
@@ -106,13 +109,26 @@ var pc = d3.parcoords()("#example")
   .createAxes();
 </script>
 <p>That's all there is to it!</p>
-<h3>Brushing</h3>
+<h3>Brush away the clutter</h3>
 <p>D&eacute;j&agrave; vu! Have you seen <a href="http://mbostock.github.com/protovis/ex/cars.html">this chart before</a>?</p>
+<p>Click and drag along an axis to brush.<br/>
+Only data within the brush extents is displayed.<br/>
+Brushing lets you quickly zoom in on interesting groups and outliers.</p>
 <div id="example1" class="parcoords"></div>
 <p>
-Load external data from a csv file. Brush (interactively filter) by clicking and dragging on the axis lines.
+This cars dataset is loaded from a <a href="data/cars.csv">csv file</a>.
 </p>
 <pre><a href="#" class="show-code" data-code="brushing">Show code</a></pre>
+<p>Try resorting the axes, alphabetically, by running this code in a <a href="http://webmasters.stackexchange.com/questions/8525/how-to-open-the-javascript-console-in-different-browsers">javascript console</a>:</p>
+<pre>
+// get dimensions and sort alphabetically
+var reordered = pc1.dimensions().sort();
+
+pc1.dimensions(reordered)   // set the new dimension order
+  .autoscale()              // update scales
+  .render()                 // re-render data
+  .reorderAxes();           // transition axes
+</pre>
 <script id="brushing">// interact with this variable from a javascript console
 var pc1;
 
@@ -122,6 +138,7 @@ var blue_to_brown = d3.scale.linear()
   .range(["steelblue", "brown"])
   .interpolate(d3.interpolateLab);
 
+// load csv file and create the chart
 d3.csv('data/cars.csv', function(data) {
   pc1 = d3.parcoords()("#example1")
     .data(data)
@@ -130,13 +147,16 @@ d3.csv('data/cars.csv', function(data) {
     .brushable();
 });
 </script>
-<h3>Reordering</h3>
+<h3>Reorder to reveal relationships</h3>
 <p>
-Parallel coordinates isn't just for exploring data. You can see properties of mathematical functions as well.
+This chart has generated from built-in <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Math">JavaScript math functions</a>.
 </p>
 <p>
-Check out the intersection points, curves, grids and densities created by polylines in the plot below.
-Drag the axis titles to reorder the dimensions.
+Pure mathematical relationships may emerge in your explorations, though real data tends to be much noisier. The cars dataset has several roughly inverse relationships, revealed by dense crossings. The first two dimensions in this chart, <em>-x</em> and <em>x</em>, have a perfectly inverse relationship. All lines between those axes meet at a single point.
+</p>
+<p>
+Only relationships between adjacent dimensions are revealed.<br/>
+Drag the axes titles around to reorder the dimensions.
 </p>
 <div id="example2" class="parcoords"></div>
 <pre><a href="#" class="show-code" data-code="reordering">Show code</a></pre>
@@ -166,11 +186,12 @@ pc2.dimensions(dimensions2)
   .render()
   .reorderable();
 </script>
-<h3>Coloring</h3>
-<p>Set the <strong>color()</strong> to a function to color polylines based on the data</p>
+<h3>Coloring gives polylines a personality</h3>
+<p>Coloring polylines based on a dimension helps you track them across many dimensions. Patches of color emerge and disappear.</p>
 <div id="example3" class="parcoords"></div>
 <pre><a href="#" class="show-code" data-code="coloring">Show code</a></pre>
-<script id="coloring">var data3 = d3.range(-2*Math.PI,2*Math.PI,Math.PI/40)
+<script id="coloring">// generate data with math functions
+var data3 = d3.range(-2*Math.PI,2*Math.PI,Math.PI/40)
   .map(function(x) {
     return {
       "sin(x)": Math.sin(x),
@@ -181,6 +202,7 @@ pc2.dimensions(dimensions2)
     };
   });
 
+// color based on the value of sin(x)
 var color = function(d) {
   return d3.hcl(Math.round(180*d["sin(x)"]+180), 50, 55).toString();
 };
@@ -194,7 +216,7 @@ d3.parcoords()("#example3")
   .margin({top: 40, left: 0, right: 0, bottom: 12})
   .brushable();
 </script>
-<p>For static coloring, just pass in a a color string . This group of plots is colored with <a href="https://github.com/mbostock/d3/wiki/Ordinal-Scales#wiki-category10">d3.scale.category20b()</a></p>
+<p>For a single color, just pass in a CSS color string. This group of plots is colored with values from <a href="https://github.com/mbostock/d3/wiki/Ordinal-Scales#wiki-category10">d3.scale.category20b()</a>.</p>
 <div id="example-coloring-0" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
 <div id="example-coloring-1" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
 <div id="example-coloring-2" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
@@ -219,6 +241,7 @@ d3.parcoords()("#example3")
 <pre><a href="#" class="show-code" data-code="coloring-basic">Show code</a></pre>
 <script id="coloring-basic">var colors = d3.scale.category20b(); 
 
+// create a chart in every element with class "parcoords-coloring"
 d3.selectAll(".parcoords-coloring")
   .each(function(d,i) {
     var color = colors(i);
@@ -230,6 +253,7 @@ d3.selectAll(".parcoords-coloring")
       .margin({ top: 0, left: 0, bottom: 24, right: 0 })
       .render();
 
+    // color labels
     var text = chart.svg.append("text")
       .attr("x", 162)
       .attr("y", 64)
@@ -239,29 +263,33 @@ d3.selectAll(".parcoords-coloring")
       .style("fill", "#ddd")
       .text(colors(i))
 
+    // hover effect
     d3.select(this).on("mouseover", function() { text.style("fill", "#222"); });
     d3.select(this).on("mouseout", function() { text.style("fill", "#ddd"); });
   });
 </script>
 
-
-
 <h3>Compositing and Opacity</h3>
-<p>Control <a href="https://developer.mozilla.org/en-US/docs/Canvas_tutorial/Compositing">compositing<a> and opacity with <b>composite()</b> and <b>alpha()</b>.</p>
+<p>Control <a href="https://developer.mozilla.org/en-US/docs/Canvas_tutorial/Compositing">compositing</a> and opacity with <b>composite()</b> and <b>alpha()</b>, respectively. Compositing controls how pixels are combined to form the final image.
+</p>
+<p>
+Four useful settings are:
+</p>
 <ul>
   <li><strong>source-over</strong> (default), new lines drawn over rendered lines</li>
   <li><strong>lighter</strong>, dense intersections glow</li>
   <li><strong>darker</strong>, dense intersections darken</li>
   <li><strong>destination-over</strong>, new lines drawn underneath rendered lines</li>
 </ul>
+<p>Use this slider to change alpha/opacity. The current value is <strong id="alpha-opacity">0.3</strong><br/>
+<input type="range" min="0" max="1" value="0.3" step="0.01" id="compositing-opacity"/>
+</p>
 <div id="example-compositing-0" class="parcoords parcoords-compositing float" style="width:360px;height:120px"></div>
 <div id="example-compositing-1" class="parcoords parcoords-compositing float" style="width:360px;height:120px"></div>
 <div id="example-compositing-2" class="parcoords parcoords-compositing float" style="width:360px;height:120px"></div>
 <div id="example-compositing-3" class="parcoords parcoords-compositing float" style="width:360px;height:120px"></div>
 <div style="clear:both"></div>
 <p class="centered">
-Use this slider to change opacity!<br/>
-0 <input type="range" min="0" max="1" value="0.3" step="0.01" id="compositing-opacity"/> 1
 </p>
 <pre><a href="#" class="show-code" data-code="compositing">Show code</a></pre>
 <script id="compositing">var composite_modes = [
@@ -276,6 +304,7 @@ var color = d3.scale.linear()
   .range(["cadetblue", "#049"])
   .interpolate(d3.interpolateLab);
 
+// keep the charts in an array
 var pc_compositing = [];
 
 d3.selectAll(".parcoords-compositing")
@@ -293,12 +322,18 @@ d3.selectAll(".parcoords-compositing")
     pc_compositing[i].ctx.highlight.fillText(mode, 130, 10);
   });
 
+// opacity slider
 d3.select("#compositing-opacity").on("change", function() {
+  d3.select("#alpha-opacity").text(Math.round(this.value*100)/100);
   for (mode in pc_compositing) {
     pc_compositing[mode].alpha(this.value).render();
   };
 });
 </script>
+
+<h3>More on the way...</h3>
+
+<p>This library is in active development, so keep an eye out for new features and documentation. Major changes will be announced on the <a href="https://groups.google.com/forum/?fromgroups#!forum/d3-js">d3.js mailing list</a>, or you can <a href="https://github.com/syntagmatic/parallel-coordinates">watch the GitHub repository</a> to track every change.</p>
 
 <script>
 // Code viewer

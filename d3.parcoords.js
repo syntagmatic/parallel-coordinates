@@ -27,7 +27,7 @@ d3.parcoords = function(config) {
     });
 
     // svg tick and brush layers
-    var svg = pc.svg = selection
+    pc.svg = selection
       .append("svg")
         .attr("width", __.width)
         .attr("height", __.height)
@@ -137,6 +137,8 @@ d3.parcoords = function(config) {
   };
 
   pc.createAxes = function() {
+    if (g) pc.removeAxes(); 
+
     // Add a group element for each dimension.
     g = pc.svg.selectAll(".dimension")
         .data(__.dimensions)
@@ -158,6 +160,16 @@ d3.parcoords = function(config) {
           "class": "label"
         })
         .text(String)
+    return this;
+  };
+
+  pc.removeAxes = function() {
+    g.remove();
+    return this;
+  };
+
+  pc.reorderAxes = function() {
+    pc.svg.selectAll(".dimension").transition().duration(2000).attr("transform", function(p) { return "translate(" + position(p) + ")"; });
     return this;
   };
 
@@ -358,7 +370,7 @@ d3.parcoords = function(config) {
   return pc;
 };
 
-d3.parcoords.version = "beta";
+d3.parcoords.version = "0.1";
 
 // quantitative dimensions based on numerical or null values in the first row
 d3.parcoords.quantitative = function(data) {
