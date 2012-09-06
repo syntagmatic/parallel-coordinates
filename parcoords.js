@@ -143,9 +143,9 @@ d3.parcoords = function(config) {
         .each(function(d) { d3.select(this).call(axis.scale(yscale[d])); })
       .append("svg:text")
         .attr({
-          "text-anchor": "left",
+          "text-anchor": "middle",
           "y": 0,
-          "transform": "rotate(-30) translate(-6,-8)",
+          "transform": "translate(0,-12)",
           "x": 0,
           "class": "label"
         })
