@@ -241,4 +241,4 @@ The following methods are available from [d3.svg.axis](https://github.com/mbosto
 
 ## Credits
 
-This library created with examples and suggestions from Mike Bostock, Jason Davies, Alfred Inselberg, Mary Becica, Stephen Boak, Ziggy Jonsson, Ger Hobbelt, Johan Sundström, Raffael Marty and Bob Monteverde.
+This library created with examples, suggestions and encouragement from Mike Bostock, Jason Davies, Mary Becica, Stephen Boak, Ziggy Jonsson, Ger Hobbelt, Johan Sundström, Raffael Marty, Hugo Lopez, Bob Monteverde, and Alfred Inselberg.

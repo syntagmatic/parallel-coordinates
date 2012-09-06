@@ -9,7 +9,8 @@
     font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
     margin: 50px auto 20px;
     width: 720px;
-    background: #f2f1f0;
+    background: #fcfcfc;
+    line-height: 1.35em;
   }
   a {
     text-decoration: none;
@@ -27,16 +28,14 @@
   #example2,
   #example3 {
     height: 200px;
-    background: #eee;
-    border: 1px solid #d0d0d0;
     margin: 12px 0;
   }
   pre {
     color: #444;
     font-family: Ubuntu Mono, Monaco, monospace;
     padding: 4px 8px;
-    background: #f6f6f6;
-    border: 1px solid #e4e4e4;
+    background: #f2f2f2;
+    border: 1px solid #ccc;
   }
   h1 small {
     font-weight: normal;
@@ -51,11 +50,16 @@
 </style>
 <a href="https://github.com/syntagmatic/parallel-coordinates"><img style="position: absolute; top: 0; right: 0; border: 0;" src="forkme.png" alt="Fork me on GitHub"></a>
 <h1>Parallel Coordinates <small>(beta)</small></h1>
-<p>An open-source framework for visualizing multi-dimensional spaces</p>
-<em>Why should I be interested in multi-dimensional space?</em>
-<p>A JavaScript implementation of <a href="http://en.wikipedia.org/wiki/Parallel_coordinates">parallel coordinates</a> using <a href="http://d3js.org/">d3</a></p>
+<p>An open-source library for exploring multi-dimensional datasets.</p>
+<p><strong><a href="parcoords.js">parcoords.js</a></strong> <small> - requires <strong><a href="http://d3js.org/">D3.js</a></strong></small></p>
+<p>This library is unstable and in development, but you're welcome to try it out.</p>
+<ul>
+  <li><a href="https://github.com/syntagmatic/parallel-coordinates#resources">Resources</a></li>
+  <li><a href="https://github.com/syntagmatic/parallel-coordinates#parallel-coordinates">API Reference</a></li>
+  <li><a href="https://github.com/syntagmatic/parallel-coordinates/issues">Issues</a></li>
+</ul>
 
-<h3>Example</h3>
+<h3>Getting Started</h3>
 <div id="example" class="parcoords" style="width:360px;height:150px"></div>
 <p>
 Make a container div in HTML
