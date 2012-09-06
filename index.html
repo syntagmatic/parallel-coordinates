@@ -7,7 +7,7 @@
   body {
     font-size: 15px;
     font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
-    margin: 0 auto;
+    margin: 50px auto 20px;
     width: 720px;
     background: #f2f1f0;
   }
@@ -54,10 +54,8 @@
 <p>An open-source framework for visualizing multi-dimensional spaces</p>
 <em>Why should I be interested in multi-dimensional space?</em>
 <p>A JavaScript implementation of <a href="http://en.wikipedia.org/wiki/Parallel_coordinates">parallel coordinates</a> using <a href="http://d3js.org/">d3</a></p>
-<h3>Minimal</h3>
-<p>
-Getting started is easy.
-</p>
+
+<h3>Example</h3>
 <div id="example" class="parcoords" style="width:360px;height:150px"></div>
 <p>
 Make a container div in HTML
@@ -100,22 +98,14 @@ var pc = d3.parcoords()("#example")
   .tickSubdivide(true)
   .createAxes();
 </script>
-<h3>Brushable</h3>
+<h3>Brushing</h3>
+<p></p>
 <div id="example1" class="parcoords"></div>
 <p>
 Load external data from a csv file. Enable brushing by clicking and dragging on the axis lines.
 </p>
-<pre>
-var pc1;
-d3.csv('data/movies.csv', function(data) {
-  pc1 = d3.parcoords()("#example1")
-    .data(data)
-    .render()
-    .brushable();
-});
-</pre>
-<script>
-var pc1;
+<pre><a href="#" class="show-code" data-code="brushing">Show code</a></pre>
+<script id="brushing">var pc1;
 d3.csv('data/movies.csv', function(data) {
   pc1 = d3.parcoords()("#example1")
     .data(data)
@@ -123,7 +113,7 @@ d3.csv('data/movies.csv', function(data) {
     .brushable();
 });
 </script>
-<h3>Reorderable</h3>
+<h3>Reordering</h3>
 <p>
 Parallel coordinates isn't just for exploring data. You can see properties of mathematical functions as well.
 </p>
@@ -132,38 +122,8 @@ Check out the intersection points, curves, grids and densities created by polyli
 Drag the axis titles to reorder the dimensions.
 </p>
 <div id="example2" class="parcoords"></div>
-<p>Generate some data</p>
-<pre>
-var data2 = d3.range(0,2*Math.PI,Math.PI/30)
-  .map(function(x) {
-    return {
-      x: x,
-      sin: Math.sin(x),
-      cos: Math.cos(x),
-      atan: Math.atan(x),
-      exp: Math.exp(x),
-      "square(x)": x*x,
-      sqrt: Math.sqrt(x),
-    };
-  });
-
-// get list of dimensions
-var dimensions2 = d3.keys(data2[0]);
-</pre>
-<p>Set up the chart, with reordering enabled</p>
-<pre>
-var pc2 = d3.parcoords()("#example2");
-
-pc2.dimensions(dimensions2)
-  .data(data2)
-  .color("#000")
-  .alpha(0.2)
-  .margin({ top: 40, left: 0, bottom: 12, right: 0 })
-  .render()
-  .reorderable();
-</pre>
-<script>
-var data2 = d3.range(0,2*Math.PI,Math.PI/40)
+<pre><a href="#" class="show-code" data-code="reordering">Show code</a></pre>
+<script id="reordering">var data2 = d3.range(0,2*Math.PI,Math.PI/40)
   .map(function(x) {
     return {
       "-x": -x,
@@ -189,36 +149,11 @@ pc2.dimensions(dimensions2)
   .render()
   .reorderable();
 </script>
-<h3>Color</h3>
+<h3>Coloring</h3>
 <div id="example3" class="parcoords"></div>
 <p>Set the <strong>color()</strong> to a function to color polylines based on the data</p>
-<pre>
-var data3 = d3.range(-2*Math.PI,2*Math.PI,Math.PI/40)
-  .map(function(x) {
-    return {
-      "sin(x)": Math.sin(x),
-      "cos(x)": Math.cos(x),
-      "sin(x/2)": Math.sin(x/2),
-      "sin(x*2)": Math.sin(x*2),
-      "cos(x/2)": Math.cos(x/2),
-    };
-  });
-
-var color = function(d) {
-  return d3.hcl(Math.round(180*d["sin(x)"]+180), 50, 55).toString();
-};
-
-d3.parcoords()("#example3")
-  .dimensions(d3.keys(data3[0]))
-  .data(data3)
-  .color(color)
-  .alpha(0.5)
-  .render()
-  .margin({top: 40, left: 0, right: 0, bottom: 12})
-  .brushable();
-</pre>
-<script>
-var data3 = d3.range(-2*Math.PI,2*Math.PI,Math.PI/40)
+<pre><a href="#" class="show-code" data-code="coloring">Show code</a></pre>
+<script id="coloring">var data3 = d3.range(-2*Math.PI,2*Math.PI,Math.PI/40)
   .map(function(x) {
     return {
       "sin(x)": Math.sin(x),
@@ -259,8 +194,8 @@ d3.parcoords()("#example3")
 Use this slider to change opacity!<br/>
 0 <input type="range" min="0" max="1" value="0.3" step="0.01" id="compositing-opacity"/> 1
 </p>
-<pre>
-var composite_modes = [
+<pre><a href="#" class="show-code" data-code="compositing">Show code</a></pre>
+<script id="compositing">var composite_modes = [
   "source-over",
   "lighter",
   "destination-over",
@@ -294,40 +229,14 @@ d3.select("#compositing-opacity").on("change", function() {
     pc_compositing[mode].alpha(this.value).render();
   };
 });
-</pre>
+</script>
+
 <script>
-var composite_modes = [
-  "source-over",
-  "lighter",
-  "destination-over",
-  "darker"
-];
-
-var color = d3.scale.linear()
-  .domain([-1, 1])
-  .range(["cadetblue", "#049"])
-  .interpolate(d3.interpolateLab);
-
-var pc_compositing = [];
-
-d3.selectAll(".parcoords-compositing")
-  .each(function(d,i) {
-    var mode = composite_modes[i];
-    pc_compositing[i] = d3.parcoords()(this)
-      .data(data3)
-      .alpha(0.3)
-      .composite(mode)
-      .color(function(d) { return color(Math.sin(d["sin(x)"]*10)); })
-      .margin({ top: 20, left: -10, bottom: 0, right: -10 })
-      .render()
-      .axisDots();
-
-    pc_compositing[i].ctx.highlight.fillText(mode, 110, 10);
-  });
-
-d3.select("#compositing-opacity").on("change", function() {
-  for (mode in pc_compositing) {
-    pc_compositing[mode].alpha(this.value).render();
-  };
-});
+// Code viewer
+d3.selectAll(".show-code").on("click", function(d) {
+  var code = d3.select("#" + d3.select(this).attr("data-code")).text();
+  d3.select(this.parentNode)
+    .text(code)
+  event.preventDefault();
+})
 </script>
