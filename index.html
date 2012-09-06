@@ -47,6 +47,9 @@
     font-weight: normal;
     font-size: 0.5em;
   }
+  h3 {
+    margin-top: 40px;
+  }
   .float {
     float: left;
   }
@@ -182,7 +185,7 @@ pc2.dimensions(dimensions2)
   .data(data2)
   .color("#000")
   .alpha(0.2)
-  .margin({ top: 40, left: 0, bottom: 12, right: 0 })
+  .margin({ top: 20, left: 0, bottom: 12, right: 0 })
   .render()
   .reorderable();
 </script>
@@ -213,7 +216,7 @@ d3.parcoords()("#example3")
   .color(color)
   .alpha(0.5)
   .render()
-  .margin({top: 40, left: 0, right: 0, bottom: 12})
+  .margin({top: 20, left: 0, right: 0, bottom: 12})
   .brushable();
 </script>
 <p>For a single color, just pass in a CSS color string. This group of plots is colored with values from <a href="https://github.com/mbostock/d3/wiki/Ordinal-Scales#wiki-category10">d3.scale.category20b()</a>.</p>
