@@ -50,12 +50,12 @@ d3.parcoords = function(config) {
       ctx = {};
 
   // side effects for setters
-  var set_events = d3.dispatch.apply(this,d3.keys(__));
-  set_events.on("composite", function(d) { ctx.foreground.globalCompositeOperation = d.value; });
-  set_events.on("alpha", function(d) { ctx.foreground.globalAlpha = d.value; });
-  set_events.on("width", function(d) { pc.resize(); });
-  set_events.on("height", function(d) { pc.resize(); });
-  set_events.on("margin", function(d) { pc.resize(); });
+  var side_effects = d3.dispatch.apply(this,d3.keys(__))
+    .on("composite", function(d) { ctx.foreground.globalCompositeOperation = d.value; })
+    .on("alpha", function(d) { ctx.foreground.globalAlpha = d.value; })
+    .on("width", function(d) { pc.resize(); })
+    .on("height", function(d) { pc.resize(); })
+    .on("margin", function(d) { pc.resize(); });
 
   // expose the state of the chart
   pc.state = __;
@@ -341,7 +341,7 @@ d3.parcoords = function(config) {
         if (!arguments.length) return state[key];
         var old = state[key];
         state[key] = x;
-        set_events[key].call(pc,{"value": x, "previous": old});
+        side_effects[key].call(pc,{"value": x, "previous": old});
         events[key].call(pc,{"value": x, "previous": old});
         return obj;
       };
