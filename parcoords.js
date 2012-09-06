@@ -77,8 +77,8 @@ d3.parcoords = function(config) {
     pc.selection.selectAll("canvas")
         .style("margin-top", __.margin.top + "px") 
         .style("margin-left", __.margin.left + "px") 
-        .attr("width", w())
-        .attr("height", h())
+        .attr("width", w()+2)
+        .attr("height", h()+2)
 
     // default styles, needs to be set when canvas width changes
     ctx.foreground.strokeStyle = __.color;
