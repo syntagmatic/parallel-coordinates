@@ -49,6 +49,14 @@ d3.parcoords = function(config) {
       g, // groups for axes, brushes
       ctx = {};
 
+  // side effects for setters
+  var set_events = d3.dispatch.apply(this,d3.keys(__));
+  set_events.on("composite", function(d) { ctx.foreground.globalCompositeOperation = d.value; });
+  set_events.on("alpha", function(d) { ctx.foreground.globalAlpha = d.value; });
+  set_events.on("width", function(d) { pc.resize(); });
+  set_events.on("height", function(d) { pc.resize(); });
+  set_events.on("margin", function(d) { pc.resize(); });
+
   // expose the state of the chart
   pc.state = __;
 
@@ -250,44 +258,6 @@ d3.parcoords = function(config) {
     return this;
   };
 
-  // custom getsets
-  pc.height = function(_) {
-    if (!arguments.length) return __.height;
-    __.height  = _;
-    pc.resize();
-    return this;
-  };
-
-  pc.width = function(_) {
-    if (!arguments.length) return __.width;
-    __.width = _;
-    pc.resize();
-    return this;
-  };
-
-  pc.margin = function(_) {
-    if (!arguments.length) return __.margin;
-    __.margin = _;
-    pc.resize();
-    return this;
-  };
-
-  pc.composite = function(_) {
-    if (!arguments.length) return __.composite;
-    __.composite = _;
-    ctx.foreground.globalCompositeOperation = _;
-    events.composite.call(this, _);
-    return this;
-  };
-
-  pc.alpha = function(_) {
-    if (!arguments.length) return __.alpha;
-    __.alpha = _;
-    ctx.foreground.globalAlpha = _;
-    events.alpha.call(this,_);
-    return this;
-  };
-
   // draw single polyline
   function path(d, ctx) {
     ctx.strokeStyle = d3.functor(__.color)(d);
@@ -371,6 +341,7 @@ d3.parcoords = function(config) {
         if (!arguments.length) return state[key];
         var old = state[key];
         state[key] = x;
+        set_events[key].call(pc,{"value": x, "previous": old});
         events[key].call(pc,{"value": x, "previous": old});
         return obj;
       };
