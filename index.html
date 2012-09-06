@@ -2,7 +2,7 @@
 <title>Parallel Coordinates</title>
 <link rel="stylesheet" type="text/css" href="parcoords.css">
 <script src="d3.v2.js"></script>
-<script src="parcoords.js"></script>
+<script src="d3.parcoords.js"></script>
 <style>
   body {
     font-size: 15px;
@@ -13,7 +13,10 @@
     line-height: 1.35em;
   }
   a {
-    text-decoration: none;
+    color: #555;
+  }
+  a:hover {
+    color: #000;
   }
   ul {
     margin: 0 20px;
@@ -50,8 +53,8 @@
 </style>
 <a href="https://github.com/syntagmatic/parallel-coordinates"><img style="position: absolute; top: 0; right: 0; border: 0;" src="forkme.png" alt="Fork me on GitHub"></a>
 <h1>Parallel Coordinates <small>(beta)</small></h1>
-<p>An open-source library for exploring multi-dimensional datasets.</p>
-<p><strong><a href="parcoords.js">parcoords.js</a></strong> <small> - requires <strong><a href="http://d3js.org/">D3.js</a></strong></small></p>
+<p>A visual toolkit for <a href="http://www.cs.ucdavis.edu/~ma/ECS289H/papers/Inselberg1997.pdf">multidimensional detectives</a>.</p>
+<p><strong><a href="d3.parcoords.js">d3.parcoords.js</a></strong> <small> - requires <strong><a href="http://d3js.org/">D3.js</a></strong></small></p>
 <p>This library is unstable and in development, but you're welcome to try it out.</p>
 <ul>
   <li><a href="https://github.com/syntagmatic/parallel-coordinates#resources">Resources</a></li>
@@ -82,8 +85,8 @@ var <strong>data</strong> = [
 Create a parallel coordinates plot
 </p>
 <pre>
-var pc = d3.parcoords()("#example")
-  .data(data)
+var pc = d3.parcoords()("#<strong>example</strong>")
+  .data(<strong>data</strong>)
   .render()
   .createAxes();
 </pre>
@@ -102,23 +105,27 @@ var pc = d3.parcoords()("#example")
   .tickSubdivide(true)
   .createAxes();
 </script>
+<p>That's all there is to it!</p>
 <h3>Brushing</h3>
-<p></p>
+<p>D&eacute;j&agrave; vu! Have you seen <a href="http://mbostock.github.com/protovis/ex/cars.html">this chart before</a>?</p>
 <div id="example1" class="parcoords"></div>
 <p>
 Load external data from a csv file. Brush (interactively filter) by clicking and dragging on the axis lines.
 </p>
 <pre><a href="#" class="show-code" data-code="brushing">Show code</a></pre>
-<script id="brushing">var pc1;
-d3.csv('data/cars.csv', function(data) {
-  var color = d3.scale.linear()
-    .domain([9, 50])
-    .range(["steelblue", "brown"])
-    .interpolate(d3.interpolateLab);
+<script id="brushing">// interact with this variable from a javascript console
+var pc1;
 
+// create a linear color scale
+var blue_to_brown = d3.scale.linear()
+  .domain([9, 50])
+  .range(["steelblue", "brown"])
+  .interpolate(d3.interpolateLab);
+
+d3.csv('data/cars.csv', function(data) {
   pc1 = d3.parcoords()("#example1")
     .data(data)
-    .color(function(d) { return color(d['economy (mpg)']); })
+    .color(function(d) { return blue_to_brown(d['economy (mpg)']); })
     .render()
     .brushable();
 });
