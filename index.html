@@ -211,16 +211,16 @@ d3.selectAll(".parcoords-coloring")
     var color = colors(i);
 
     var chart = d3.parcoords()(this)
-      .data(data3)
-      .alpha(0.3)
+      .data(data3.slice(7*i,7*i+30))
+      .alpha(0.6)
       .color(color)
       .margin({ top: 0, left: 0, bottom: 24, right: 0 })
       .render();
 
     var text = chart.svg.append("text")
-      .attr("x", 118)
+      .attr("x", 162)
       .attr("y", 64)
-      .attr("text-anchor", "right")
+      .style("text-anchor", "end")
       .style("font-weight", "bold")
       .style("font-size", "11px")
       .style("fill", "#ddd")
