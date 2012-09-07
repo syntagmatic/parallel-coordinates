@@ -141,7 +141,7 @@ d3.parcoords = function(config) {
 
     // Add a group element for each dimension.
     g = pc.svg.selectAll(".dimension")
-        .data(__.dimensions)
+        .data(__.dimensions, function(d) { return d; })
       .enter().append("svg:g")
         .attr("class", "dimension")
         .attr("transform", function(d) { return "translate(" + xscale(d) + ")"; })
@@ -160,6 +160,7 @@ d3.parcoords = function(config) {
           "class": "label"
         })
         .text(String)
+
     return this;
   };
 
@@ -168,8 +169,35 @@ d3.parcoords = function(config) {
     return this;
   };
 
-  pc.reorderAxes = function() {
-    pc.svg.selectAll(".dimension").transition().duration(2000).attr("transform", function(p) { return "translate(" + position(p) + ")"; });
+  pc.updateAxes = function() {
+    var g_data = pc.svg.selectAll(".dimension")
+        .data(__.dimensions, function(d) { return d; })
+
+    g_data.enter().append("svg:g")
+        .attr("class", "dimension")
+        .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
+        .style("opacity", 0)
+        .append("svg:g")
+        .attr("class", "axis")
+        .attr("transform", "translate(0,0)")
+        .each(function(d) { d3.select(this).call(axis.scale(yscale[d])); })
+      .append("svg:text")
+        .attr({
+          "text-anchor": "middle",
+          "y": 0,
+          "transform": "translate(0,-12)",
+          "x": 0,
+          "class": "label"
+        })
+        .text(String);
+
+    g_data.exit().remove();
+
+    g = pc.svg.selectAll(".dimension");
+
+    g.transition().duration(1100)
+      .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
+      .style("opacity", 1)
     return this;
   };
 

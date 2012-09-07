@@ -130,7 +130,7 @@ var reordered = pc1.dimensions().sort();
 
 pc1.dimensions(reordered)   // set the new dimension order
   .render()                 // re-render data
-  .reorderAxes();           // transition axes
+  .updateAxes();            // transition axes
 </pre>
 <script id="brushing">// interact with this variable from a javascript console
 var pc1;

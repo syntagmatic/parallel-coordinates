@@ -129,9 +129,9 @@ Create static SVG axes with dimension names, ticks, and labels.
 
 Remove SVG axes.
 
-<a name="parcoords_reorderAxes" href="#parcoords_reorderAxes">#</a> parcoords.<b>reorderAxes</b>()
+<a name="parcoords_updateAxes" href="#parcoords_updateAxes">#</a> parcoords.<b>updateAxes</b>()
 
-Reorder SVG axes. Call this after updating the dimension order.
+Update SVG axes. Call this after updating the dimension order.
 
 <a name="parcoords_brushable" href="#parcoords_brushable">#</a> parcoords.<b>brushable</b>()
 
