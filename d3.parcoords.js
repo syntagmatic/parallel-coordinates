@@ -55,7 +55,8 @@ d3.parcoords = function(config) {
     .on("alpha", function(d) { ctx.foreground.globalAlpha = d.value; })
     .on("width", function(d) { pc.resize(); })
     .on("height", function(d) { pc.resize(); })
-    .on("margin", function(d) { pc.resize(); });
+    .on("margin", function(d) { pc.resize(); })
+    .on("dimensions", function(d) { xscale.domain(__.dimensions); });
 
   // expose the state of the chart
   pc.state = __;
@@ -71,8 +72,7 @@ d3.parcoords = function(config) {
 
   pc.autoscale = function() {
     // xscale
-    xscale.rangePoints([0, w()], 1)
-      .domain(__.dimensions);
+    xscale.rangePoints([0, w()], 1);
 
     // yscale
     __.dimensions.forEach(function(k) {
@@ -101,14 +101,14 @@ d3.parcoords = function(config) {
   };
 
   pc.detectDimensions = function() {
-    __.dimensions = d3.parcoords.quantitative(__.data);
+    pc.dimensions(d3.parcoords.quantitative(__.data));
     return this;
   };
 
   pc.render = function() {
     // try to autodetect dimensions and create scales
     if (!__.dimensions.length) pc.detectDimensions();
-    if (!pc.xscale.domain().length) pc.autoscale();
+    if (!(__.dimensions[0] in yscale)) pc.autoscale();
 
     pc.clear('foreground');
     if (brushed) {
@@ -370,7 +370,7 @@ d3.parcoords = function(config) {
   return pc;
 };
 
-d3.parcoords.version = "0.1";
+d3.parcoords.version = "0.1.1";
 
 // quantitative dimensions based on numerical or null values in the first row
 d3.parcoords.quantitative = function(data) {

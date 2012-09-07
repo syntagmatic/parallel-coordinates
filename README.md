@@ -87,7 +87,7 @@ If no dimensions have been specified, it will attempt to <a href="#parcoords_det
 
 <a name="parcoords_dimensions" href="#parcoords_dimensions">#</a> parcoords.<b>dimensions</b>(*dimensions*)
 
-If *dimensions* is specified, sets the quantitative dimensions to be visualized. The format is an array of dimension names.
+If *dimensions* is specified, sets the quantitative dimensions to be visualized. The format is an array of dimension names. This will update the xscale domain, but will not trigger re-rendering of lines or axes.
 
 ```javascript
 var dimensions = ['protein', 'calcium', 'sodium'];
