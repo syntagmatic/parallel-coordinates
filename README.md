@@ -217,6 +217,20 @@ Pass an array of data to overlay the data on the chart, masking the background.
 
 Clear the highlighting layer. This is equivalent to calling <a href="#parcoords_clear">parcoords.clear("highlight")</a>.
 
+<a name="parcoords_interactive" href="#parcoords_interactive">#</a> parcoords.<b>interactive</b>()
+
+Active interactive mode for command line use. Currently this only affects adding/removing/reordering dimensions
+
+```javascript
+// normal mode
+parcoords.dimensions([3,1,2])
+  .render()
+  .updateAxes()
+
+// interactive mode
+parcoords.dimensions([3,1,2])
+```
+
 <a name="parcoords_clear" href="#parcoords_clear">#</a> parcoords.<b>clear</b>(*layer*)
 
 Clear the *layer*, which could be *"foreground"*, *"background"* or *"highlight"*.

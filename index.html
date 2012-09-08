@@ -58,7 +58,7 @@
   }
 </style>
 <a href="https://github.com/syntagmatic/parallel-coordinates"><img style="position: absolute; top: 0; right: 0; border: 0;" src="forkme.png" alt="Fork me on GitHub"></a>
-<h1>Parallel Coordinates <small>(0.1.1)</small></h1>
+<h1>Parallel Coordinates <small>(0.1.2)</small></h1>
 <p>A visual toolkit for <a href="http://www.cs.ucdavis.edu/~ma/ECS289H/papers/Inselberg1997.pdf">multidimensional detectives</a>.</p>
 <p><strong><a href="d3.parcoords.js">d3.parcoords.js</a></strong> <small> - requires <strong><a href="http://d3js.org/">D3.js</a></strong></small><br/>
 <strong><a href="d3.parcoords.css">d3.parcoords.css</a></strong> <small> - default styles</small></p>
@@ -123,14 +123,15 @@ Brushing lets you quickly zoom in on interesting groups and outliers.</p>
 This cars dataset is loaded from a <a href="data/cars.csv">csv file</a>.
 </p>
 <pre><a href="#" class="show-code" data-code="brushing">Show code</a></pre>
-<p>Try resorting the axes, alphabetically, by running this code in a <a href="http://webmasters.stackexchange.com/questions/8525/how-to-open-the-javascript-console-in-different-browsers">javascript console</a>:</p>
+<p>Try resorting the axes, alphabetically, by running this code in a <a href="http://webmasters.stackexchange.com/questions/8525/how-to-open-the-javascript-console-in-different-browsers">javascript console</a>. The chart is in interactive mode, so it will update the axes and re-render automatically.</p>
 <pre>
-// get dimensions and sort alphabetically
-var reordered = pc1.dimensions().sort();
-
-pc1.dimensions(reordered)   // set the new dimension order
-  .render()                 // re-render data
-  .updateAxes();            // transition axes
+pc1.dimensions([
+  "0-60 mph (s)",
+  "economy (mpg)",
+  "power (hp)",
+  "weight (lb)",
+  "displacement (cc)"
+]);
 </pre>
 <script id="brushing">// interact with this variable from a javascript console
 var pc1;
@@ -145,9 +146,10 @@ var blue_to_brown = d3.scale.linear()
 d3.csv('data/cars.csv', function(data) {
   pc1 = d3.parcoords()("#example1")
     .data(data)
-    .color(function(d) { return blue_to_brown(d['economy (mpg)']); })
+    .color(function(d) { return blue_to_brown(d['economy (mpg)']); })  // quantitative color scale
     .render()
-    .brushable();
+    .brushable()  // enable brushing
+    .interactive()  // command line mode
 });
 </script>
 <h3>Reorder to reveal relationships</h3>

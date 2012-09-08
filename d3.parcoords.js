@@ -7,11 +7,7 @@ d3.parcoords = function(config) {
     margin: { top: 24, right: 0, bottom: 12, left: 0 },
     color: "#069",
     composite: "source-over",
-    alpha: "0.7",
-    //brushable: false,
-    //reorderable: false,
-    //axes: false,
-    //interactive: false
+    alpha: "0.7"
   };
 
   extend(__, config);
@@ -44,6 +40,13 @@ d3.parcoords = function(config) {
   var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush"].concat(d3.keys(__))),
       w = function() { return __.width - __.margin.right - __.margin.left; },
       h = function() { return __.height - __.margin.top - __.margin.bottom },
+      flags = {
+        brushable: false,
+        reorderable: false,
+        axes: false,
+        interactive: false,
+        debug: false
+      },
       xscale = d3.scale.ordinal(),
       yscale = {},
       dragging = {},
@@ -60,10 +63,16 @@ d3.parcoords = function(config) {
     .on("width", function(d) { pc.resize(); })
     .on("height", function(d) { pc.resize(); })
     .on("margin", function(d) { pc.resize(); })
-    .on("dimensions", function(d) { xscale.domain(__.dimensions); });
+    .on("dimensions", function(d) {
+      xscale.domain(__.dimensions);
+      if (flags.interactive) pc.render().updateAxes();
+    });
+
+  pc.toString = function() { return "Parallel Coordinates: " + __.dimensions.length + " dimensions (" + d3.keys(__.data[0]).length + " total) , " + __.data.length + " rows"; };
 
   // expose the state of the chart
   pc.state = __;
+  pc.flags = flags;
 
   // create getter/setters
   getset(pc, __, events);
@@ -164,7 +173,7 @@ d3.parcoords = function(config) {
           "class": "label"
         })
         .text(String)
-
+    flags.axes= true;
     return this;
   };
 
@@ -222,6 +231,7 @@ d3.parcoords = function(config) {
         .style("visibility", null)
         .attr("x", -15)
         .attr("width", 30)
+    flags.brushable = true;
     return this;
   };
 
@@ -247,6 +257,17 @@ d3.parcoords = function(config) {
           d3.select(this).transition().attr("transform", "translate(" + xscale(d) + ")");
           pc.render();
         }));
+    flags.reorderable = true;
+    return this;
+  };
+
+  pc.interactive = function() {
+    flags.interactive = true;
+    return this;
+  };
+
+  pc.noisy = function() {
+    flags.noisy = true;
     return this;
   };
 
@@ -383,6 +404,7 @@ d3.parcoords = function(config) {
     d3.keys(state).forEach(function(key) {   
       obj[key] = function(x) {
         if (!arguments.length) return state[key];
+        if (flags.debug) console.log(hey, x);
         var old = state[key];
         state[key] = x;
         side_effects[key].call(pc,{"value": x, "previous": old});
@@ -402,7 +424,7 @@ d3.parcoords = function(config) {
   return pc;
 };
 
-d3.parcoords.version = "0.1.1";
+d3.parcoords.version = "0.1.2";
 
 // quantitative dimensions based on numerical or null values in the first row
 d3.parcoords.quantitative = function(data) {
