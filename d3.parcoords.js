@@ -7,7 +7,11 @@ d3.parcoords = function(config) {
     margin: { top: 24, right: 0, bottom: 12, left: 0 },
     color: "#069",
     composite: "source-over",
-    alpha: "0.7"
+    alpha: "0.7",
+    //brushable: false,
+    //reorderable: false,
+    //axes: false,
+    //interactive: false
   };
 
   extend(__, config);
