@@ -19,7 +19,7 @@ d3.parcoords = function(config) {
     __.height = selection[0][0].clientHeight;
 
     // canvas data layers
-    ["background", "marks", "foreground", "highlight"].forEach(function(layer) {
+    ["extents", "shadows", "marks", "foreground", "highlight"].forEach(function(layer) {
       ctx[layer] = selection
         .append("canvas")
           .attr("class", layer)
@@ -45,6 +45,7 @@ d3.parcoords = function(config) {
         reorderable: false,
         axes: false,
         interactive: false,
+        shadows: false,
         debug: false
       },
       xscale = d3.scale.ordinal(),
@@ -63,6 +64,9 @@ d3.parcoords = function(config) {
     .on("width", function(d) { pc.resize(); })
     .on("height", function(d) { pc.resize(); })
     .on("margin", function(d) { pc.resize(); })
+    .on("data", function(d) { 
+      if (flags.shadows) paths(__.data, ctx.shadows);
+    })
     .on("dimensions", function(d) {
       xscale.domain(__.dimensions);
       if (flags.interactive) pc.render().updateAxes();
@@ -107,8 +111,9 @@ d3.parcoords = function(config) {
     ctx.foreground.globalCompositeOperation = __.composite;
     ctx.foreground.globalAlpha = __.alpha;
     ctx.highlight.lineWidth = 3;
-    ctx.background.strokeStyle = "rgba(140,140,140,0.25)";
-    ctx.background.fillStyle = "rgba(255,255,255,0.4)";
+    ctx.shadows.strokeStyle = "#dadada";
+    ctx.extents.strokeStyle = "rgba(140,140,140,0.25)";
+    ctx.extents.fillStyle = "rgba(255,255,255,0.4)";
 
     return this;
   };
@@ -130,6 +135,12 @@ d3.parcoords = function(config) {
       __.data.forEach(path_foreground);
     }
     events.render.call(this);
+    return this;
+  };
+
+  pc.shadows = function() {
+    flags.shadows = true;
+    if (__.data.length > 0) paths(__.data, ctx.shadows);
     return this;
   };
 
@@ -211,6 +222,7 @@ d3.parcoords = function(config) {
     g.transition().duration(1100)
       .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
       .style("opacity", 1)
+   if (flags.shadows) paths(__.data, ctx.shadows);
     return this;
   };
 
@@ -275,7 +287,7 @@ d3.parcoords = function(config) {
   function brush() {
     brushed = selected();  
     pc.render();
-    extent_area();
+    //extent_area();
     events.brush.call(pc,brushed);
   };
 
@@ -324,7 +336,7 @@ d3.parcoords = function(config) {
   };
 
   // draw single polyline
-  function path(d, ctx) {
+  function color_path(d, ctx) {
     ctx.strokeStyle = d3.functor(__.color)(d);
     ctx.beginPath();
     __.dimensions.map(function(p,i) {
@@ -337,15 +349,31 @@ d3.parcoords = function(config) {
     ctx.stroke();
   };
 
+  // draw many polylines of the same color
+  function paths(data, ctx) {
+    ctx.clearRect(-1,-1,w()+2,h()+2);
+    ctx.beginPath();
+    data.forEach(function(d) {
+      __.dimensions.map(function(p,i) {
+        if (i == 0) {
+          ctx.moveTo(position(p),yscale[p](d[p]));
+        } else { 
+          ctx.lineTo(position(p),yscale[p](d[p]));
+        }
+      });
+    });
+    ctx.stroke();
+  };
+
   function extent_area() {
-    pc.clear('background');
+    pc.clear('extents');
 
     // no active brushes
     var actives = __.dimensions.filter(is_brushed);
     if (actives.length == 0) return;
 
     // create envelope
-    var ctx = pc.ctx.background;
+    var ctx = pc.ctx.extents;
     ctx.beginPath();
     __.dimensions.map(function(p,i) {
       if (i == 0) {
@@ -392,11 +420,11 @@ d3.parcoords = function(config) {
   };
 
   function path_foreground(d) {
-    return path(d, ctx.foreground);
+    return color_path(d, ctx.foreground);
   };
 
   function path_highlight(d) {
-    return path(d, ctx.highlight);
+    return color_path(d, ctx.highlight);
   };
 
   // getter/setter with event firing
@@ -424,7 +452,7 @@ d3.parcoords = function(config) {
   return pc;
 };
 
-d3.parcoords.version = "0.1.2";
+d3.parcoords.version = "0.1.3";
 
 // quantitative dimensions based on numerical or null values in the first row
 d3.parcoords.quantitative = function(data) {

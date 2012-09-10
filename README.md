@@ -157,6 +157,10 @@ The behavior is identical to that of the [original reorderable d3.js parallel co
 
 Mark the points where polylines meet an axis with dots.
 
+<a name="parcoords_shadows" href="#parcoords_shadows">#</a> parcoords.<b>shadows</b>()
+
+Active greyed-out background shadows.
+
 <a name="parcoords_width" href="#parcoords_width">#</a> parcoords.<b>width</b>()
 
 ```javascript
@@ -211,7 +215,7 @@ Set the quantative dimensions using based on the first row of data.
 
 <a name="parcoords_highlight" href="#parcoords_highlight">#</a> parcoords.<b>highlight</b>([<i>values</i>])
 
-Pass an array of data to overlay the data on the chart, masking the background.
+Pass an array of data to overlay the data on the chart, masking the foreground.
 
 <a name="parcoords_unhighlight" href="#parcoords_unhighlight">#</a> parcoords.<b>unhighlight</b>([<i>values</i>])
 
@@ -219,21 +223,25 @@ Clear the highlighting layer. This is equivalent to calling <a href="#parcoords_
 
 <a name="parcoords_interactive" href="#parcoords_interactive">#</a> parcoords.<b>interactive</b>()
 
-Active interactive mode for command line use. Currently this only affects adding/removing/reordering dimensions
+Activate interactive mode for use with a JavaScript console. The concept is that for each method that modifies a chart, everything that needs to happen to update the rendered chart will run automatically.
+
+Currently this only affects adding/removing/reordering dimensions. Normally the chart must be re-rendered and axes updated:
 
 ```javascript
-// normal mode
 parcoords.dimensions([3,1,2])
   .render()
   .updateAxes()
+```
 
-// interactive mode
+In interactive mode, just specify the new dimensions array.
+
+```javascript
 parcoords.dimensions([3,1,2])
 ```
 
 <a name="parcoords_clear" href="#parcoords_clear">#</a> parcoords.<b>clear</b>(*layer*)
 
-Clear the *layer*, which could be *"foreground"*, *"background"* or *"highlight"*.
+Clear the *layer*, which could be *"foreground"*, *"shadows"*, *"marks"*, *"extents"* or *"highlight"*.
 
 <a name="parcoords_ctx" href="#parcoords_ctx">#</a> parcoords.<b>ctx</b>
 
