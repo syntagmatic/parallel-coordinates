@@ -29,7 +29,8 @@
   #example-axes,
   #example1,
   #example2,
-  #example3 {
+  #example3,
+  #example-zscore {
     height: 200px;
     margin: 12px 0;
   }
@@ -81,11 +82,13 @@ Make a container div in HTML
 Make some data in JavaScript
 </p>
 <pre>
+// x,-x,x^,ax,1/x, random
 var <strong>data</strong> = [
-  [1, 0.7, 2, 42],
-  [0.4, 0.9, 1, 20],
-  [0.9, 0.2, 3, 19],
-  [0.1, 0, 1, 25]
+  [0,-0,0,0,0,3 ],
+  [1,-1,1,2,1,6 ],
+  [2,-2,4,4,0.5,2],
+  [3,-3,9,6,0.33,4],
+  [4,-4,16,8,0.25,9]
 ];
 </pre>
 <p>
@@ -98,11 +101,14 @@ var pc = d3.parcoords()("#<strong>example</strong>")
   .createAxes();
 </pre>
 <script>
+// x,-x,x^,ax,1/x, random
 var data = [
-  [1, 0.7, 2, 42],
-  [0.4, 0.9, 1, 20],
-  [0.9, 0.2, 3, 19],
-  [0.1, 0, 1, 25]
+  [0,-0,0,0,0,3 ],
+  [1,-1,1,2,1,6 ],
+  [2,-2,4,4,0.5,2],
+  [3,-3,9,6,0.33,4],
+  [4,-4,16,8,0.25,9]
+  [5,-5,25,10,0.2,1]
 ];
 
 var pc = d3.parcoords()("#example")
@@ -337,6 +343,78 @@ d3.select("#compositing-opacity").on("change", function() {
 });
 </script>
 
+<h3>Statistical Coloring</h3>
+
+<p>One useful way to use coloring is to compute a statistic for each row, and color by that value. This plot is colored by <a href="http://en.wikipedia.org/wiki/Standard_score">Z-score</a> along the *weight* dimension.</p>
+
+<ul>
+  <li><strong>Green</strong> - Positive Z-score</li>
+  <li><strong>Blue</strong> - Near-zero Z-score</li>
+  <li><strong>Red</strong> - Negative Z-score</li>
+</ul>
+
+<p>Click a different axis label to color by Z-score for that dimension.<br/>Thanks to <a href="http://vogievetsky.github.com/">Vadim Ogievetsky</a> for the suggestion.</p>
+
+<div id="example-zscore" class="parcoords"></div>
+<pre><a href="#" class="show-code" data-code="zscore">Show code</a></pre>
+<script src="lib/underscore.js"></script>
+<script src="lib/underscore.math.js"></script>
+<script id="zscore">// this section uses underscore.js and underscore.math
+var pcz;
+
+// color scale for zscores
+var zcolorscale = d3.scale.linear()
+  .domain([-Infinity, -2, -0.5, 0.5, 2, Infinity])
+  .range(["#d21", "#d21", "#679", "#679", "#590", "#590"])
+  .interpolate(d3.interpolateLab);
+
+// load csv file and create the chart
+d3.csv('data/cars.csv', function(data) {
+  pcz = d3.parcoords()("#example-zscore")
+    .data(data)
+    .render()
+    .shadows()  // background shadows
+    .brushable()  // enable brushing
+    .interactive()  // command line mode
+
+  change_color("weight (lb)");
+
+  // click label to activate coloring
+  pcz.svg.selectAll(".dimension")
+    .on("click", change_color)
+    .selectAll(".label")
+    .style("font-size", "14px");
+});
+
+// update color 
+function change_color(dimension) { 
+  pcz.svg.selectAll(".dimension")
+    .style("font-weight", "normal")
+    .filter(function(d) { return d == dimension; })
+    .style("font-weight", "bold")
+
+  pcz.color(zcolor(pcz.data(),dimension)).render()
+}
+
+// return color function based on plot and dimension
+function zcolor(col, dimension) {
+  var z = zscore(_(col).pluck(dimension).map(parseFloat))
+  return function(d) { return zcolorscale(z(d[dimension])) }
+};
+
+// color by zscore
+function zscore(col) {
+  var n = col.length,
+      mean = _(col).mean(),
+      sigma = _(col).stdDeviation();
+  return function(d) {
+    return (d-mean)/sigma;
+  };
+};
+</script>
+
+<p>Try using <a href="https://github.com/jasondavies/science.js/tree/master/src/stats">science.js</a>, <a href="http://harthur.github.com/clusterfck/">clusterfck</a>, or implement your own <a href="http://en.wikipedia.org/wiki/List_of_statistics_articles">statistics</a>. You may find <a href="http://underscorejs.org/">Underscore.js</a> and <a href="https://github.com/syntagmatic/underscore.math/blob/master/underscore.math.js">Underscore.math</a> useful to calculate statistics from scratch.</p>
+
 <h3>More on the way...</h3>
 
 <p>This library is in active development, so keep an eye out for new features and documentation. Major changes will be announced on the <a href="https://groups.google.com/forum/?fromgroups#!forum/d3-js">d3.js mailing list</a>, or you can <a href="https://github.com/syntagmatic/parallel-coordinates">watch the GitHub repository</a> to track every change.</p>
@@ -362,4 +440,5 @@ d3.selectAll(".show-code").on("click", function(d) {
     .text(code)
   event.preventDefault();
 })
+
 </script>
