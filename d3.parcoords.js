@@ -222,6 +222,7 @@ d3.parcoords = function(config) {
     g.transition().duration(1100)
       .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
       .style("opacity", 1)
+   if (flags.shadows) paths(__.data, ctx.shadows);
     return this;
   };
 
@@ -350,6 +351,7 @@ d3.parcoords = function(config) {
 
   // draw many polylines of the same color
   function paths(data, ctx) {
+    ctx.clearRect(-1,-1,w()+2,h()+2);
     ctx.beginPath();
     data.forEach(function(d) {
       __.dimensions.map(function(p,i) {
