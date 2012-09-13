@@ -1,5 +1,5 @@
 .parcoords > svg, .parcoords > canvas { 
-  font: 12px sans-serif;
+  font: 14px sans-serif;
   position: absolute;
 }
 .parcoords > canvas {
@@ -7,6 +7,9 @@
 }
 .parcoords rect.background {
   fill: transparent;
+}
+.parcoords rect.background:hover {
+  fill: rgba(120,120,120,0.2);
 }
 .parcoords .resize rect {
   fill: rgba(0,0,0,0.1);

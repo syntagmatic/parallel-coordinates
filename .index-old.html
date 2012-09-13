@@ -1,0 +1,63 @@
+
+<h3>Coloring gives polylines a personality</h3>
+<p>Coloring polylines based on a dimension helps you track them across many dimensions. Patches of color emerge and disappear.</p>
+<div id="example3" class="parcoords"></div>
+<pre><a href="#" class="show-code" data-code="coloring">Show code</a></pre>
+<script>
+// color based on the value of sin(x)
+var color = function(d) {
+  return d3.hcl(Math.round(180*d["sin(x)"]+180), 50, 55).toString();
+};
+
+d3.parcoords()("#example3")
+  .dimensions(d3.keys(data3[0]))
+  .data(data3)
+  .color(color)
+  .alpha(0.5)
+  .render()
+  .margin({top: 24, left: 0, right: 0, bottom: 12})
+  .brushable();
+</script>
+
+
+<h3>Brush away the clutter</h3>
+<p>D&eacute;j&agrave; vu! Have you seen <a href="http://mbostock.github.com/protovis/ex/cars.html">this chart before</a>?</p>
+<p>Click and drag along an axis to brush.<br/>
+Only data within the brush extents is displayed.<br/>
+Brushing lets you quickly zoom in on interesting groups and outliers.</p>
+<div id="example1" class="parcoords"></div>
+<p>
+This cars dataset is loaded from a <a href="data/cars.csv">csv file</a>.
+</p>
+<pre><a href="#" class="show-code" data-code="brushing">Show code</a></pre>
+<p>Try resorting the axes, alphabetically, by running this code in a <a href="http://webmasters.stackexchange.com/questions/8525/how-to-open-the-javascript-console-in-different-browsers">javascript console</a>. The chart is in interactive mode, so it will update the axes and re-render automatically.</p>
+<pre>
+pc1.dimensions([
+  "0-60 mph (s)",
+  "economy (mpg)",
+  "power (hp)",
+  "weight (lb)",
+  "displacement (cc)"
+]);
+</pre>
+<script id="brushing">// interact with this variable from a javascript console
+var pc1;
+
+// create a linear color scale
+var blue_to_brown = d3.scale.linear()
+  .domain([9, 50])
+  .range(["steelblue", "brown"])
+  .interpolate(d3.interpolateLab);
+
+// load csv file and create the chart
+d3.csv('data/cars.csv', function(data) {
+  pc1 = d3.parcoords()("#example1")
+    .data(data)
+    .color(function(d) { return blue_to_brown(d['economy (mpg)']); })  // quantitative color scale
+    .render()
+    .shadows()  // background shadows
+    .brushable()  // enable brushing
+    .interactive()  // command line mode
+});
+</script>
+
