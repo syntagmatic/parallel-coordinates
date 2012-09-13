@@ -3,63 +3,9 @@
 <link rel="stylesheet" type="text/css" href="d3.parcoords.css">
 <script src="d3.v2.js"></script>
 <script src="d3.parcoords.js"></script>
-<style>
-  body {
-    font-size: 14px;
-    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
-    margin: 50px auto 20px;
-    width: 720px;
-    background: #fcfcfc;
-    line-height: 1.45em;
-  }
-  a {
-    color: #555;
-  }
-  a:hover {
-    color: #000;
-  }
-  ul {
-    margin: 0 20px;
-    padding: 0;
-  }
-  .dark {
-    background: #222;
-  }
-  #example,
-  #example-axes,
-  #example1,
-  #example2,
-  #example3,
-  #example-zscore {
-    height: 200px;
-    margin: 12px 0;
-  }
-  p {
-    width: 560px;
-  }
-  pre {
-    color: #444;
-    font-family: Ubuntu Mono, Monaco, monospace;
-    padding: 4px 8px;
-    background: #f2f2f2;
-    border: 1px solid #ccc;
-  }
-  h1 small {
-    font-weight: normal;
-    font-size: 0.5em;
-  }
-  h3 {
-    margin-top: 40px;
-  }
-  .float {
-    float: left;
-  }
-  .centered {
-    text-align: center;
-  }
-</style>
+<link rel="stylesheet" type="text/css" href="style.css">
 <a href="https://github.com/syntagmatic/parallel-coordinates"><img style="position: absolute; top: 0; right: 0; border: 0;" src="forkme.png" alt="Fork me on GitHub"></a>
-<h1>Parallel Coordinates <small>(0.1.3)</small></h1>
+<h1>Parallel Coordinates <small>(0.1.4)</small></h1>
 <p>A visual toolkit for <a href="http://www.cs.ucdavis.edu/~ma/ECS289H/papers/Inselberg1997.pdf">multidimensional detectives</a>.</p>
 <p><strong><a href="d3.parcoords.js">d3.parcoords.js</a></strong> <small> - requires <strong><a href="http://d3js.org/">D3.js</a></strong></small><br/>
 <strong><a href="d3.parcoords.css">d3.parcoords.css</a></strong> <small> - default styles</small></p>
@@ -70,7 +16,289 @@
   <li><a href="https://github.com/syntagmatic/parallel-coordinates/issues">Issues</a></li>
 </ul>
 
-<h3>Let's dive in!</h3>
+
+<h3>Brushing</h3>
+<p>Click an axis label to start an oscillating brush. The brush creates a sliding window, filtering out data outside the range. Multiple brushes can be created at once.</p>
+<p>Stop the brush by clicking the axis label again. You can drag, resize and remove stopped brushes.</p>
+<div id="example1" class="parcoords"></div>
+<pre><a href="#" class="show-code" data-code="brushing">Show code</a></pre>
+
+<script id="brushing">// linear color scale
+var blue_to_brown = d3.scale.linear()
+  .domain([9, 50])
+  .range(["steelblue", "brown"])
+  .interpolate(d3.interpolateLab);
+
+// interact with this variable from a javascript console
+var pc1;
+
+// load csv file and create the chart
+d3.csv('data/cars.csv', function(data) {
+  pc1 = d3.parcoords()("#example1")
+    .data(data)
+    .color(function(d) { return blue_to_brown(d['economy (mpg)']); })  // quantitative color scale
+    .alpha(0.4)
+    .render()
+    .brushable()  // enable brushing
+    .interactive()  // command line mode
+
+  var explore_count = 0;
+  var exploring = {};
+  pc1.svg
+    .selectAll(".dimension")
+    .style("cursor", "pointer")
+    .on("click", function(d) {
+      exploring[d] = d in exploring ? false : true;
+      event.preventDefault();
+      if (exploring[d]) d3.timer(explore(d,explore_count));
+    });
+  d3.timer(pc1.brush);
+
+  function explore(dimension,count) {
+    var speed = (Math.round(Math.random()) ? 1 : -1) * (Math.random()+0.5);
+    return function(t) {
+      if (!exploring[dimension]) return true;
+      var domain = pc1.yscale[dimension].domain();
+      var width = (domain[1] - domain[0])/2;
+
+      var center = width/2*(1+Math.sin(speed*t/1200)) + domain[0];
+
+      pc1.yscale[dimension].brush.extent([
+        d3.max([center, domain[0]-width/400]),  
+        d3.min([center+width, domain[1]+width/100])  
+      ])(pc1.g()
+          .filter(function(d) {
+            return d == dimension;
+          })
+      );
+    };
+  };
+
+});
+</script>
+
+
+<h3>Reordering</h3>
+<p>
+Data for this chart is generated from built-in <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Math">JavaScript math functions</a>.
+</p>
+<p>
+Pure mathematical relationships may emerge in your explorations, though real data tends to be much noisier. The cars dataset has several roughly inverse relationships, revealed by dense crossings. The first two dimensions in this chart, <em>-x</em> and <em>x</em>, have a perfectly inverse relationship. All lines between those axes meet at a single point.
+</p>
+<p>
+Only relationships between adjacent dimensions are revealed.<br/>
+Drag the axes titles around to reorder the dimensions.
+</p>
+<p>
+<a href="#" id="reorder-dance">Shuffle dimensions!</a>
+</p>
+<script>
+d3.select("#reorder-dance").on("click", function() {
+  event.preventDefault();
+  function dance() {
+    pc2.dimensions( _.shuffle(pc2.dimensions()) )
+    .render()
+    .updateAxes();
+  };
+  dance();
+});
+</script>
+<div id="example2" class="parcoords"></div>
+<pre><a href="#" class="show-code" data-code="reordering">Show code</a></pre>
+<script id="reordering">var data2 = d3.range(0,2*Math.PI,Math.PI/40)
+  .map(function(x) {
+    return {
+      "-x": -x,
+      x: x,
+      "sin(x)": Math.sin(x),
+      "cos(x)": Math.cos(x),
+      "atan(x)": Math.atan(x),
+      "exp(x)": Math.exp(x),
+      "square(x)": x*x,
+      "sqrt(x)": Math.sqrt(x),
+    };
+  });
+
+// get list of dimensions
+var dimensions2 = d3.keys(data2[0]);
+var pc2 = d3.parcoords()("#example2");
+
+pc2.dimensions(dimensions2)
+  .data(data2)
+  .color("#000")
+  .alpha(0.2)
+  .margin({ top: 24, left: 0, bottom: 12, right: 0 })
+  .render()
+  .reorderable();
+</script>
+<script id="coloring">// generate data with math functions
+var data3 = d3.range(-2*Math.PI,2*Math.PI,Math.PI/40)
+  .map(function(x) {
+    return {
+      "sin(x)": Math.sin(x),
+      "cos(x)": Math.cos(x),
+      "sin(x/2)": Math.sin(x/2),
+      "sin(x*2)": Math.sin(x*2),
+      "cos(x/2)": Math.cos(x/2),
+    };
+  });
+</script>
+
+<h3>Color</h3>
+<p>CSS color string. This group of plots is colored with values from <a href="https://github.com/mbostock/d3/wiki/Ordinal-Scales#wiki-category10">d3.scale.category20b()</a>.</p>
+<div id="example-coloring-0" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-1" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-2" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-3" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-4" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-5" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-6" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-7" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-8" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-9" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-10" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-11" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-12" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-13" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-14" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-15" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-16" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-17" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-18" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div id="example-coloring-19" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
+<div style="clear:both"></div>
+<pre><a href="#" class="show-code" data-code="coloring-basic">Show code</a></pre>
+<script id="coloring-basic">var colors = d3.scale.category20b(); 
+
+// create a chart in every element with class "parcoords-coloring"
+d3.selectAll(".parcoords-coloring")
+  .each(function(d,i) {
+    var color = colors(i);
+
+    var chart = d3.parcoords()(this)
+      .data(data3.slice(7*i,7*i+30))
+      .alpha(0.6)
+      .color(color)
+      .margin({
+        top: 0,
+        left: 0,
+        bottom: 24,
+        right: 0
+      })
+      .render();
+
+    // color labels
+    var text = chart.svg.append("text")
+      .attr("x", 162)
+      .attr("y", 64)
+      .style({
+        "text-anchor": "end",
+        "font-weight": "bold",
+        "font-size": "11px",
+        "fill": "#ddd"
+      })
+      .text(colors(i))
+
+    // hover effect
+    d3.select(this).on({
+      "mouseover": function() { text.style("fill", "#222"); },
+      "mouseout": function() { text.style("fill", "#ddd"); }
+    })
+  });
+</script>
+<h3>Statistical Coloring</h3>
+
+<p>One useful way to use coloring is to compute a statistic for each row, and color by that value. This plot is colored by <a href="http://en.wikipedia.org/wiki/Standard_score">Z-score</a> along the *weight* dimension.</p>
+
+
+<p>Click a different axis label to color by Z-score for that dimension.<br/>Thanks to <a href="http://vogievetsky.github.com/">Vadim Ogievetsky</a> for the suggestion.</p>
+
+<div id="example-zscore" class="parcoords"></div>
+
+<!--
+<ul id="zscore-colors">
+  <li><input type="text" id="zscore-color0" value="green"/> - Positive Z-score</li>
+  <li><input type="text" id="zscore-color1" value="grey"/> - Near-zero Z-score</li>
+  <li><input type="text" id="zscore-color2" value="blue"/> - Negative Z-score</li>
+</ul>
+-->
+
+<pre><a href="#" class="show-code" data-code="zscore">Show code</a></pre>
+<script src="lib/underscore.js"></script>
+<script src="lib/underscore.math.js"></script>
+<script id="zscore">// this section uses underscore.js and underscore.math
+var pcz;
+
+// color scale for zscores
+var zcolorscale = d3.scale.linear()
+  .domain([-2,0,2])
+  .range(["#D53E4F", "#fee08b", "#3288bd"])
+  .interpolate(d3.interpolateLab);
+
+// load csv file and create the chart
+d3.csv('data/cars.csv', function(data) {
+  pcz = d3.parcoords()("#example-zscore")
+    .data(data)
+    .render()
+    .alpha(0.6)
+    .brushable()  // enable brushing
+    .interactive()  // command line mode
+
+  change_color("weight (lb)");
+
+  // click label to activate coloring
+  pcz.svg.selectAll(".dimension")
+    .on("click", change_color)
+    .selectAll(".label")
+    .style("font-size", "14px");
+});
+
+// update color 
+function change_color(dimension) { 
+  pcz.svg.selectAll(".dimension")
+    .style("font-weight", "normal")
+    .filter(function(d) { return d == dimension; })
+    .style("font-weight", "bold")
+
+  pcz.color(zcolor(pcz.data(),dimension)).render()
+}
+
+// return color function based on plot and dimension
+function zcolor(col, dimension) {
+  var z = zscore(_(col).pluck(dimension).map(parseFloat))
+  return function(d) { return zcolorscale(z(d[dimension])) }
+};
+
+// color by zscore
+function zscore(col) {
+  var n = col.length,
+      mean = _(col).mean(),
+      sigma = _(col).stdDeviation();
+  return function(d) {
+    return (d-mean)/sigma;
+  };
+};
+
+// color picker
+/*
+var zcolors = {};
+d3.range(3).map(function(i) {
+  d3.select("#zscore-color" + i).on("keyup", function() {
+    d3.select("#zscore-colors")
+      .selectAll("input")
+      .each(function(d,i) {
+        zcolors[i] = this.value;
+      });
+    zcolorscale.range([zcolors[0], zcolors[1], zcolors[2]])
+    pcz.render();
+  });
+});
+*/
+</script>
+
+<p>Try using <a href="https://github.com/jasondavies/science.js/tree/master/src/stats">science.js</a>, <a href="http://harthur.github.com/clusterfck/">clusterfck</a>, or implement your own <a href="http://en.wikipedia.org/wiki/List_of_statistics_articles">statistics</a>. You may find <a href="http://underscorejs.org/">Underscore.js</a> and <a href="https://github.com/syntagmatic/underscore.math/blob/master/underscore.math.js">Underscore.math</a> useful to calculate statistics from scratch.</p>
+
+<h3>Getting Started</h3>
 <div id="example" class="parcoords" style="width:360px;height:150px"></div>
 <p>
 Make a container div in HTML
@@ -119,167 +347,6 @@ var pc = d3.parcoords()("#example")
   .createAxes();
 </script>
 <p>That's all there is to it!</p>
-<h3>Brush away the clutter</h3>
-<p>D&eacute;j&agrave; vu! Have you seen <a href="http://mbostock.github.com/protovis/ex/cars.html">this chart before</a>?</p>
-<p>Click and drag along an axis to brush.<br/>
-Only data within the brush extents is displayed.<br/>
-Brushing lets you quickly zoom in on interesting groups and outliers.</p>
-<div id="example1" class="parcoords"></div>
-<p>
-This cars dataset is loaded from a <a href="data/cars.csv">csv file</a>.
-</p>
-<pre><a href="#" class="show-code" data-code="brushing">Show code</a></pre>
-<p>Try reordering and removing some axes by running this code in a <a href="http://webmasters.stackexchange.com/questions/8525/how-to-open-the-javascript-console-in-different-browsers">javascript console</a>. The chart is in interactive mode, so it will re-render and update axes automatically when dimensions are updated.</p>
-<pre>
-pc1.dimensions([
-  "0-60 mph (s)",
-  "economy (mpg)",
-  "power (hp)",
-  "weight (lb)",
-  "displacement (cc)"
-]);
-</pre>
-<script id="brushing">// interact with this variable from a javascript console
-var pc1;
-
-// create a linear color scale
-var blue_to_brown = d3.scale.linear()
-  .domain([9, 50])
-  .range(["steelblue", "brown"])
-  .interpolate(d3.interpolateLab);
-
-// load csv file and create the chart
-d3.csv('data/cars.csv', function(data) {
-  pc1 = d3.parcoords()("#example1")
-    .data(data)
-    .color(function(d) { return blue_to_brown(d['economy (mpg)']); })  // quantitative color scale
-    .render()
-    .shadows()  // background shadows
-    .brushable()  // enable brushing
-    .interactive()  // command line mode
-});
-</script>
-<h3>Reorder to reveal relationships</h3>
-<p>
-Data for this chart is generated from built-in <a href="https://developer.mozilla.org/en-US/docs/JavaScript/Reference/Global_Objects/Math">JavaScript math functions</a>.
-</p>
-<p>
-Pure mathematical relationships may emerge in your explorations, though real data tends to be much noisier. The cars dataset has several roughly inverse relationships, revealed by dense crossings. The first two dimensions in this chart, <em>-x</em> and <em>x</em>, have a perfectly inverse relationship. All lines between those axes meet at a single point.
-</p>
-<p>
-Only relationships between adjacent dimensions are revealed.<br/>
-Drag the axes titles around to reorder the dimensions.
-</p>
-<div id="example2" class="parcoords"></div>
-<pre><a href="#" class="show-code" data-code="reordering">Show code</a></pre>
-<script id="reordering">var data2 = d3.range(0,2*Math.PI,Math.PI/40)
-  .map(function(x) {
-    return {
-      "-x": -x,
-      x: x,
-      "sin(x)": Math.sin(x),
-      "cos(x)": Math.cos(x),
-      "atan(x)": Math.atan(x),
-      "exp(x)": Math.exp(x),
-      "square(x)": x*x,
-      "sqrt(x)": Math.sqrt(x),
-    };
-  });
-
-// get list of dimensions
-var dimensions2 = d3.keys(data2[0]);
-var pc2 = d3.parcoords()("#example2");
-
-pc2.dimensions(dimensions2)
-  .data(data2)
-  .color("#000")
-  .alpha(0.2)
-  .margin({ top: 24, left: 0, bottom: 12, right: 0 })
-  .render()
-  .reorderable();
-</script>
-<h3>Coloring gives polylines a personality</h3>
-<p>Coloring polylines based on a dimension helps you track them across many dimensions. Patches of color emerge and disappear.</p>
-<div id="example3" class="parcoords"></div>
-<pre><a href="#" class="show-code" data-code="coloring">Show code</a></pre>
-<script id="coloring">// generate data with math functions
-var data3 = d3.range(-2*Math.PI,2*Math.PI,Math.PI/40)
-  .map(function(x) {
-    return {
-      "sin(x)": Math.sin(x),
-      "cos(x)": Math.cos(x),
-      "sin(x/2)": Math.sin(x/2),
-      "sin(x*2)": Math.sin(x*2),
-      "cos(x/2)": Math.cos(x/2),
-    };
-  });
-
-// color based on the value of sin(x)
-var color = function(d) {
-  return d3.hcl(Math.round(180*d["sin(x)"]+180), 50, 55).toString();
-};
-
-d3.parcoords()("#example3")
-  .dimensions(d3.keys(data3[0]))
-  .data(data3)
-  .color(color)
-  .alpha(0.5)
-  .render()
-  .margin({top: 24, left: 0, right: 0, bottom: 12})
-  .brushable();
-</script>
-<p>For a single color, just pass in a CSS color string. This group of plots is colored with values from <a href="https://github.com/mbostock/d3/wiki/Ordinal-Scales#wiki-category10">d3.scale.category20b()</a>.</p>
-<div id="example-coloring-0" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-1" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-2" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-3" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-4" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-5" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-6" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-7" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-8" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-9" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-10" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-11" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-12" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-13" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-14" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-15" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-16" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-17" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-18" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div id="example-coloring-19" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
-<div style="clear:both"></div>
-<pre><a href="#" class="show-code" data-code="coloring-basic">Show code</a></pre>
-<script id="coloring-basic">var colors = d3.scale.category20b(); 
-
-// create a chart in every element with class "parcoords-coloring"
-d3.selectAll(".parcoords-coloring")
-  .each(function(d,i) {
-    var color = colors(i);
-
-    var chart = d3.parcoords()(this)
-      .data(data3.slice(7*i,7*i+30))
-      .alpha(0.6)
-      .color(color)
-      .margin({ top: 0, left: 0, bottom: 24, right: 0 })
-      .render();
-
-    // color labels
-    var text = chart.svg.append("text")
-      .attr("x", 162)
-      .attr("y", 64)
-      .style("text-anchor", "end")
-      .style("font-weight", "bold")
-      .style("font-size", "11px")
-      .style("fill", "#ddd")
-      .text(colors(i))
-
-    // hover effect
-    d3.select(this).on("mouseover", function() { text.style("fill", "#222"); });
-    d3.select(this).on("mouseout", function() { text.style("fill", "#ddd"); });
-  });
-</script>
 
 <h3>Compositing and Opacity</h3>
 <p>Control <a href="https://developer.mozilla.org/en-US/docs/Canvas_tutorial/Compositing">compositing</a> and opacity with <b>composite()</b> and <b>alpha()</b>, respectively. Compositing controls how pixels are combined to form the final image.
@@ -326,8 +393,15 @@ d3.selectAll(".parcoords-compositing")
       .data(data3)
       .alpha(0.3)
       .composite(mode)
-      .color(function(d) { return color(Math.sin(d["sin(x)"]*10)); })
-      .margin({ top: 20, left: -10, bottom: 0, right: -10 })
+      .color(function(d) {
+        return color(Math.sin(d["sin(x)"]*10));
+      })
+      .margin({
+        top: 20,
+        left: -10,
+        bottom: 0,
+        right: -10
+      })
       .render()
       .axisDots();
 
@@ -343,78 +417,6 @@ d3.select("#compositing-opacity").on("change", function() {
 });
 </script>
 
-<h3>Statistical Coloring</h3>
-
-<p>One useful way to use coloring is to compute a statistic for each row, and color by that value. This plot is colored by <a href="http://en.wikipedia.org/wiki/Standard_score">Z-score</a> along the *weight* dimension.</p>
-
-<ul>
-  <li><strong>Green</strong> - Positive Z-score</li>
-  <li><strong>Blue</strong> - Near-zero Z-score</li>
-  <li><strong>Red</strong> - Negative Z-score</li>
-</ul>
-
-<p>Click a different axis label to color by Z-score for that dimension.<br/>Thanks to <a href="http://vogievetsky.github.com/">Vadim Ogievetsky</a> for the suggestion.</p>
-
-<div id="example-zscore" class="parcoords"></div>
-<pre><a href="#" class="show-code" data-code="zscore">Show code</a></pre>
-<script src="lib/underscore.js"></script>
-<script src="lib/underscore.math.js"></script>
-<script id="zscore">// this section uses underscore.js and underscore.math
-var pcz;
-
-// color scale for zscores
-var zcolorscale = d3.scale.linear()
-  .domain([-Infinity, -2, -0.5, 0.5, 2, Infinity])
-  .range(["#d21", "#d21", "#679", "#679", "#590", "#590"])
-  .interpolate(d3.interpolateLab);
-
-// load csv file and create the chart
-d3.csv('data/cars.csv', function(data) {
-  pcz = d3.parcoords()("#example-zscore")
-    .data(data)
-    .render()
-    .shadows()  // background shadows
-    .brushable()  // enable brushing
-    .interactive()  // command line mode
-
-  change_color("weight (lb)");
-
-  // click label to activate coloring
-  pcz.svg.selectAll(".dimension")
-    .on("click", change_color)
-    .selectAll(".label")
-    .style("font-size", "14px");
-});
-
-// update color 
-function change_color(dimension) { 
-  pcz.svg.selectAll(".dimension")
-    .style("font-weight", "normal")
-    .filter(function(d) { return d == dimension; })
-    .style("font-weight", "bold")
-
-  pcz.color(zcolor(pcz.data(),dimension)).render()
-}
-
-// return color function based on plot and dimension
-function zcolor(col, dimension) {
-  var z = zscore(_(col).pluck(dimension).map(parseFloat))
-  return function(d) { return zcolorscale(z(d[dimension])) }
-};
-
-// color by zscore
-function zscore(col) {
-  var n = col.length,
-      mean = _(col).mean(),
-      sigma = _(col).stdDeviation();
-  return function(d) {
-    return (d-mean)/sigma;
-  };
-};
-</script>
-
-<p>Try using <a href="https://github.com/jasondavies/science.js/tree/master/src/stats">science.js</a>, <a href="http://harthur.github.com/clusterfck/">clusterfck</a>, or implement your own <a href="http://en.wikipedia.org/wiki/List_of_statistics_articles">statistics</a>. You may find <a href="http://underscorejs.org/">Underscore.js</a> and <a href="https://github.com/syntagmatic/underscore.math/blob/master/underscore.math.js">Underscore.math</a> useful to calculate statistics from scratch.</p>
-
 <h3>More on the way...</h3>
 
 <p>This library is in active development, so keep an eye out for new features and documentation. Major changes will be announced on the <a href="https://groups.google.com/forum/?fromgroups#!forum/d3-js">d3.js mailing list</a>, or you can <a href="https://github.com/syntagmatic/parallel-coordinates">watch the GitHub repository</a> to track every change.</p>
@@ -422,6 +424,11 @@ function zscore(col) {
 <p>
 For past versions of parallel coordinates that demonstrate various features and techniques, see this <a href="http://bl.ocks.org/syntagmatic">list of bl.ocks</a>.
 </p>
+
+
+<h3>Credits</h3>
+
+<p>Created by Kai Chang with many <a href="https://github.com/syntagmatic/parallel-coordinates#credits">collaborators</a></p>
 
 <h3>Changes</h3>
 

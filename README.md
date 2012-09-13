@@ -147,6 +147,10 @@ The behavior is identical to that of the [original d3.js parallel coordinates](h
 
 For <a href="#parcoords_brushable">brushable</a> plots, returns the selected data.
 
+<a name="parcoords_brushReset" href="#parcoords_brushReset">#</a> parcoords.<b>brushReset</b>()
+
+TODO. This is supposed to reset all brushes, but may not work presently.
+
 <a name="parcoords_reorderable" href="#parcoords_reorderable">#</a> parcoords.<b>reorderable</b>()
 
 Enable reordering of axes. Automatically creates axes if they don't exist.

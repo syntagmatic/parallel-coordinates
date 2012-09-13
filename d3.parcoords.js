@@ -2,6 +2,7 @@ d3.parcoords = function(config) {
   var __ = {
     dimensions: [],
     data: [],
+    brushed: false,
     width: 600,
     height: 300,
     margin: { top: 24, right: 0, bottom: 12, left: 0 },
@@ -53,7 +54,6 @@ d3.parcoords = function(config) {
       dragging = {},
       line = d3.svg.line(),
       axis = d3.svg.axis().orient("left").ticks(5),
-      brushed,
       g, // groups for axes, brushes
       ctx = {};
 
@@ -129,8 +129,8 @@ d3.parcoords = function(config) {
     if (!(__.dimensions[0] in yscale)) pc.autoscale();
 
     pc.clear('foreground');
-    if (brushed) {
-      brushed.forEach(path_foreground);
+    if (__.brushed) {
+      __.brushed.forEach(path_foreground);
     } else {
       __.data.forEach(path_foreground);
     }
@@ -184,6 +184,7 @@ d3.parcoords = function(config) {
           "class": "label"
         })
         .text(String)
+
     flags.axes= true;
     return this;
   };
@@ -236,7 +237,7 @@ d3.parcoords = function(config) {
           d3.select(this).call(
             yscale[d].brush = d3.svg.brush()
               .y(yscale[d])
-              .on("brush", brush)
+              .on("brush", pc.brush)
           );
         })
       .selectAll("rect")
@@ -278,24 +279,30 @@ d3.parcoords = function(config) {
     return this;
   };
 
-  pc.noisy = function() {
-    flags.noisy = true;
-    return this;
-  };
-
   // Get data within brushes
-  function brush() {
-    brushed = selected();  
+  pc.brush = function() {
+    __.brushed = selected();  
     pc.render();
     //extent_area();
-    events.brush.call(pc,brushed);
+    events.brush.call(pc,__.brushed);
   };
 
   // expose a few objects
   pc.xscale = xscale;
   pc.yscale = yscale;
   pc.ctx = ctx;
-  pc.brushed = function() { return brushed };
+  pc.g = function() { return g; };
+
+  // TODO
+  pc.brushReset = function(dimension) {
+    yscale[dimension].brush.clear()(
+      pc1.g()
+        .filter(function(p) {
+          return dimension == p;
+        })
+    )
+    return this;
+  };
 
   // rescale for height, width and margins
   pc.resize = function() {
@@ -452,7 +459,7 @@ d3.parcoords = function(config) {
   return pc;
 };
 
-d3.parcoords.version = "0.1.3";
+d3.parcoords.version = "0.1.4";
 
 // quantitative dimensions based on numerical or null values in the first row
 d3.parcoords.quantitative = function(data) {
