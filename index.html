@@ -15,8 +15,6 @@
   <li><a href="https://github.com/syntagmatic/parallel-coordinates#parallel-coordinates">API Reference</a></li>
   <li><a href="https://github.com/syntagmatic/parallel-coordinates/issues">Issues</a></li>
 </ul>
-
-
 <h3>Brushing</h3>
 <p>Click an axis label to start an oscillating brush. The brush creates a sliding window, filtering out data outside the range. Multiple brushes can be created at once.</p>
 <p>Stop the brush by clicking the axis label again. You can drag, resize and remove stopped brushes.</p>
@@ -215,7 +213,7 @@ d3.selectAll(".parcoords-coloring")
 <p>One useful way to use coloring is to compute a statistic for each row, and color by that value. This plot is colored by <a href="http://en.wikipedia.org/wiki/Standard_score">Z-score</a> along the *weight* dimension.</p>
 
 
-<p>Click a different axis label to color by Z-score for that dimension.<br/>Thanks to <a href="http://vogievetsky.github.com/">Vadim Ogievetsky</a> for the suggestion.</p>
+<p>Click a different axis label to color by Z-score for that dimension.</p>
 
 <div id="example-zscore" class="parcoords"></div>
 
@@ -235,8 +233,8 @@ var pcz;
 
 // color scale for zscores
 var zcolorscale = d3.scale.linear()
-  .domain([-2,0,2])
-  .range(["#D53E4F", "#fee08b", "#3288bd"])
+  .domain([-2,-0.5,0.5,2])
+  .range(["brown", "#999", "#999", "steelblue"])
   .interpolate(d3.interpolateLab);
 
 // load csv file and create the chart
