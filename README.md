@@ -213,6 +213,24 @@ Change the opacity of the polylines, also the foreground context's globalAlpha.
 
 Set the xscale, yscale, and canvas sizes. Usually this is called automatically, such as on render() or resize() events 
 
+<a name="parcoords_mode" href="#parcoords_mode">#</a> parcoords.<b>mode</b>(*type*)
+
+Toggle the rendering mode. Currently there are two options:
+
+* *"default"* renders instantaneously, but is less responsive with more than ~2000 rows of data
+* *"queue"* puts the data in a queue, and renders progressively. This way the user can interact with the chart during rendering.
+
+<a name="parcoords_rate" href="#parcoords_rate">#</a> parcoords.<b>rate</b>(*integer*)
+
+Change the number of lines drawn each frame when the <a href="#parcoords_mode">rendering mode</a> is set to *"queue"*. Some suggested values for different machines are:
+
+* Mobile phone or iPad: 12-30
+* Normal PC with Firefox: 20-60
+* Normal PC with Chrome/Safari: 30-100
+* Fast PC with Chrome/Safari: 100-300
+
+In the future, an automatic rate adjuster will be included to optimize this number on-the-fly.
+
 <a name="parcoords_detectDimensions" href="#parcoords_detectDimensions">#</a> parcoords.<b>detectDimensions</b>()
 
 Set the quantative dimensions using based on the first row of data.

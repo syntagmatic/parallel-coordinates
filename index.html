@@ -79,6 +79,54 @@ d3.csv('data/cars.csv', function(data) {
 });
 </script>
 
+<h3>Getting Started</h3>
+<div id="example" class="parcoords" style="width:360px;height:150px"></div>
+<p>
+Make a container div in HTML
+</p>
+<pre>
+&lt;div id="<strong>example</strong>" class="parcoords" style="width:300px;height:150px"&gt;&lt;/div&gt;
+</pre>
+<p>
+Make some data in JavaScript
+</p>
+<pre>
+var <strong>data</strong> = [
+  [0,-0,0,0,0,3 ],
+  [1,-1,1,2,1,6 ],
+  [2,-2,4,4,0.5,2],
+  [3,-3,9,6,0.33,4],
+  [4,-4,16,8,0.25,9]
+];
+</pre>
+<p>
+Create a parallel coordinates plot
+</p>
+<pre>
+var pc = d3.parcoords()("#<strong>example</strong>")
+  .data(<strong>data</strong>)
+  .render()
+  .createAxes();
+</pre>
+<script>
+// x,-x,x^,ax,1/x, random
+var data = [
+  [0,-0,0,0,0,3 ],
+  [1,-1,1,2,1,6 ],
+  [2,-2,4,4,0.5,2],
+  [3,-3,9,6,0.33,4],
+  [4,-4,16,8,0.25,9]
+];
+
+var pc = d3.parcoords()("#example")
+  .data(data)
+  .render()
+  .ticks(2)
+  .tickSubdivide(true)
+  .createAxes();
+</script>
+<p>That's all there is to it!</p>
+
 
 <h3>Reordering</h3>
 <p>
@@ -300,55 +348,6 @@ d3.range(3).map(function(i) {
 
 <p>Try using <a href="https://github.com/jasondavies/science.js/tree/master/src/stats">science.js</a>, <a href="http://harthur.github.com/clusterfck/">clusterfck</a>, or implement your own <a href="http://en.wikipedia.org/wiki/List_of_statistics_articles">statistics</a>. You may find <a href="http://underscorejs.org/">Underscore.js</a> and <a href="https://github.com/syntagmatic/underscore.math/blob/master/underscore.math.js">Underscore.math</a> useful to calculate statistics from scratch.</p>
 
-<h3>Getting Started</h3>
-<div id="example" class="parcoords" style="width:360px;height:150px"></div>
-<p>
-Make a container div in HTML
-</p>
-<pre>
-&lt;div id="<strong>example</strong>" class="parcoords" style="width:300px;height:150px"&gt;&lt;/div&gt;
-</pre>
-<p>
-Make some data in JavaScript
-</p>
-<pre>
-// x,-x,x^,ax,1/x, random
-var <strong>data</strong> = [
-  [0,-0,0,0,0,3 ],
-  [1,-1,1,2,1,6 ],
-  [2,-2,4,4,0.5,2],
-  [3,-3,9,6,0.33,4],
-  [4,-4,16,8,0.25,9]
-];
-</pre>
-<p>
-Create a parallel coordinates plot
-</p>
-<pre>
-var pc = d3.parcoords()("#<strong>example</strong>")
-  .data(<strong>data</strong>)
-  .render()
-  .createAxes();
-</pre>
-<script>
-// x,-x,x^,ax,1/x, random
-var data = [
-  [0,-0,0,0,0,3 ],
-  [1,-1,1,2,1,6 ],
-  [2,-2,4,4,0.5,2],
-  [3,-3,9,6,0.33,4],
-  [4,-4,16,8,0.25,9]
-];
-
-var pc = d3.parcoords()("#example")
-  .data(data)
-  .render()
-  .ticks(2)
-  .tickSubdivide(true)
-  .createAxes();
-</script>
-<p>That's all there is to it!</p>
-
 <h3>Compositing and Opacity</h3>
 <p>Control <a href="https://developer.mozilla.org/en-US/docs/Canvas_tutorial/Compositing">compositing</a> and opacity with <b>composite()</b> and <b>alpha()</b>, respectively. Compositing controls how pixels are combined to form the final image.
 </p>
@@ -418,6 +417,43 @@ d3.select("#compositing-opacity").on("change", function() {
 });
 </script>
 
+<h3>Progressive Rendering</h3>
+
+<p>With thousands of data points, the chart will get less responsive when brushing. The interface may stutter or freeze, frustrating the uesr. To solve this, enable progressive rendering by setting the render <a href="https://github.com/syntagmatic/parallel-coordinates#parcoords_mode">mode</a> to <em>"queue"</em>.</p>
+<p>Change the speed of rendering by setting the <a href="https://github.com/syntagmatic/parallel-coordinates#parcoords_rate">rate</a>. You can read more about this technique on the <a href="http://bl.ocks.org/d/3341641/">Render Queue</a> page.</p>
+
+<div id="example-progressive" class="parcoords" style="width:1200px;margin-left:-200px;"></div>
+<pre><a href="#" class="show-code" data-code="progressive">Show code</a></pre>
+
+<script id="progressive">// linear color scale
+// interact with this variable from a javascript console
+var pc_progressive;
+
+// load csv file and create the chart
+d3.csv('data/nutrients.csv', function(data) {
+  var colorgen = d3.scale.category20();
+  var colors = {};
+  _(data).chain()
+    .pluck('group')
+    .uniq()
+    .each(function(d,i) {
+      colors[d] = colorgen(i);
+    });
+
+  var color = function(d) { return colors[d.group]; };
+
+  pc_progressive = d3.parcoords()("#example-progressive")
+    .data(data)
+    .color(color)
+    .alpha(0.4)
+    .mode("queue")
+    .render()
+    .brushable()  // enable brushing
+    .interactive()  // command line mode
+
+});
+</script>
+
 <h3>More on the way...</h3>
 
 <p>This library is in active development, so keep an eye out for new features and documentation. Major changes will be announced on the <a href="https://groups.google.com/forum/?fromgroups#!forum/d3-js">d3.js mailing list</a>, or you can <a href="https://github.com/syntagmatic/parallel-coordinates">watch the GitHub repository</a> to track every change.</p>
@@ -425,7 +461,6 @@ d3.select("#compositing-opacity").on("change", function() {
 <p>
 For past versions of parallel coordinates that demonstrate various features and techniques, see this <a href="http://bl.ocks.org/syntagmatic">list of bl.ocks</a>.
 </p>
-
 
 <h3>Credits</h3>
 
