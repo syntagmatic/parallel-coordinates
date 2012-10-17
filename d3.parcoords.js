@@ -3,6 +3,8 @@ d3.parcoords = function(config) {
     dimensions: [],
     data: [],
     brushed: false,
+    mode: "default",
+    rate: 10,
     width: 600,
     height: 300,
     margin: { top: 24, right: 0, bottom: 12, left: 0 },
@@ -64,6 +66,7 @@ d3.parcoords = function(config) {
     .on("width", function(d) { pc.resize(); })
     .on("height", function(d) { pc.resize(); })
     .on("margin", function(d) { pc.resize(); })
+    .on("rate", function(d) { rqueue.rate(d.value); })
     .on("data", function(d) { 
       if (flags.shadows) paths(__.data, ctx.shadows);
     })
@@ -123,19 +126,36 @@ d3.parcoords = function(config) {
     return this;
   };
 
+  var rqueue = d3.parcoords.renderQueue(path_foreground)
+    .rate(50)
+    .clear(function() { pc.clear('foreground'); });
+
   pc.render = function() {
     // try to autodetect dimensions and create scales
     if (!__.dimensions.length) pc.detectDimensions();
     if (!(__.dimensions[0] in yscale)) pc.autoscale();
 
+    pc.render[__.mode]();
+
+    events.render.call(this);
+    return this;
+  };
+
+  pc.render.default = function() {
     pc.clear('foreground');
     if (__.brushed) {
       __.brushed.forEach(path_foreground);
     } else {
       __.data.forEach(path_foreground);
     }
-    events.render.call(this);
-    return this;
+  };
+
+  pc.render.queue = function() {
+    if (__.brushed) {
+      rqueue(__.brushed);
+    } else {
+      rqueue(__.data);
+    }
   };
 
   pc.shadows = function() {
@@ -478,3 +498,75 @@ d3.parcoords.adjacent_pairs = function(arr) {
   };
   return ret;
 };
+
+d3.parcoords.renderQueue = (function(func) {
+  var _queue = [],                  // data to be rendered
+      _rate = 10,                 // number of calls per frame
+      _invalidate = function() {},  // invalidate last render queue
+      _clear = function() {};       // clearing function
+
+  var rq = function(data) {
+    if (data) rq.data(data);
+    _invalidate();
+    _clear();
+    rq.render();
+  };
+
+  rq.render = function() {
+    var valid = true;
+    _invalidate = rq.invalidate = function() {
+      valid = false;
+    };
+
+    function doFrame() {
+      if (!valid) return true;
+      if (!_queue.length) return true;
+      var chunk = _queue.splice(0,_rate);
+      chunk.map(func);
+      timer_frame(doFrame);
+    }
+
+    doFrame();
+  };
+
+  rq.data = function(data) {
+    _invalidate();
+    _queue = data.slice(0);
+    return rq;
+  };
+
+  rq.add = function(data) {
+    _queue = _queue.concat(data);
+  };
+
+  rq.rate = function(value) {
+    if (!arguments.length) return _rate;
+    _rate = value;
+    return rq;
+  };
+
+  rq.remaining = function() {
+    return _queue.length;
+  };
+
+  // clear the canvas
+  rq.clear = function(func) {
+    if (!arguments.length) {
+      _clear();
+      return rq;
+    }
+    _clear = func;
+    return rq;
+  };
+
+  rq.invalidate = _invalidate;
+
+  var timer_frame = window.requestAnimationFrame
+    || window.webkitRequestAnimationFrame
+    || window.mozRequestAnimationFrame
+    || window.oRequestAnimationFrame
+    || window.msRequestAnimationFrame
+    || function(callback) { setTimeout(callback, 17); };
+
+  return rq;
+});

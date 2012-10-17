@@ -24,7 +24,8 @@ ul {
 #example1,
 #example2,
 #example3,
-#example-zscore {
+#example-zscore,
+#example-progressive {
   height: 200px;
   margin: 12px 0;
 }
