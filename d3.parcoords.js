@@ -126,7 +126,7 @@ d3.parcoords = function(config) {
     return this;
   };
 
-  var rqueue = d3.parcoords.renderQueue(path_foreground)
+  var rqueue = d3.renderQueue(path_foreground)
     .rate(50)
     .clear(function() { pc.clear('foreground'); });
 
@@ -499,7 +499,7 @@ d3.parcoords.adjacent_pairs = function(arr) {
   return ret;
 };
 
-d3.parcoords.renderQueue = (function(func) {
+d3.renderQueue = (function(func) {
   var _queue = [],                  // data to be rendered
       _rate = 10,                 // number of calls per frame
       _invalidate = function() {},  // invalidate last render queue
