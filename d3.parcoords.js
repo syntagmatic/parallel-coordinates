@@ -479,7 +479,7 @@ d3.parcoords = function(config) {
   return pc;
 };
 
-d3.parcoords.version = "0.1.4";
+d3.parcoords.version = "0.1.5";
 
 // quantitative dimensions based on numerical or null values in the first row
 d3.parcoords.quantitative = function(data) {
