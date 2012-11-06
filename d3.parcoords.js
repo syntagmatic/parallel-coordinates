@@ -98,7 +98,7 @@ d3.parcoords = function(config) {
     __.dimensions.forEach(function(k) {
       yscale[k] = d3.scale.linear()
         .domain(d3.extent(__.data, function(d) { return +d[k]; }))
-        .range([h(), 0])
+        .range([h()+1, 1])
     });
 
     // canvas sizes 

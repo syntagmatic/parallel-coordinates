@@ -1,0 +1,30 @@
+<!doctype html>
+<title>Brushing Example</title>
+<link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<script src="../d3.v2.js"></script>
+<script src="../d3.parcoords.js"></script>
+<div id="example1" class="parcoords"></div>
+
+<script id="brushing">// quantitative color scale
+var blue_to_brown = d3.scale.linear()
+  .domain([9, 50])
+  .range(["steelblue", "brown"])
+  .interpolate(d3.interpolateLab);
+
+var color = function(d) { return blue_to_brown(d['economy (mpg)']); };
+
+// load csv file and create the chart
+d3.csv('../data/cars.csv', function(data) {
+  pc1 = d3.parcoords()("#example1")
+    .data(data)
+    .color(color)
+    .alpha(0.4)
+    .render()
+    .mode('queue')
+    .brushable();  // enable brushing
+});
+</script>
+
+
+
