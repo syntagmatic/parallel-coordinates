@@ -1,0 +1,22 @@
+<!doctype html>
+<title>Basic Parallel Coordinates Example</title>
+<link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<script src="../d3.v2.js"></script>
+<script src="../d3.parcoords.js"></script>
+<body>
+<div id="example" class="parcoords" style="width:500px;height:150px"></div>
+<p>Demonstrates creating a parallel coordinates plot with axes using a 2-dimensional array of numbers.</p>
+</body>
+<script>
+var pc = d3.parcoords()("#example")
+  .data([
+    [0,-0,0,0,0,3 ],
+    [1,-1,1,2,1,6 ],
+    [2,-2,4,4,0.5,2],
+    [3,-3,9,6,0.33,4],
+    [4,-4,16,8,0.25,9]
+  ])
+  .render()
+  .createAxes();
+</script>
