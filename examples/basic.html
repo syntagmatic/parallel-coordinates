@@ -1,0 +1,20 @@
+<!doctype html>
+<title>Basic Parallel Coordinates Example</title>
+<link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
+<script src="../d3.v2.js"></script>
+<script src="../d3.parcoords.js"></script>
+<h2>Basic Parallel Coordinates Example</h2>
+<div id="example" class="parcoords" style="width:500px;height:150px"></div>
+<p></p>
+<script>
+var pc = d3.parcoords()("#example")
+  .data([
+    [0,-0,0,0,0,3 ],
+    [1,-1,1,2,1,6 ],
+    [2,-2,4,4,0.5,2],
+    [3,-3,9,6,0.33,4],
+    [4,-4,16,8,0.25,9]
+  ])
+  .render()
+  .createAxes();
+</script>
