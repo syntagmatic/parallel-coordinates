@@ -4,7 +4,8 @@
 <link rel="stylesheet" type="text/css" href="style.css">
 <script src="../d3.v2.js"></script>
 <script src="../d3.parcoords.js"></script>
-<div id="example1" class="parcoords"></div>
+<div id="example" class="parcoords" style="width:960px;height:200px;"></div>
+<p>Loads an external <a href="../data/cars.csv">csv file</a>, creates a custom <a href="https://github.com/mbostock/d3/wiki/Quantitative-Scales#wiki-quantitative">quantitative color scale</a> using <a href="http://bl.ocks.org/3014589">L*a*b interpolation</a>, and enables brushing.
 
 <script id="brushing">// quantitative color scale
 var blue_to_brown = d3.scale.linear()
@@ -16,12 +17,11 @@ var color = function(d) { return blue_to_brown(d['economy (mpg)']); };
 
 // load csv file and create the chart
 d3.csv('../data/cars.csv', function(data) {
-  pc1 = d3.parcoords()("#example1")
+  d3.parcoords()("#example")
     .data(data)
     .color(color)
     .alpha(0.4)
     .render()
-    .mode('queue')
     .brushable();  // enable brushing
 });
 </script>
