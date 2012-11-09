@@ -1,0 +1,63 @@
+<!doctype html>
+<title>Linking to Data Table</title>
+<link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<style>
+/* data table styles */
+#grid { height: 198px; }
+.row, .header { clear: left; font-size: 12px; line-height: 18px; height: 18px; }
+.row:nth-child(odd) { background: rgba(0,0,0,0.05); }
+.header { font-weight: bold; }
+.cell { float: left; overflow: hidden; white-space: nowrap; width: 100px; }
+.col-0 { width: 180px; }
+</style>
+<script src="../d3.v2.js"></script>
+<script src="../d3.parcoords.js"></script>
+<script src="../lib/divgrid.js"></script>
+<div id="example" class="parcoords" style="height:200px;"></div>
+<div id="grid"></div>
+<p>An extension of the <a href="brushing.html">bushing example</a> which links the chart to a data table. When hovering over the table, that row of data is highlighted in the chart. When brushing, the data in the table is updated.</p>
+<p>The table is <a href="http://bl.ocks.org/3687826">divgrid</a>, a simple <a href="http://bost.ocks.org/mike/chart/">reusable chart</a> that follows <a href="http://bl.ocks.org/3808218">general update pattern I</a>.</p>
+<p>Divgrid isn't fast when updating with hundreds or thousands of rows, so <strong>only the first 10 rows of the data are shown</strong>. For better performance, use a more sophisticated data grid like <a href="https://github.com/mleibman/SlickGrid">SlickGrid</a>.</p>
+<p>There is an <a href="http://exposedata.com/parallel/">old example</a> of SlickGrid with parallel coordinates. In that version the SVG is a bottleneck. An example of SlickGrid with this library should appear in the next few weeks (Nov-Dec, 2012).</p>
+<script id="brushing">// quantitative color scale
+var blue_to_brown = d3.scale.linear()
+  .domain([9, 50])
+  .range(["steelblue", "brown"])
+  .interpolate(d3.interpolateLab);
+
+var color = function(d) { return blue_to_brown(d['economy (mpg)']); };
+
+// load csv file and create the chart
+d3.csv('../data/cars.csv', function(data) {
+  var parcoords = d3.parcoords()("#example")
+    .data(data)
+    .color(color)
+    .alpha(0.4)
+    .render()
+    .brushable();  // enable brushing
+
+  // create data table, row hover highlighting
+  var grid = d3.divgrid();
+  d3.select("#grid")
+    .datum(data.slice(0,10))
+    .call(grid)
+    .selectAll(".row")
+    .on({
+      "mouseover": function(d) { parcoords.highlight([d]) },
+      "mouseout": parcoords.unhighlight
+    });
+
+  // update data table on brush event
+  parcoords.on("brush", function(d) {
+    d3.select("#grid")
+      .datum(d.slice(0,10))
+      .call(grid)
+      .selectAll(".row")
+      .on({
+        "mouseover": function(d) { parcoords.highlight([d]) },
+        "mouseout": parcoords.unhighlight
+      });
+  });
+});
+</script>
