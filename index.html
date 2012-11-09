@@ -20,6 +20,7 @@
 <ul>
   <li><a href="examples/basic.html">Basic</a></li>
   <li><a href="examples/brushing.html">Brushing</a></li>
+  <li><a href="examples/ordinal.html">Ordinal Dimension</a></li>
 </ul>
 <h3>Brushing</h3>
 <p>Click an axis label to start an oscillating brush. The brush creates a sliding window, filtering out data outside the range. Multiple brushes can be created at once.</p>
@@ -336,21 +337,6 @@ function zscore(col) {
   };
 };
 
-// color picker
-/*
-var zcolors = {};
-d3.range(3).map(function(i) {
-  d3.select("#zscore-color" + i).on("keyup", function() {
-    d3.select("#zscore-colors")
-      .selectAll("input")
-      .each(function(d,i) {
-        zcolors[i] = this.value;
-      });
-    zcolorscale.range([zcolors[0], zcolors[1], zcolors[2]])
-    pcz.render();
-  });
-});
-*/
 </script>
 
 <p>Try using <a href="https://github.com/jasondavies/science.js/tree/master/src/stats">science.js</a>, <a href="http://harthur.github.com/clusterfck/">clusterfck</a>, or implement your own <a href="http://en.wikipedia.org/wiki/List_of_statistics_articles">statistics</a>. You may find <a href="http://underscorejs.org/">Underscore.js</a> and <a href="https://github.com/syntagmatic/underscore.math/blob/master/underscore.math.js">Underscore.math</a> useful to calculate statistics from scratch.</p>
