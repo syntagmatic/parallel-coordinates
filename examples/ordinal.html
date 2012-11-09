@@ -1,5 +1,5 @@
 <!doctype html>
-<title>Brushing Example</title>
+<title>Ordinal Dimension Example</title>
 <link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
 <link rel="stylesheet" type="text/css" href="style.css">
 <script src="../d3.v2.js"></script>
@@ -36,13 +36,16 @@ d3.csv('../data/cars.csv', function(data) {
     d.brand_id = brand_index[d.brand];
   });
 
+  // create a parallel coordinates plot
   d3.parcoords()("#example")
     .data(data)
     .color(color)
     .alpha(0.4)
     .render()
+    .reorderable()
     .brushable();  // enable brushing
 
+  // create a key for brand ids 
   d3.select("#brand_key")
     .selectAll("li")
     .data(brands)
@@ -50,11 +53,6 @@ d3.csv('../data/cars.csv', function(data) {
     .text(function(d,i ) {
       return d + ": " + i;
     });
-
-  // for command line exploration
-  window.brands = brands;
-  window.brand_index = brand_index;
-  window.data = data;
 });
 </script>
 
