@@ -17,8 +17,23 @@
 <link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
 <link rel="stylesheet" type="text/css" href="style.css">
 <style>
+body, html {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+#grid, #pager {
+  position: fixed;
+  width: 100%;
+}
 #grid {
+  bottom: 0;
   height: 300px;
+}
+#pager {
+  bottom: 306px;
+  height: 20px;
 }
 </style>
 <script src="../d3.v2.js"></script>
@@ -26,9 +41,7 @@
 <script src="../lib/divgrid.js"></script>
 <div id="example" class="parcoords" style="height:240px;"></div>
 <div id="grid"></div>
-<div id="pager" style="height:20px;"></div>
-<p>This is an example of using <a href="https://github.com/mleibman/SlickGrid/">SlickGrid</a> as a data table.
-</p>
+<div id="pager"></div>
 <script id="brushing">
 // load csv file and create the chart
 d3.csv('../data/nutrients.csv', function(data) {
@@ -39,8 +52,10 @@ d3.csv('../data/nutrients.csv', function(data) {
     .data(data)
     .alpha(0.4)
     .mode("queue") // progressive rendering
+    .height(d3.max([document.body.clientHeight-326, 220]))
     .render()
     .reorderable()
+    .shadows()
     .brushable();
 
   // setting up grid
