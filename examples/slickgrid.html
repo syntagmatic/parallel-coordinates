@@ -33,7 +33,7 @@
 // load csv file and create the chart
 d3.csv('../data/nutrients.csv', function(data) {
   // slickgrid needs each data element to have an id
-  data.forEach(function(d,i) { d.id = i });
+  data.forEach(function(d,i) { d.id = d.id || i; });
 
   var parcoords = d3.parcoords()("#example")
     .data(data)
