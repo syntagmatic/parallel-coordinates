@@ -22,6 +22,7 @@ body, html {
   height: 100%;
   width: 100%;
   overflow: hidden;
+  font-size: 12px;
 }
 #grid, #pager {
   position: fixed;
@@ -34,6 +35,10 @@ body, html {
 #pager {
   bottom: 306px;
   height: 20px;
+}
+.slick-row:hover {
+  font-weight: bold;
+  color: #069;
 }
 </style>
 <script src="../d3.v2.js"></script>
@@ -53,6 +58,12 @@ d3.csv('../data/nutrients.csv', function(data) {
     .alpha(0.4)
     .mode("queue") // progressive rendering
     .height(d3.max([document.body.clientHeight-326, 220]))
+    .margin({
+      top: 36,
+      left: 0,
+      right: 0,
+      bottom: 16
+    })
     .render()
     .reorderable()
     .brushable();
