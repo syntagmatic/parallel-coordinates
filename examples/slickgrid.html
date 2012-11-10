@@ -50,14 +50,14 @@ d3.csv('../data/nutrients.csv', function(data) {
       id: key,
       name: key,
       field: key,
-      sortable: true,
+      sortable: true
     }
   });
 
   var options = {
     enableCellNavigation: true,
     enableColumnReorder: false,
-    multiColumnSort: true
+    multiColumnSort: false
   };
 
   var dataView = new Slick.Data.DataView();
@@ -73,6 +73,43 @@ d3.csv('../data/nutrients.csv', function(data) {
   dataView.onRowsChanged.subscribe(function (e, args) {
     grid.invalidateRows(args.rows);
     grid.render();
+  });
+
+  // column sorting
+  var sortcol = column_keys[0];
+  var sortdir = 1;
+
+  function comparer(a, b) {
+    var x = a[sortcol], y = b[sortcol];
+    return (x == y ? 0 : (x > y ? 1 : -1));
+  }
+  
+  grid.onSort.subscribe(function (e, args) {
+    sortdir = args.sortAsc ? 1 : -1;
+    sortcol = args.sortCol.field;
+
+    if ($.browser.msie && $.browser.version <= 8) {
+      // using temporary Object.prototype.toString override
+      // more limited and does lexicographic sort only by default, but can be much faster
+
+      var percentCompleteValueFn = function () {
+        var val = this["percentComplete"];
+        if (val < 10) {
+          return "00" + val;
+        } else if (val < 100) {
+          return "0" + val;
+        } else {
+          return val;
+        }
+      };
+
+      // use numeric sort of % and lexicographic for everything else
+      dataView.fastSort(sortcol, args.sortAsc);
+    } else {
+      // using native sort with comparer
+      // preferred method but can be very slow in IE with huge datasets
+      dataView.sort(comparer, args.sortAsc);
+    }
   });
 
   // highlight row in chart
