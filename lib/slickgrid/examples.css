@@ -1,21 +1,5 @@
 @import url('slick-default-theme.css');
 
-* {
-  font-family: arial;
-  font-size: 8pt;
-}
-
-body {
-  background: beige;
-  padding: 0;
-  margin: 8;
-}
-
-h2 {
-  font-size: 10pt;
-  border-bottom: 1px dotted gray;
-}
-
 ul {
   margin-left: 0;
   padding: 0;
@@ -30,10 +14,9 @@ li {
   margin: 0;
 }
 
-#myGrid {
+#grid {
   background: white;
   outline: 0;
-  border: 1px solid gray;
 }
 
 .grid-header {
