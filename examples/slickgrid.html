@@ -1,0 +1,103 @@
+<!doctype html>
+<title>Linking to SlickGrid</title>
+
+<!-- SlickGrid -->
+<link rel="stylesheet" href="../lib/slickgrid/slick.grid.css" type="text/css"/>
+<link rel="stylesheet" href="../lib/slickgrid/jquery-ui-1.8.16.custom.css" type="text/css"/>
+<link rel="stylesheet" href="../lib/slickgrid/examples.css" type="text/css"/>
+<link rel="stylesheet" href="../lib/slickgrid/slick.pager.css" type="text/css"/>
+<script src="../lib/slickgrid/jquery-1.7.min.js"></script>
+<script src="../lib/slickgrid/jquery.event.drag-2.0.min.js"></script>
+<script src="../lib/slickgrid/slick.core.js"></script>
+<script src="../lib/slickgrid/slick.grid.js"></script>
+<script src="../lib/slickgrid/slick.pager.js"></script>
+<script src="../lib/slickgrid/slick.dataview.js"></script>
+<!-- End SlickGrid -->
+
+<link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<style>
+#grid {
+  height: 300px;
+}
+</style>
+<script src="../d3.v2.js"></script>
+<script src="../d3.parcoords.js"></script>
+<script src="../lib/divgrid.js"></script>
+<div id="example" class="parcoords" style="height:240px;"></div>
+<div id="grid"></div>
+<div id="pager" style="height:20px;"></div>
+<p>This is an example of using <a href="https://github.com/mleibman/SlickGrid/">SlickGrid</a> as a data table.
+</p>
+<script id="brushing">
+// load csv file and create the chart
+d3.csv('../data/nutrients.csv', function(data) {
+  // slickgrid needs each data element to have an id
+  data.forEach(function(d,i) { d.id = i });
+
+  var parcoords = d3.parcoords()("#example")
+    .data(data)
+    .alpha(0.4)
+    .mode("queue") // progressive rendering
+    .render()
+    .reorderable()
+    .brushable();
+
+  // setting up grid
+  var column_keys = d3.keys(data[0]);
+  var columns = column_keys.map(function(key,i) {
+    return {
+      id: key,
+      name: key,
+      field: key,
+      sortable: true,
+    }
+  });
+
+  var options = {
+    enableCellNavigation: true,
+    enableColumnReorder: false,
+    multiColumnSort: true
+  };
+
+  var dataView = new Slick.Data.DataView();
+  var grid = new Slick.Grid("#grid", dataView, columns, options);
+  var pager = new Slick.Controls.Pager(dataView, grid, $("#pager"));
+
+  // wire up model events to drive the grid
+  dataView.onRowCountChanged.subscribe(function (e, args) {
+    grid.updateRowCount();
+    grid.render();
+  });
+
+  dataView.onRowsChanged.subscribe(function (e, args) {
+    grid.invalidateRows(args.rows);
+    grid.render();
+  });
+
+  // highlight row in chart
+  grid.onMouseEnter.subscribe(function(e,args) {
+    var i = grid.getCellFromEvent(e).row;
+    var d = parcoords.brushed() || data;
+    parcoords.highlight([d[i]]);
+  });
+  grid.onMouseLeave.subscribe(function(e,args) {
+    parcoords.unhighlight();
+  });
+
+  // fill grid with data
+  gridUpdate(data);
+
+  // update grid on brush
+  parcoords.on("brush", function(d) {
+    gridUpdate(d);
+  });
+
+  function gridUpdate(data) {
+    dataView.beginUpdate();
+    dataView.setItems(data);
+    dataView.endUpdate();
+  };
+
+});
+</script>

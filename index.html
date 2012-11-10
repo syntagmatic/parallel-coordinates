@@ -22,6 +22,7 @@
   <li><a href="examples/brushing.html">Brushing</a></li>
   <li><a href="examples/ordinal.html">Ordinal Dimension</a></li>
   <li><a href="examples/table.html">Linking with a Data Table</a></li>
+  <li><a href="examples/slickgrid.html">Progressive Rendering and SlickGrid</a> - for larger datasets: 2k-200k rows</li>
 </ul>
 <h3>Brushing</h3>
 <p>Click an axis label to start an oscillating brush. The brush creates a sliding window, filtering out data outside the range. Multiple brushes can be created at once.</p>
@@ -413,7 +414,7 @@ d3.select("#compositing-opacity").on("change", function() {
 
 <h3>Progressive Rendering</h3>
 
-<p>With thousands of data points, the chart will get less responsive when brushing. The interface may stutter or freeze, frustrating the uesr. To solve this, enable progressive rendering by setting the render <a href="https://github.com/syntagmatic/parallel-coordinates#parcoords_mode">mode</a> to <em>"queue"</em>.</p>
+<p>With thousands of data points, the chart will get less responsive when brushing. The interface may stutter or freeze, frustrating the user. To solve this, enable progressive rendering by setting the render <a href="https://github.com/syntagmatic/parallel-coordinates#parcoords_mode">mode</a> to <em>"queue"</em>.</p>
 <p>Change the speed of rendering by setting the <a href="https://github.com/syntagmatic/parallel-coordinates#parcoords_rate">rate</a>. You can read more about this technique on the <a href="http://bl.ocks.org/d/3341641/">Render Queue</a> page.</p>
 
 <div id="example-progressive" class="parcoords" style="width:1200px;margin-left:-200px;"></div>
