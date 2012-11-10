@@ -23,10 +23,10 @@ d3.parcoords = function(config) {
 
     // canvas data layers
     ["extents", "shadows", "marks", "foreground", "highlight"].forEach(function(layer) {
-      ctx[layer] = selection
+      canvas[layer] = selection
         .append("canvas")
-          .attr("class", layer)
-          [0][0].getContext("2d");
+        .attr("class", layer)[0][0];
+      ctx[layer] = canvas[layer].getContext("2d");
     });
 
     // svg tick and brush layers
@@ -57,7 +57,8 @@ d3.parcoords = function(config) {
       line = d3.svg.line(),
       axis = d3.svg.axis().orient("left").ticks(5),
       g, // groups for axes, brushes
-      ctx = {};
+      ctx = {},
+      canvas = {};
 
   // side effects for setters
   var side_effects = d3.dispatch.apply(this,d3.keys(__))
@@ -311,6 +312,7 @@ d3.parcoords = function(config) {
   pc.xscale = xscale;
   pc.yscale = yscale;
   pc.ctx = ctx;
+  pc.canvas = canvas;
   pc.g = function() { return g; };
 
   // TODO
@@ -349,8 +351,7 @@ d3.parcoords = function(config) {
   // highlight an array of data
   pc.highlight = function(data) {
     pc.clear("highlight");
-    ctx.highlight.fillStyle = "rgba(255,255,255,0.8)";
-    ctx.highlight.fillRect(-1,-1,w()+2,h()+2);
+    d3.select(canvas.foreground).classed("faded", true);
     data.forEach(path_highlight);
     events.highlight.call(this,data);
     return this;
@@ -359,6 +360,7 @@ d3.parcoords = function(config) {
   // clear highlighting
   pc.unhighlight = function(data) {
     pc.clear("highlight");
+    d3.select(canvas.foreground).classed("faded", false);
     return this;
   };
 

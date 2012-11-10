@@ -265,6 +265,10 @@ parcoords.dimensions([3,1,2])
 
 Clear the *layer*, which could be *"foreground"*, *"shadows"*, *"marks"*, *"extents"* or *"highlight"*.
 
+<a name="parcoords_canvas" href="#parcoords_canvas">#</a> parcoords.<b>canvas</b>
+
+An object containing the canvas elements.
+
 <a name="parcoords_ctx" href="#parcoords_ctx">#</a> parcoords.<b>ctx</b>
 
 An object containing the [canvas 2d rendering contexts](https://developer.mozilla.org/en-US/docs/DOM/CanvasRenderingContext2D). Use this to modify canvas rendering styles, except for the foreground stroke which is controlled by <a href="#parcoords_autoscale">parcoords.color()</a>.

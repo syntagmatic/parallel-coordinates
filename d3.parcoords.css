@@ -23,3 +23,12 @@
   stroke: #222;
   shape-rendering: crispEdges;
 }
+.parcoords canvas {
+  opacity: 1;
+  -moz-transition: opacity 0.3s;
+  -webkit-transition: opacity 0.3s;
+  -o-transition: opacity 0.3s;
+}
+.parcoords canvas.faded {
+  opacity: 0.25;
+}
