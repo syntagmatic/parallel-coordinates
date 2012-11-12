@@ -1,0 +1,205 @@
+<!doctype html>
+<title>Veterans</title>
+
+<!-- SlickGrid -->
+<link rel="stylesheet" href="../lib/slickgrid/slick.grid.css" type="text/css"/>
+<link rel="stylesheet" href="../lib/slickgrid/jquery-ui-1.8.16.custom.css" type="text/css"/>
+<link rel="stylesheet" href="../lib/slickgrid/examples.css" type="text/css"/>
+<link rel="stylesheet" href="../lib/slickgrid/slick.pager.css" type="text/css"/>
+<script src="../lib/slickgrid/jquery-1.7.min.js"></script>
+<script src="../lib/slickgrid/jquery.event.drag-2.0.min.js"></script>
+<script src="../lib/slickgrid/slick.core.js"></script>
+<script src="../lib/slickgrid/slick.grid.js"></script>
+<script src="../lib/slickgrid/slick.pager.js"></script>
+<script src="../lib/slickgrid/slick.dataview.js"></script>
+<!-- End SlickGrid -->
+
+<link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<style>
+body, html {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-size: 12px;
+}
+#grid, #pager {
+  position: fixed;
+  width: 100%;
+}
+#grid {
+  bottom: 0;
+  height: 300px;
+}
+#pager {
+  bottom: 306px;
+  height: 20px;
+}
+.slick-row:hover {
+  font-weight: bold;
+  color: #069;
+}
+</style>
+<script src="../d3.v2.js"></script>
+<script src="../d3.parcoords.js"></script>
+<script src="../lib/underscore.js"></script>
+<script src="../lib/divgrid.js"></script>
+<div id="example" class="parcoords" style="height:240px;"></div>
+<div id="grid"></div>
+<div id="pager"></div>
+<script id="brushing">
+// load csv file and create the chart
+d3.csv('../data/ngl_wyoming.csv', function(data) {
+  // process veterans dataset
+  var dateParse = d3.time.format("%m/%d/%Y").parse;
+
+  var first_names = _(data).chain().pluck("d_first_name").uniq().value().sort();
+  var middle_names = _(data).chain().pluck("d_mid_name").uniq().value().sort();
+  var last_names = _(data).chain().pluck("d_last_name").uniq().value().sort();
+  var cem_names = _(data).chain().pluck("cem_name").uniq().value().sort();
+  var branches = _(data).chain().pluck("branch").uniq().value().sort();
+  var ranks = _(data).chain().pluck("rank").uniq().value().sort();
+  var wars = _(data).chain().pluck("war").uniq().value().sort();
+
+  var indexes = {};
+
+  indexes["first_names"] = {};
+  indexes["middle_names"] = {};
+  indexes["last_names"] = {};
+  indexes["cem_names"] = {};
+  indexes["branches"] = {};
+  indexes["ranks"] = {};
+  indexes["wars"] = {};
+  first_names.forEach(function(d,i) { indexes["first_names"][d] = i; });
+  middle_names.forEach(function(d,i) { indexes["middle_names"][d] = i; });
+  last_names.forEach(function(d,i) { indexes["last_names"][d] = i; });
+  cem_names.forEach(function(d,i) { indexes["cem_names"][d] = i; });
+  branches.forEach(function(d,i) { indexes["branches"][d] = i; });
+  ranks.forEach(function(d,i) { indexes["ranks"][d] = i; });
+  wars.forEach(function(d,i) { indexes["wars"][d] = i; });
+
+  data.forEach(function(d,i) {
+    d.section_id = d.section_id.replace(/[a-zA-Z]/,"");   // strip letters. TODO leave this in table, only do it for chart rendering
+    d.first_name = indexes.first_names[d.d_first_name];
+    d.middle_name = indexes.middle_names[d.d_mid_name];
+    d.last_name = indexes.last_names[d.d_last_name];
+    d.cem_name_id = indexes.cem_names[d.cem_name];
+    d.branch_id = indexes.branches[d.branch];
+    d.rank_id = indexes.ranks[d.rank];
+    d.war_id = indexes.wars[d.war];
+    var birth_date = dateParse(d.d_birth_date);
+    d.birth_date = birth_date ? birth_date.getTime() : null;
+    var death_date = dateParse(d.d_death_date);
+    d.death_date = death_date ? death_date.getTime() : null;
+    delete d.cem_url;
+    delete d.section_id;
+    delete d.row_num;
+    delete d.cem_addr_one;
+    delete d.cem_addr_two;
+    delete d.cem_phone;
+    delete d.relationship;
+    delete d.d_suffix;
+    delete d.v_suffix;
+    delete d.v_first_name;
+    delete d.v_last_name;
+    delete d.v_mid_name;
+  });
+
+  // slickgrid needs each data element to have an id
+  data.forEach(function(d,i) { d.id = d.id || i; });
+
+  var parcoords = d3.parcoords()("#example")
+    .data(data)
+    .alpha(0.1)
+    .mode("queue") // progressive rendering
+    .height(d3.max([document.body.clientHeight-326, 220]))
+    .margin({
+      top: 36,
+      left: 0,
+      right: 0,
+      bottom: 16
+    })
+    .render()
+    .reorderable()
+    .brushable();
+
+  // setting up grid
+  var column_keys = d3.keys(data[0]);
+  var columns = column_keys.map(function(key,i) {
+    return {
+      id: key,
+      name: key,
+      field: key,
+      sortable: true
+    }
+  });
+
+  var options = {
+    enableCellNavigation: true,
+    enableColumnReorder: false,
+    multiColumnSort: false
+  };
+
+  var dataView = new Slick.Data.DataView();
+  var grid = new Slick.Grid("#grid", dataView, columns, options);
+  var pager = new Slick.Controls.Pager(dataView, grid, $("#pager"));
+
+  // wire up model events to drive the grid
+  dataView.onRowCountChanged.subscribe(function (e, args) {
+    grid.updateRowCount();
+    grid.render();
+  });
+
+  dataView.onRowsChanged.subscribe(function (e, args) {
+    grid.invalidateRows(args.rows);
+    grid.render();
+  });
+
+  // column sorting
+  var sortcol = column_keys[0];
+  var sortdir = 1;
+
+  function comparer(a, b) {
+    var x = a[sortcol], y = b[sortcol];
+    return (x == y ? 0 : (x > y ? 1 : -1));
+  }
+  
+  // click header to sort grid column
+  grid.onSort.subscribe(function (e, args) {
+    sortdir = args.sortAsc ? 1 : -1;
+    sortcol = args.sortCol.field;
+
+    if ($.browser.msie && $.browser.version <= 8) {
+      dataView.fastSort(sortcol, args.sortAsc);
+    } else {
+      dataView.sort(comparer, args.sortAsc);
+    }
+  });
+
+  // highlight row in chart
+  grid.onMouseEnter.subscribe(function(e,args) {
+    var i = grid.getCellFromEvent(e).row;
+    var d = parcoords.brushed() || data;
+    parcoords.highlight([d[i]]);
+  });
+  grid.onMouseLeave.subscribe(function(e,args) {
+    parcoords.unhighlight();
+  });
+
+  // fill grid with data
+  gridUpdate(data);
+
+  // update grid on brush
+  parcoords.on("brush", function(d) {
+    gridUpdate(d);
+  });
+
+  function gridUpdate(data) {
+    dataView.beginUpdate();
+    dataView.setItems(data);
+    dataView.endUpdate();
+  };
+
+});
+</script>
