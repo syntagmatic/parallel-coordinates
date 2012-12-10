@@ -318,7 +318,7 @@ d3.parcoords = function(config) {
   // TODO
   pc.brushReset = function(dimension) {
     yscale[dimension].brush.clear()(
-      pc1.g()
+      pc.g()
         .filter(function(p) {
           return dimension == p;
         })
