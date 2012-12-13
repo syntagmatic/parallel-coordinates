@@ -461,7 +461,6 @@ d3.parcoords = function(config) {
     d3.keys(state).forEach(function(key) {   
       obj[key] = function(x) {
         if (!arguments.length) return state[key];
-        if (flags.debug) console.log(hey, x);
         var old = state[key];
         state[key] = x;
         side_effects[key].call(pc,{"value": x, "previous": old});
