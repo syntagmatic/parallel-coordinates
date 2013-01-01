@@ -1,7 +1,8 @@
 d3.parcoords = function(config) {
   var __ = {
-    dimensions: [],
     data: [],
+    dimensions: [],
+    types: {},
     brushed: false,
     mode: "default",
     rate: 10,
@@ -123,6 +124,7 @@ d3.parcoords = function(config) {
   };
 
   pc.detectDimensions = function() {
+    pc.types(d3.parcoords.detectDimensionTypes(__.data));
     pc.dimensions(d3.parcoords.quantitative(__.data));
     return this;
   };
@@ -480,7 +482,7 @@ d3.parcoords = function(config) {
   return pc;
 };
 
-d3.parcoords.version = "0.1.5";
+d3.parcoords.version = "0.1.6";
 
 // quantitative dimensions based on numerical or null values in the first row
 d3.parcoords.quantitative = function(data) {
@@ -489,6 +491,27 @@ d3.parcoords.quantitative = function(data) {
       var v = data[0][col];
       return (parseFloat(v) == v) && (v != null);
     });
+};
+
+// a better "typeof" from this post: http://stackoverflow.com/questions/7390426/better-way-to-get-type-of-a-javascript-variable
+d3.parcoords.toType = function(v) {
+  return ({}).toString.call(v).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
+};
+
+// try to coerce to number before returning type
+d3.parcoords.toTypeCoerceNumbers = function(v) {
+  if ((parseFloat(v) == v) && (v != null)) return "number";
+  return d3.parcoords.toType(v);
+};
+
+// attempt to determine types of each dimension based on first row of data
+d3.parcoords.detectDimensionTypes = function(data) {
+  var types = {}
+  d3.keys(data[0])
+    .forEach(function(col) {
+      types[col] = d3.parcoords.toTypeCoerceNumbers(data[0][col]);
+    });
+  return types;
 };
 
 // pairs of adjacent dimensions

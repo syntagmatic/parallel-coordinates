@@ -95,6 +95,24 @@ var dimensions = ['protein', 'calcium', 'sodium'];
 
 If no *dimensions* are specified, then it returns the currently set dimensions.
 
+<a name="parcoords_types" href="#parcoords_types">#</a> parcoords.<b>types</b>(*object*)
+
+If *types* is specified, sets the data types for the dimensions. The format is an object where the keys are dimension names and the values are type strings.
+
+For example:
+
+```javascript
+var types = {
+  "name": "string",
+  "protein": "number",
+  "calcium": "number"
+}
+```
+
+If no *types* are specified, then it returns the currently set types.
+
+Detected types are automatically populated by <a href="#parcoords_detectDimensions">detectDimensions</a> using d3.parcoords.<strong>detectDimensionTypes</strong>.
+
 <a name="parcoords_color" href="#parcoords_color">#</a> parcoords.<b>color</b>(*color*)
 
 If a *color* is a string, polylines will be rendered as that color. If *color* is a function, that function will be run for each data element and the polyline color will be the return value.
