@@ -523,6 +523,15 @@ d3.parcoords.adjacent_pairs = function(arr) {
   return ret;
 };
 
+// calculate 2d intersection of line a->b with line c->d
+// points are objects with x and y properties
+d3.parcoords.intersection =  function(a, b, c, d) {
+  return {
+    x: ((a.x * b.y - a.y * b.x) * (c.x - d.x) - (a.x - b.x) * (c.x * d.y - c.y * d.x)) / ((a.x - b.x) * (c.y - d.y) - (a.y - b.y) * (c.x - d.x)),
+    y: ((a.x * b.y - a.y * b.x) * (c.y - d.y) - (a.y - b.y) * (c.x * d.y - c.y * d.x)) / ((a.x - b.x) * (c.y - d.y) - (a.y - b.y) * (c.x - d.x))
+  };
+};
+
 d3.renderQueue = (function(func) {
   var _queue = [],                  // data to be rendered
       _rate = 10,                 // number of calls per frame
