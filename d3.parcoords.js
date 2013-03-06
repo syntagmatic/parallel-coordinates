@@ -23,7 +23,7 @@ d3.parcoords = function(config) {
     __.height = selection[0][0].clientHeight;
 
     // canvas data layers
-    ["extents", "shadows", "marks", "foreground", "highlight"].forEach(function(layer) {
+    ["shadows", "marks", "foreground", "highlight"].forEach(function(layer) {
       canvas[layer] = selection
         .append("canvas")
         .attr("class", layer)[0][0];
@@ -117,8 +117,6 @@ d3.parcoords = function(config) {
     ctx.foreground.globalAlpha = __.alpha;
     ctx.highlight.lineWidth = 3;
     ctx.shadows.strokeStyle = "#dadada";
-    ctx.extents.strokeStyle = "rgba(140,140,140,0.25)";
-    ctx.extents.fillStyle = "rgba(255,255,255,0.4)";
 
     return this;
   };
@@ -306,7 +304,6 @@ d3.parcoords = function(config) {
   pc.brush = function() {
     __.brushed = selected();  
     pc.render();
-    //extent_area();
     events.brush.call(pc,__.brushed);
   };
 
@@ -393,30 +390,6 @@ d3.parcoords = function(config) {
         }
       });
     });
-    ctx.stroke();
-  };
-
-  function extent_area() {
-    pc.clear('extents');
-
-    // no active brushes
-    var actives = __.dimensions.filter(is_brushed);
-    if (actives.length == 0) return;
-
-    // create envelope
-    var ctx = pc.ctx.extents;
-    ctx.beginPath();
-    __.dimensions.map(function(p,i) {
-      if (i == 0) {
-        ctx.moveTo(xscale(p), brush_max(p));
-      } else { 
-        ctx.lineTo(xscale(p), brush_max(p));
-      }
-    });
-    __.dimensions.reverse().map(function(p,i) {
-      ctx.lineTo(xscale(p), brush_min(p));
-    });
-    ctx.fill();
     ctx.stroke();
   };
 
