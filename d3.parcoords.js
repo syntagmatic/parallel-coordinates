@@ -11,7 +11,7 @@ d3.parcoords = function(config) {
     margin: { top: 24, right: 0, bottom: 12, left: 0 },
     color: "#069",
     composite: "source-over",
-    alpha: "0.7"
+    alpha: 0.7
   };
 
   extend(__, config);
@@ -244,7 +244,7 @@ d3.parcoords = function(config) {
     g.transition().duration(1100)
       .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
       .style("opacity", 1)
-   if (flags.shadows) paths(__.data, ctx.shadows);
+    if (flags.shadows) paths(__.data, ctx.shadows);
     return this;
   };
 
@@ -303,8 +303,8 @@ d3.parcoords = function(config) {
   // Get data within brushes
   pc.brush = function() {
     __.brushed = selected();  
-    pc.render();
     events.brush.call(pc,__.brushed);
+    pc.render();
   };
 
   // expose a few objects
@@ -326,6 +326,7 @@ d3.parcoords = function(config) {
   };
 
   // rescale for height, width and margins
+  // TODO currently assumes chart is brushable, and destroys old brushes
   pc.resize = function() {
     // selection size
     pc.selection.select("svg") 
@@ -336,13 +337,12 @@ d3.parcoords = function(config) {
     // scales
     pc.autoscale();
 
-    // axes
-    if (g) {
-      g.attr("transform", function(d) { return "translate(" + xscale(d) + ")"; })
-      g.selectAll("g.axis").each(function(d) { d3.select(this).call(axis.scale(yscale[d])); })
-    };
+    // axes, destroys old brushes. the current brush state should pass through in the future
+    if (g) pc.createAxes().brushable();
  
-    pc.render();
+    // argh, don't want to do this
+    pc.brush();
+    
     events.resize.call(this, {width: __.width, height: __.height, margin: __.margin});
     return this;
   };
