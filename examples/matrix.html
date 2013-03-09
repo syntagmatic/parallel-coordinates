@@ -1,0 +1,75 @@
+<!doctype html>
+<title>Matrix Examples</title>
+<link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<script src="../lib/sylvester.js"></script>
+<script src="../d3.v2.js"></script>
+<script src="../d3.parcoords.js"></script>
+<h3>Diagonal Matrix</h3>
+<div id="diagonal" class="parcoords" style="width:260px;height:100px;"></div>
+<h3>Symmetric Matrix</h3>
+<div id="symmetric" class="parcoords" style="width:260px;height:100px;"></div>
+<h3>Orthogonal Matrix</h3>
+<div id="orthogonal" class="parcoords" style="width:260px;height:100px;"></div>
+<h3>Matrix Multiplication</h3>
+m1
+<div id="m1" class="parcoords" style="width:260px;height:100px;"></div>
+m2
+<div id="m2" class="parcoords" style="width:260px;height:100px;"></div>
+m1 x m2
+<div id="m3" class="parcoords" style="width:260px;height:100px;"></div>
+<script id="brushing">
+var diagonal = [
+  [1, 0, 0, 0],
+  [0, 4, 0, 0],
+  [0, 0, 6, 0],
+  [0, 0, 0, 2],
+];
+var symmetric = [
+  [1,  7,  3],
+  [7,  4, -5],
+  [3, -5,  6],
+];
+var orthogonal = [
+  [2, -2,  1],
+  [1,  2,  2],
+  [2,  1, -2],
+];
+var m1 = [
+  [1,7,3],
+  [9,4,0],
+  [2,7,1]
+];
+var m2 = [
+  [6,2,8],
+  [9,1,3],
+  [0,7,6]
+];
+var m3 = $M(m1).x($M(m2)).elements;
+
+render(diagonal, "#diagonal");
+render(symmetric, "#symmetric");
+render(orthogonal, "#orthogonal");
+render(m1, "#m1");
+render(m2, "#m2");
+render(m3, "#m3");
+
+function render(data, selector) {
+  var text = data.join("\n");
+  d3.select(selector)
+    .insert("textarea")
+    .style("width", "90px")
+    .style("height", "80px")
+    .text(text);
+
+  d3.parcoords()(selector)
+    .data(data)
+    .alpha(0.6)
+    .render()
+    .ticks(2)
+    .createAxes();
+};
+</script>
+
+
+
