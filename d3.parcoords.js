@@ -340,9 +340,6 @@ d3.parcoords = function(config) {
     // axes, destroys old brushes. the current brush state should pass through in the future
     if (g) pc.createAxes().brushable();
  
-    // argh, don't want to do this
-    pc.brush();
-    
     events.resize.call(this, {width: __.width, height: __.height, margin: __.margin});
     return this;
   };
