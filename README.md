@@ -12,6 +12,7 @@ An implementation of parallel coordinates in d3 as a [reusable chart](http://bos
 * [Multivariate Analysis Using Parallel Coordinates](http://www.b-eye-network.com/view/3355), Stephen Few
 * [Edward Tufte's "Slopegraphs"](http://charliepark.org/slopegraphs/), Charlie Park
 * [Data Visualization's Final Frontier](http://smartdatacollective.com/j-kevin-byrne/52031/data-visualizations-final-frontier), J. Kevin Byrne
+* [D3JS Parallel Lines and Football](http://dexvis.wordpress.com/2013/01/28/d3js-parallel-lines-and-football/), Patrick Martin
 
 ### Papers
 
@@ -316,4 +317,4 @@ The following methods are available from [d3.svg.axis](https://github.com/mbosto
 
 ## Credits
 
-This library created with examples, suggestions and encouragement from Mike Bostock, Jason Davies, Mary Becica, Stephen Boak, Ziggy Jonsson, Ger Hobbelt, Johan Sundström, Raffael Marty, Hugo Lopez, Bob Monteverde, Vadim Ogievetsky, Chris Rich, and Alfred Inselberg.
+This library created with examples, suggestions and encouragement from Mike Bostock, Jason Davies, Mary Becica, Stephen Boak, Ziggy Jonsson, Ger Hobbelt, Johan Sundström, Raffael Marty, Hugo Lopez, Bob Monteverde, Vadim Ogievetsky, Chris Rich, Patrick Martin, and Alfred Inselberg.

@@ -54,40 +54,7 @@ d3.csv('../data/ngl_wyoming.csv', function(data) {
   // process veterans dataset
   var dateParse = d3.time.format("%m/%d/%Y").parse;
 
-  var first_names = _(data).chain().pluck("d_first_name").uniq().value().sort();
-  var middle_names = _(data).chain().pluck("d_mid_name").uniq().value().sort();
-  var last_names = _(data).chain().pluck("d_last_name").uniq().value().sort();
-  var cem_names = _(data).chain().pluck("cem_name").uniq().value().sort();
-  var branches = _(data).chain().pluck("branch").uniq().value().sort();
-  var ranks = _(data).chain().pluck("rank").uniq().value().sort();
-  var wars = _(data).chain().pluck("war").uniq().value().sort();
-
-  var indexes = {};
-
-  indexes["first_names"] = {};
-  indexes["middle_names"] = {};
-  indexes["last_names"] = {};
-  indexes["cem_names"] = {};
-  indexes["branches"] = {};
-  indexes["ranks"] = {};
-  indexes["wars"] = {};
-  first_names.forEach(function(d,i) { indexes["first_names"][d] = i; });
-  middle_names.forEach(function(d,i) { indexes["middle_names"][d] = i; });
-  last_names.forEach(function(d,i) { indexes["last_names"][d] = i; });
-  cem_names.forEach(function(d,i) { indexes["cem_names"][d] = i; });
-  branches.forEach(function(d,i) { indexes["branches"][d] = i; });
-  ranks.forEach(function(d,i) { indexes["ranks"][d] = i; });
-  wars.forEach(function(d,i) { indexes["wars"][d] = i; });
-
   data.forEach(function(d,i) {
-    d.section_id = d.section_id.replace(/[a-zA-Z]/,"");   // strip letters. TODO leave this in table, only do it for chart rendering
-    d.first_name = indexes.first_names[d.d_first_name];
-    d.middle_name = indexes.middle_names[d.d_mid_name];
-    d.last_name = indexes.last_names[d.d_last_name];
-    d.cem_name_id = indexes.cem_names[d.cem_name];
-    d.branch_id = indexes.branches[d.branch];
-    d.rank_id = indexes.ranks[d.rank];
-    d.war_id = indexes.wars[d.war];
     var birth_date = dateParse(d.d_birth_date);
     d.birth_date = birth_date ? birth_date.getTime() : null;
     var death_date = dateParse(d.d_death_date);

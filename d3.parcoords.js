@@ -98,9 +98,15 @@ d3.parcoords = function(config) {
 
     // yscale
     __.dimensions.forEach(function(k) {
-      yscale[k] = d3.scale.linear()
-        .domain(d3.extent(__.data, function(d) { return +d[k]; }))
-        .range([h()+1, 1])
+      if (__.types[k] == "number") {
+        yscale[k] = d3.scale.linear()
+          .domain(d3.extent(__.data, function(d) { return +d[k]; }))
+          .range([h()+1, 1])
+      } else {
+        yscale[k] = d3.scale.ordinal()
+           .domain(__.data.map(function(p) { return p[k]; }))
+           .rangePoints([h()+1, 1]);
+      }
     });
 
     // canvas sizes 
@@ -123,7 +129,7 @@ d3.parcoords = function(config) {
 
   pc.detectDimensions = function() {
     pc.types(d3.parcoords.detectDimensionTypes(__.data));
-    pc.dimensions(d3.parcoords.quantitative(__.data));
+    pc.dimensions(d3.keys(pc.types()));
     return this;
   };
 
@@ -415,7 +421,11 @@ d3.parcoords = function(config) {
     return __.data
       .filter(function(d) {
         return actives.every(function(p, dimension) {
-          return extents[dimension][0] <= d[p] && d[p] <= extents[dimension][1];
+          if (__.types[p] == "number") {
+            return extents[dimension][0] <= d[p] && d[p] <= extents[dimension][1];
+          } else {
+            return extents[dimension][0] <= yscale[p](d[p]) && yscale[p](d[p]) <= extents[dimension][1];
+          }
         });
       });
   };
@@ -452,7 +462,7 @@ d3.parcoords = function(config) {
   return pc;
 };
 
-d3.parcoords.version = "0.1.6";
+d3.parcoords.version = "0.1.7";
 
 // quantitative dimensions based on numerical or null values in the first row
 d3.parcoords.quantitative = function(data) {
