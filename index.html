@@ -440,11 +440,14 @@ d3.csv('data/nutrients.csv', function(data) {
     .data(data)
     .color(color)
     .alpha(0.4)
+    .margin({ top: 24, left: 90, bottom: 12, right: 0 })
     .mode("queue")
     .render()
     .brushable()  // enable brushing
     .interactive()  // command line mode
 
+  pc_progressive.svg.selectAll("text")
+    .style("font", "10px sans-serif");
 });
 </script>
 

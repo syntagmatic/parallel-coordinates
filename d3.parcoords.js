@@ -93,21 +93,34 @@ d3.parcoords = function(config) {
   d3.rebind(pc, axis, "ticks", "orient", "tickValues", "tickSubdivide", "tickSize", "tickPadding", "tickFormat");
 
   pc.autoscale = function() {
-    // xscale
-    xscale.rangePoints([0, w()], 1);
-
     // yscale
-    __.dimensions.forEach(function(k) {
-      if (__.types[k] == "number") {
-        yscale[k] = d3.scale.linear()
+    var defaultScales = {
+      "number": function(k) {
+        return d3.scale.linear()
           .domain(d3.extent(__.data, function(d) { return +d[k]; }))
           .range([h()+1, 1])
-      } else {
-        yscale[k] = d3.scale.ordinal()
-           .domain(__.data.map(function(p) { return p[k]; }))
-           .rangePoints([h()+1, 1]);
+      },
+      "string": function(k) {
+        return d3.scale.ordinal()
+          .domain(__.data.map(function(p) { return p[k]; }))
+          .rangePoints([h()+1, 1])
+      }
+    };
+
+    __.dimensions.forEach(function(k) {
+      yscale[k] = defaultScales[__.types[k]](k);
+    });
+
+    // hack to remove ordinal dimensions with many values
+    pc.dimensions().forEach(function(p,i) {
+      if (__.types[p] == "string" && yscale[p].domain().length > 60) {
+        __.dimensions.splice(i,1);
+        pc.dimensions(__.dimensions);
       }
     });
+
+    // xscale
+    xscale.rangePoints([0, w()], 1);
 
     // canvas sizes 
     pc.selection.selectAll("canvas")
@@ -133,10 +146,6 @@ d3.parcoords = function(config) {
     return this;
   };
 
-  var rqueue = d3.renderQueue(path_foreground)
-    .rate(50)
-    .clear(function() { pc.clear('foreground'); });
-
   pc.render = function() {
     // try to autodetect dimensions and create scales
     if (!__.dimensions.length) pc.detectDimensions();
@@ -157,6 +166,10 @@ d3.parcoords = function(config) {
     }
   };
 
+  var rqueue = d3.renderQueue(path_foreground)
+    .rate(50)
+    .clear(function() { pc.clear('foreground'); });
+
   pc.render.queue = function() {
     if (__.brushed) {
       rqueue(__.brushed);
@@ -171,6 +184,7 @@ d3.parcoords = function(config) {
     return this;
   };
 
+  // draw little dots on the axis line where data intersects
   pc.axisDots = function() {
     var ctx = pc.ctx.marks;
     ctx.globalAlpha = d3.min([1/Math.pow(data.length, 1/2), 1]);
@@ -418,14 +432,20 @@ d3.parcoords = function(config) {
     var actives = __.dimensions.filter(is_brushed),
         extents = actives.map(function(p) { return yscale[p].brush.extent(); });
 
+    // test if within range
+    var within = {
+      "number": function(d,p,dimension) {
+        return extents[dimension][0] <= d[p] && d[p] <= extents[dimension][1]
+      },
+      "string": function(d,p,dimension) {
+        return extents[dimension][0] <= yscale[p](d[p]) && yscale[p](d[p]) <= extents[dimension][1]
+      }
+    };
+
     return __.data
       .filter(function(d) {
         return actives.every(function(p, dimension) {
-          if (__.types[p] == "number") {
-            return extents[dimension][0] <= d[p] && d[p] <= extents[dimension][1];
-          } else {
-            return extents[dimension][0] <= yscale[p](d[p]) && yscale[p](d[p]) <= extents[dimension][1];
-          }
+          return within[__.types[p]](d,p,dimension);
         });
       });
   };
