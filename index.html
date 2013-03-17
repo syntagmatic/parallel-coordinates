@@ -6,7 +6,7 @@
 <link rel="stylesheet" type="text/css" href="style.css">
 <a href="https://github.com/syntagmatic/parallel-coordinates"><img style="position: absolute; top: 0; right: 0; border: 0;" src="forkme.png" alt="Fork me on GitHub"></a>
 <h1>Parallel Coordinates <small>(0.1.7)</small></h1>
-<p style="color: #a00;">Currently testing out automatic ordinal axes. String dimensions are covered with labels.</p>
+<p style="color: #a00;"></p>
 <p>A visual toolkit for <a href="http://www.cs.ucdavis.edu/~ma/ECS289H/papers/Inselberg1997.pdf">multidimensional detectives</a>.</p>
 <p><strong><a href="d3.parcoords.js">d3.parcoords.js</a></strong> <small> - requires <strong><a href="http://d3js.org/">D3.js</a></strong></small><br/>
 <strong><a href="d3.parcoords.css">d3.parcoords.css</a></strong> <small> - default styles</small></p>
@@ -89,37 +89,31 @@ d3.csv('data/cars.csv', function(data) {
 });
 </script>
 
-<h3>Getting Started</h3>
+<h3>Minimal Example</h3>
 <div id="example" class="parcoords" style="width:360px;height:150px"></div>
-<p>
-Make a container div in HTML
-</p>
 <pre>
-&lt;div id="<strong>example</strong>" class="parcoords" style="width:300px;height:150px"&gt;&lt;/div&gt;
-</pre>
-<p>
-Make some data in JavaScript
-</p>
-<pre>
-var <strong>data</strong> = [
+&lt;script src="<a href="http://d3js.org/d3.v3.min.js"><strong>http://d3js.org/d3.v3.min.js</strong></a>"&gt;&lt;/script&gt;
+&lt;script src="<a href="d3.parcoords.js"><strong>d3.parcoords.js</strong></a>"&gt;&lt;/script&gt;
+&lt;link rel="stylesheet" type="text/css" href="<a href="d3.parcoords.css"><strong>d3.parcoords.css</strong><a/>"&gt;
+&lt;div id="<strong>example</strong>" class="parcoords" style="width:360px;height:150px"&gt;&lt;/div&gt;
+
+&lt;script&gt;
+var data = [
   [0,-0,0,0,0,3 ],
   [1,-1,1,2,1,6 ],
   [2,-2,4,4,0.5,2],
   [3,-3,9,6,0.33,4],
   [4,-4,16,8,0.25,9]
 ];
-</pre>
-<p>
-Create a parallel coordinates plot
-</p>
-<pre>
+
 var pc = d3.parcoords()("#<strong>example</strong>")
   .data(<strong>data</strong>)
   .render()
+  .ticks(3)
   .createAxes();
+&lt;/script&gt;
 </pre>
 <script>
-// x,-x,x^,ax,1/x, random
 var data = [
   [0,-0,0,0,0,3 ],
   [1,-1,1,2,1,6 ],
@@ -131,11 +125,9 @@ var data = [
 var pc = d3.parcoords()("#example")
   .data(data)
   .render()
-  .ticks(2)
-  .tickSubdivide(true)
+  .ticks(3)
   .createAxes();
 </script>
-<p>That's all there is to it!</p>
 
 
 <h3>Reordering</h3>
