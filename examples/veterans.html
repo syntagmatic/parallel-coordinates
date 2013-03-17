@@ -52,6 +52,8 @@ text {
 <div id="grid"></div>
 <div id="pager"></div>
 <script id="brushing">
+var parcoords = d3.parcoords();
+
 // load csv file and create the chart
 d3.csv('../data/ngl_wyoming.csv', function(data) {
   // process veterans dataset
@@ -79,7 +81,7 @@ d3.csv('../data/ngl_wyoming.csv', function(data) {
   // slickgrid needs each data element to have an id
   data.forEach(function(d,i) { d.id = d.id || i; });
 
-  var parcoords = d3.parcoords()("#example")
+  parcoords("#example")
     .data(data)
     .alpha(0.1)
     .mode("queue") // progressive rendering

@@ -5,7 +5,7 @@ d3.parcoords = function(config) {
     types: {},
     brushed: false,
     mode: "default",
-    rate: 10,
+    rate: 20,
     width: 600,
     height: 300,
     margin: { top: 24, right: 0, bottom: 12, left: 0 },
@@ -112,12 +112,13 @@ d3.parcoords = function(config) {
     });
 
     // hack to remove ordinal dimensions with many values
-    pc.dimensions().forEach(function(p,i) {
-      if (__.types[p] == "string" && yscale[p].domain().length > 60) {
-        __.dimensions.splice(i,1);
-        pc.dimensions(__.dimensions);
+    pc.dimensions(pc.dimensions().filter(function(p,i) {
+      var uniques = yscale[p].domain().length;
+      if (__.types[p] == "string" && (uniques > 60 || uniques < 2)) {
+        return false;
       }
-    });
+      return true;
+    }));
 
     // xscale
     xscale.rangePoints([0, w()], 1);

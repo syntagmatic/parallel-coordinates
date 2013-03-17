@@ -408,7 +408,7 @@ d3.select("#compositing-opacity").on("change", function() {
 <p>With thousands of data points, the chart will get less responsive when brushing. The interface may stutter or freeze, frustrating the user. To solve this, enable progressive rendering by setting the render <a href="https://github.com/syntagmatic/parallel-coordinates#parcoords_mode">mode</a> to <em>"queue"</em>.</p>
 <p>Change the speed of rendering by setting the <a href="https://github.com/syntagmatic/parallel-coordinates#parcoords_rate">rate</a>. You can read more about this technique on the <a href="http://bl.ocks.org/d/3341641/">Render Queue</a> page.</p>
 
-<div id="example-progressive" class="parcoords" style="width:1200px;margin-left:-200px;"></div>
+<div id="example-progressive" class="parcoords" style="width:1300px;margin-left:-250px;height:270px;"></div>
 <pre><a href="#" class="show-code" data-code="progressive">Show code</a></pre>
 
 <script id="progressive">// linear color scale
@@ -432,7 +432,7 @@ d3.csv('data/nutrients.csv', function(data) {
     .data(data)
     .color(color)
     .alpha(0.4)
-    .margin({ top: 24, left: 90, bottom: 12, right: 0 })
+    .margin({ top: 24, left: 150, bottom: 12, right: 0 })
     .mode("queue")
     .render()
     .brushable()  // enable brushing
