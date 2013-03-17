@@ -534,42 +534,38 @@ d3.parcoords.intersection =  function(a, b, c, d) {
 
 d3.renderQueue = (function(func) {
   var _queue = [],                  // data to be rendered
-      _rate = 10,                 // number of calls per frame
-      _invalidate = function() {},  // invalidate last render queue
-      _clear = function() {};       // clearing function
+      _rate = 10,                   // number of calls per frame
+      _clear = function() {},       // clearing function
+      _i = 0;                       // current iteration
 
   var rq = function(data) {
     if (data) rq.data(data);
-    _invalidate();
+    rq.invalidate();
     _clear();
     rq.render();
   };
 
   rq.render = function() {
+    _i = 0;
     var valid = true;
-    _invalidate = rq.invalidate = function() {
-      valid = false;
-    };
+    rq.invalidate = function() { valid = false; };
 
     function doFrame() {
-      if (!valid) return true;
-      if (!_queue.length) return true;
-      var chunk = _queue.splice(0,_rate);
+      if (!valid) return false;
+      if (_i > _queue.length) return false;
+      var chunk = _queue.slice(_i,_i+_rate);
+      _i += _rate;
       chunk.map(func);
-      timer_frame(doFrame);
+      d3.timer(doFrame);
     }
 
     doFrame();
   };
 
   rq.data = function(data) {
-    _invalidate();
+    rq.invalidate();
     _queue = data.slice(0);
     return rq;
-  };
-
-  rq.add = function(data) {
-    _queue = _queue.concat(data);
   };
 
   rq.rate = function(value) {
@@ -579,7 +575,7 @@ d3.renderQueue = (function(func) {
   };
 
   rq.remaining = function() {
-    return _queue.length;
+    return _queue.length - _i;
   };
 
   // clear the canvas
@@ -592,14 +588,7 @@ d3.renderQueue = (function(func) {
     return rq;
   };
 
-  rq.invalidate = _invalidate;
-
-  var timer_frame = window.requestAnimationFrame
-    || window.webkitRequestAnimationFrame
-    || window.mozRequestAnimationFrame
-    || window.oRequestAnimationFrame
-    || window.msRequestAnimationFrame
-    || function(callback) { setTimeout(callback, 17); };
+  rq.invalidate = function() {};
 
   return rq;
 });
