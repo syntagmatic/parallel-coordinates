@@ -1,0 +1,41 @@
+<!doctype html>
+<title>Galactic Example</title>
+<style>
+html, body {
+  background: #000;
+  color: #eee;
+}
+text {
+  fill: #ccc;
+}
+</style>
+<link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
+<script src="../d3.v2.js"></script>
+<script src="../d3.parcoords.js"></script>
+<div id="example" class="parcoords" style="width:4800px;height:600px;"></div>
+<p><a href="http://astrostatistics.psu.edu/datasets/COMBO17.html">Source</a></p>
+<script>
+// quantitative color scale
+var blue_to_brown = d3.scale.linear()
+  .range(["hsla(10,100%,55%,1)", "hsla(10,20%,30%,0.3)"]);
+
+var color = function(d) { return blue_to_brown(d['Rmag']); };
+
+// load csv file and create the chart
+d3.csv('../data/COMBO17.csv', function(data) {
+
+  blue_to_brown
+    .domain(d3.extent(data, function(d) { return d['Rmag'] }))
+
+  var pc = d3.parcoords()("#example")
+    .data(data)
+    .color(color)
+    .alpha(0.4)
+    .mode("queue")
+    .render()
+    .brushable()
+    .reorderable();
+
+  pc.ctx.foreground.lineWidth = 2.5;
+});
+</script>
