@@ -48,43 +48,25 @@ body, html {
 <div id="example" class="parcoords" style="height:240px;"></div>
 <div id="grid"></div>
 <div id="pager"></div>
-<script id="brushing">
+<script>
+var parcoords = d3.parcoords()("#example")
+  .alpha(0.4)
+  .mode("queue") // progressive rendering
+  .height(d3.max([document.body.clientHeight-326, 220]))
+  .margin({
+    top: 36,
+    left: 0,
+    right: 0,
+    bottom: 16
+  });
 
-var uploader = document.getElementById("uploader");  
-var reader = new FileReader();
-
-reader.onload = function(e) {
-  var contents = e.target.result;
-  var data = d3.csv.parse(contents);
-  parallelCoordinates(data);
-
-  // remove button, since re-initializing doesn't work for now
-  uploader.parentNode.removeChild(uploader);
-};
-
-uploader.addEventListener("change", handleFiles, false);  
-
-function handleFiles() {
-  var file = this.files[0];
-  reader.readAsText(file);
-};
-
-// load csv file and create the chart
+// create chart from loaded data
 function parallelCoordinates(data) {
   // slickgrid needs each data element to have an id
   data.forEach(function(d,i) { d.id = d.id || i; });
 
-  var parcoords = d3.parcoords()("#example")
+  parcoords
     .data(data)
-    .alpha(0.4)
-    .mode("queue") // progressive rendering
-    .height(d3.max([document.body.clientHeight-326, 220]))
-    .margin({
-      top: 36,
-      left: 0,
-      right: 0,
-      bottom: 16
-    })
     .render()
     .reorderable()
     .brushable();
@@ -166,5 +148,25 @@ function parallelCoordinates(data) {
     dataView.endUpdate();
   };
 
+};
+
+// CSV Uploader
+var uploader = document.getElementById("uploader");  
+var reader = new FileReader();
+
+reader.onload = function(e) {
+  var contents = e.target.result;
+  var data = d3.csv.parse(contents);
+  parallelCoordinates(data);
+
+  // remove button, since re-initializing doesn't work for now
+  uploader.parentNode.removeChild(uploader);
+};
+
+uploader.addEventListener("change", handleFiles, false);  
+
+function handleFiles() {
+  var file = this.files[0];
+  reader.readAsText(file);
 };
 </script>

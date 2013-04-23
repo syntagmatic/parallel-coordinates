@@ -28,12 +28,14 @@ var blue_to_brown = d3.scale.linear()
 
 var color = function(d) { return blue_to_brown(d['economy (mpg)']); };
 
+var parcoords = d3.parcoords()("#example")
+  .color(color)
+  .alpha(0.4);
+
 // load csv file and create the chart
 d3.csv('../data/cars.csv', function(data) {
-  var parcoords = d3.parcoords()("#example")
+  parcoords
     .data(data)
-    .color(color)
-    .alpha(0.4)
     .render()
     .brushable();  // enable brushing
 

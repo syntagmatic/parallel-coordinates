@@ -21,17 +21,19 @@ html, body { width: 100%; }
 <div id="thumbnails"></div>
 <div id="grid"></div>
 <script>
+var parcoords = d3.parcoords()("#example")
+  .alpha(0.4);
+
 var dimensions = ["score", "created", "domain", "downs", "ups", "num_comments", "subreddit"];
 
 // load csv file and create the chart
 $.getJSON('http://www.reddit.com/.json?limit=100&jsonp=?', function(raw) {
   var data = raw['data']['children'].map(function(d) { return d.data });
 
-  window.parcoords = d3.parcoords()("#example")
+  parcoords
     .data(data)
     .detectDimensions()
     .dimensions(dimensions)
-    .alpha(0.4)
     .render()
     .brushable();  // enable brushing
 

@@ -48,13 +48,7 @@ body, html {
 <div id="grid"></div>
 <div id="pager"></div>
 <script id="brushing">
-// load csv file and create the chart
-d3.csv('../data/nutrients.csv', function(data) {
-  // slickgrid needs each data element to have an id
-  data.forEach(function(d,i) { d.id = d.id || i; });
-
-  var parcoords = d3.parcoords()("#example")
-    .data(data)
+var parcoords = d3.parcoords()("#example")
     .alpha(0.4)
     .mode("queue") // progressive rendering
     .height(d3.max([document.body.clientHeight-326, 220]))
@@ -63,7 +57,15 @@ d3.csv('../data/nutrients.csv', function(data) {
       left: 0,
       right: 0,
       bottom: 16
-    })
+    });
+
+// load csv file and create the chart
+d3.csv('../data/nutrients.csv', function(data) {
+  // slickgrid needs each data element to have an id
+  data.forEach(function(d,i) { d.id = d.id || i; });
+
+  parcoords
+    .data(data)
     .render()
     .reorderable()
     .brushable();

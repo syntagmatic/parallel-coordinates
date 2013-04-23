@@ -52,7 +52,16 @@ text {
 <div id="grid"></div>
 <div id="pager"></div>
 <script id="brushing">
-var parcoords = d3.parcoords();
+var parcoords = d3.parcoords()("#example")
+  .alpha(0.1)
+  .mode("queue") // progressive rendering
+  .height(d3.max([document.body.clientHeight-326, 220]))
+  .margin({
+    top: 36,
+    left: 0,
+    right: 0,
+    bottom: 16
+  });
 
 // load csv file and create the chart
 d3.csv('../data/ngl_wyoming.csv', function(data) {
@@ -81,17 +90,8 @@ d3.csv('../data/ngl_wyoming.csv', function(data) {
   // slickgrid needs each data element to have an id
   data.forEach(function(d,i) { d.id = d.id || i; });
 
-  parcoords("#example")
+  parcoords
     .data(data)
-    .alpha(0.1)
-    .mode("queue") // progressive rendering
-    .height(d3.max([document.body.clientHeight-326, 220]))
-    .margin({
-      top: 36,
-      left: 0,
-      right: 0,
-      bottom: 16
-    })
     .render()
     .reorderable()
     .brushable();
