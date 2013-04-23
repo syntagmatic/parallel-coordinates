@@ -1,0 +1,81 @@
+<!doctype html>
+<title>Reddit Top 100 with Thumbnails</title>
+<link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<style>
+html, body { width: 100%; }
+#example { width: 100%; height: 400px; position: fixed; top: 10px;}
+#grid { height: 198px; width: 3800px;}
+#thumbnails { height: 110px; width: 3800px; overflow: hidden; margin-top: 412px; }
+.row, .header { clear: left; font-size: 12px; line-height: 18px; height: 18px; }
+.row:nth-child(odd) { background: rgba(0,0,0,0.05); }
+.header { font-weight: bold; }
+.cell { float: left; overflow: hidden; white-space: nowrap; width: 100px; height: 18px; }
+#thumbnails img { height: 110px; padding-right: 12px; }
+</style>
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="../d3.v2.js"></script>
+<script src="../d3.parcoords.js"></script>
+<script src="../lib/divgrid.js"></script>
+<div id="example" class="parcoords"></div>
+<div id="thumbnails"></div>
+<div id="grid"></div>
+<script>
+var dimensions = ["score", "created", "domain", "downs", "ups", "num_comments", "subreddit"];
+
+// load csv file and create the chart
+$.getJSON('http://www.reddit.com/.json?limit=100&jsonp=?', function(raw) {
+  var data = raw['data']['children'].map(function(d) { return d.data });
+
+  window.parcoords = d3.parcoords()("#example")
+    .data(data)
+    .detectDimensions()
+    .dimensions(dimensions)
+    .alpha(0.4)
+    .render()
+    .brushable();  // enable brushing
+
+  // thumbnails
+  updateThumbnails(data);
+
+  // create data table, row hover highlighting
+  var grid = d3.divgrid();
+  d3.select("#grid")
+    .datum(data.slice(0,10))
+    .call(grid)
+    .selectAll(".row")
+    .on({
+      "mouseover": function(d) { parcoords.highlight([d]) },
+      "mouseout": parcoords.unhighlight
+    });
+
+  // update data table on brush event
+  parcoords.on("brush", function(d) {
+    d3.select("#grid")
+      .datum(d.slice(0,10))
+      .call(grid)
+      .selectAll(".row")
+      .on({
+        "mouseover": function(d) { parcoords.highlight([d]) },
+        "mouseout": parcoords.unhighlight
+      });
+    updateThumbnails(d);
+  });
+
+  function updateThumbnails(data) {
+    var imgs = d3.select("#thumbnails")
+      .selectAll("img")
+      .data(data, function(d) { return d.thumbnail })
+    imgs.exit().remove();
+    imgs.enter()
+      .append("a")
+      .attr("href", function(d) { return d.url; })
+      .append("img")
+      .attr("src", function(d) { return d.thumbnail; })
+      .on({
+        "mouseover": function(d) { parcoords.highlight([d]) },
+        "mouseout": parcoords.unhighlight
+      })
+  };
+});
+</script>
