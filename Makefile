@@ -1,7 +1,6 @@
 all: d3.parcoords.js
 
 TARGETS= \
-	renderQueue.js \
 	start.js \
 	pc.js \
 	events.js \
@@ -12,7 +11,8 @@ TARGETS= \
 	clear.js \
 	axis.js \
 	interactive.js \
-	end.js
+	end.js \
+	renderQueue.js
 
 d3.parcoords.js: $(addprefix src/, $(TARGETS))
 	cat $^ >$@
