@@ -1,11 +1,11 @@
 <!doctype html>
 <title>Parallel Coordinates</title>
 <link rel="stylesheet" type="text/css" href="d3.parcoords.css">
-<script src="d3.v2.js"></script>
+<script src="lib/d3/d3.min.js"></script>
 <script src="d3.parcoords.js"></script>
 <link rel="stylesheet" type="text/css" href="style.css">
 <a href="https://github.com/syntagmatic/parallel-coordinates"><img style="position: absolute; top: 0; right: 0; border: 0;" src="forkme.png" alt="Fork me on GitHub"></a>
-<h1>Parallel Coordinates <small>(0.1.7)</small></h1>
+<h1>Parallel Coordinates <small>(0.2.0)</small></h1>
 <p style="color: #a00;"></p>
 <p>A visual toolkit for <a href="http://www.cs.ucdavis.edu/~ma/ECS289H/papers/Inselberg1997.pdf">multidimensional detectives</a>.</p>
 <p><strong><a href="d3.parcoords.js">d3.parcoords.js</a></strong> <small> - requires <strong><a href="http://d3js.org/">D3.js</a></strong></small><br/>
@@ -460,7 +460,8 @@ For past versions of parallel coordinates that demonstrate various features and 
 <h3>Changes</h3>
 
 <p>
-  1.7: Preliminary ordinal dimension support
+2.0: <a href="https://github.com/syntagmatic/parallel-coordinates/pull/24">Code organization and Makefile</a><br/>
+  1.7: Preliminary ordinal dimension support<br/>
   1.6: Added dimension <a href="https://github.com/syntagmatic/parallel-coordinates#parcoords_types">types</a><br/>
   1.5: Progressive rendering<br/>
   1.4: More examples<br/>
@@ -478,5 +479,4 @@ d3.selectAll(".show-code").on("click", function(d) {
     .text(code)
   event.preventDefault();
 })
-
 </script>
