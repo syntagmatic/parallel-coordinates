@@ -21,7 +21,9 @@ pc.createAxes = function() {
         "x": 0,
         "class": "label"
       })
-      .text(String)
+      .text(function(d) {
+        return d in __.dimensionTitles ? __.dimensionTitles[d] : d;  // dimension display names
+      })
 
   flags.axes= true;
   return this;

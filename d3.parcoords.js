@@ -2,6 +2,7 @@ d3.parcoords = function(config) {
   var __ = {
     data: [],
     dimensions: [],
+    dimensionTitles: {},
     types: {},
     brushed: false,
     mode: "default",
@@ -295,7 +296,9 @@ pc.createAxes = function() {
         "x": 0,
         "class": "label"
       })
-      .text(String)
+      .text(function(d) {
+        return d in __.dimensionTitles ? __.dimensionTitles[d] : d;  // dimension display names
+      })
 
   flags.axes= true;
   return this;
@@ -501,7 +504,7 @@ function position(d) {
 }
   pc.toString = function() { return "Parallel Coordinates: " + __.dimensions.length + " dimensions (" + d3.keys(__.data[0]).length + " total) , " + __.data.length + " rows"; };
   
-  pc.version = "0.1.7";
+  pc.version = "0.2.1";
 
   return pc;
 };

@@ -2,6 +2,7 @@ d3.parcoords = function(config) {
   var __ = {
     data: [],
     dimensions: [],
+    dimensionTitles: {},
     types: {},
     brushed: false,
     mode: "default",
