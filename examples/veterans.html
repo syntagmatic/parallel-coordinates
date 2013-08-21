@@ -69,10 +69,8 @@ d3.csv('../data/ngl_wyoming.csv', function(data) {
   var dateParse = d3.time.format("%m/%d/%Y").parse;
 
   data.forEach(function(d,i) {
-    var birth_date = dateParse(d.d_birth_date);
-    d.birth_date = birth_date ? birth_date.getTime() : null;
-    var death_date = dateParse(d.d_death_date);
-    d.death_date = death_date ? death_date.getTime() : null;
+    d.birth_date = dateParse(d.d_birth_date);
+    d.death_date = dateParse(d.d_death_date);
     delete d.cem_url;
     delete d.section_id;
     delete d.row_num;

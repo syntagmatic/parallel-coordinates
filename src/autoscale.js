@@ -1,6 +1,13 @@
 pc.autoscale = function() {
   // yscale
   var defaultScales = {
+    "date": function(k) {
+      return d3.time.scale()
+        .domain(d3.extent(__.data, function(d) {
+          return d[k] ? d[k].getTime() : null;
+        }))
+        .range([h()+1, 1])
+    },
     "number": function(k) {
       return d3.scale.linear()
         .domain(d3.extent(__.data, function(d) { return +d[k]; }))

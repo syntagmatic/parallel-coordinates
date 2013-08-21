@@ -112,6 +112,13 @@ function extend(target, source) {
 pc.autoscale = function() {
   // yscale
   var defaultScales = {
+    "date": function(k) {
+      return d3.time.scale()
+        .domain(d3.extent(__.data, function(d) {
+          return d[k] ? d[k].getTime() : null;
+        }))
+        .range([h()+1, 1])
+    },
     "number": function(k) {
       return d3.scale.linear()
         .domain(d3.extent(__.data, function(d) { return +d[k]; }))
@@ -482,6 +489,9 @@ function selected() {
 
   // test if within range
   var within = {
+    "date": function(d,p,dimension) {
+      return extents[dimension][0] <= d[p] && d[p] <= extents[dimension][1]
+    },
     "number": function(d,p,dimension) {
       return extents[dimension][0] <= d[p] && d[p] <= extents[dimension][1]
     },
@@ -504,7 +514,7 @@ function position(d) {
 }
   pc.toString = function() { return "Parallel Coordinates: " + __.dimensions.length + " dimensions (" + d3.keys(__.data[0]).length + " total) , " + __.data.length + " rows"; };
   
-  pc.version = "0.2.1";
+  pc.version = "0.2.2";
 
   return pc;
 };

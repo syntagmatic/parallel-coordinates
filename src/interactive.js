@@ -83,6 +83,9 @@ function selected() {
 
   // test if within range
   var within = {
+    "date": function(d,p,dimension) {
+      return extents[dimension][0] <= d[p] && d[p] <= extents[dimension][1]
+    },
     "number": function(d,p,dimension) {
       return extents[dimension][0] <= d[p] && d[p] <= extents[dimension][1]
     },
