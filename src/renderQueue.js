@@ -17,15 +17,14 @@ d3.renderQueue = (function(func) {
     rq.invalidate = function() { valid = false; };
 
     function doFrame() {
-      if (!valid) return false;
-      if (_i > _queue.length) return false;
+      if (!valid) return true;
+      if (_i > _queue.length) return true;
       var chunk = _queue.slice(_i,_i+_rate);
       _i += _rate;
       chunk.map(func);
-      d3.timer(doFrame);
     }
 
-    doFrame();
+    d3.timer(doFrame);
   };
 
   rq.data = function(data) {
