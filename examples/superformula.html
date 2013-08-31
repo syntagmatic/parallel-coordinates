@@ -77,17 +77,6 @@ var svg = d3.select("#superformula").append("svg")
     .attr("height", 500)
     .append("g")
     .attr("transform", "translate(70,70)");
- 
-var shape = d3.superformula()
-    .size(5000)
-    .segments(3600);
- 
-var path = svg
-    .selectAll("path")
-    .data(d3.entries(types))
-    .enter().append("path")
-    .attr("transform", function(d,i) { return "translate(" + (140*(i%7)) + "," + (140*Math.floor(i/7)) + ")" })
-    .attr("d", function(d) { return shape.type(d.key)(); });
 
 var parcoords = d3.parcoords()("#example")
   .data(data)
@@ -100,4 +89,19 @@ var parcoords = d3.parcoords()("#example")
        .filter(function(d) { return selected.indexOf(d.key) > -1; })
        .style("opacity", 1);
   });
+
+var shape = d3.superformula()
+    .size(5000)
+    .segments(3600);
+ 
+var path = svg
+    .selectAll("path")
+    .data(d3.entries(types))
+    .enter().append("path")
+    .attr("transform", function(d,i) { return "translate(" + (140*(i%7)) + "," + (140*Math.floor(i/7)) + ")" })
+    .attr("d", function(d) { return shape.type(d.key)(); })
+    .on("mouseover", function(d,i) {
+      parcoords.highlight([data[i]]);
+    })
+    .on("mouseout", parcoords.unhighlight);
 </script>
