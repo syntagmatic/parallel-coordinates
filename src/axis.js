@@ -77,6 +77,9 @@ pc.brushable = function() {
         d3.select(this).call(
           yscale[d].brush = d3.svg.brush()
             .y(yscale[d])
+            .on("brushstart", function() {
+              d3.event.sourceEvent.stopPropagation();
+            })
             .on("brush", pc.brush)
         );
       })
