@@ -423,14 +423,16 @@ pc.ctx = ctx;
 pc.canvas = canvas;
 pc.g = function() { return g; };
 
-// TODO
 pc.brushReset = function(dimension) {
-  yscale[dimension].brush.clear()(
-    pc.g()
-      .filter(function(p) {
-        return dimension == p;
+  if (g) {
+    g.selectAll('.brush')
+      .each(function(d) {
+        d3.select(this).call(
+          yscale[d].brush.clear()
+        );
       })
-  )
+    pc.brush();
+  }
   return this;
 };
 
