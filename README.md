@@ -168,7 +168,7 @@ For <a href="#parcoords_brushable">brushable</a> plots, returns the selected dat
 
 <a name="parcoords_brushReset" href="#parcoords_brushReset">#</a> parcoords.<b>brushReset</b>()
 
-TODO. This is supposed to reset all brushes, but may not work presently.
+Reset all brushes.
 
 <a name="parcoords_reorderable" href="#parcoords_reorderable">#</a> parcoords.<b>reorderable</b>()
 
