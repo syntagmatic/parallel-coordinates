@@ -332,4 +332,4 @@ $ git submodule update
 
 ## Credits
 
-This library created with examples, suggestions and encouragement from Mike Bostock, Jason Davies, Mary Becica, Stephen Boak, Ziggy Jonsson, Ger Hobbelt, Johan Sundström, Raffael Marty, Hugo Lopez, Bob Monteverde, Vadim Ogievetsky, Chris Rich, Patrick Martin, Sean Parmalee, and Alfred Inselberg.
+This library created with examples, suggestions and encouragement from Mike Bostock, Jason Davies, Mary Becica, Stephen Boak, Ziggy Jonsson, Ger Hobbelt, Johan Sundström, Raffael Marty, Hugo Lopez, Bob Monteverde, Vadim Ogievetsky, Chris Rich, Patrick Martin, Sean Parmelee, and Alfred Inselberg.
