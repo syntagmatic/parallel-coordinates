@@ -622,14 +622,15 @@ pc.canvas = canvas;
 pc.g = function() { return g; };
 
 pc.brushReset = function(dimension) {
+  __.brushed = false;
   if (g) {
     g.selectAll('.brush')
       .each(function(d) {
         d3.select(this).call(
           yscale[d].brush.clear()
         );
-      })
-    pc.brush();
+      });
+    pc.render();
   }
   return this;
 };
