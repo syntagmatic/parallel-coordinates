@@ -644,11 +644,17 @@ pc.resize = function() {
     .attr("height", __.height)
   pc.svg.attr("transform", "translate(" + __.margin.left + "," + __.margin.top + ")");
 
+  // FIXME: the current brush state should pass through
+  if (flags.brushable) pc.brushReset();
+
   // scales
   pc.autoscale();
 
-  // axes, destroys old brushes. the current brush state should pass through in the future
-  if (g) pc.createAxes().brushable();
+  // axes, destroys old brushes.
+  if (g) pc.createAxes();
+  if (flags.shadows) paths(__.data, ctx.shadows);
+  if (flags.brushable) pc.brushable();
+  if (flags.reorderable) pc.reorderable();
 
   events.resize.call(this, {width: __.width, height: __.height, margin: __.margin});
   return this;
