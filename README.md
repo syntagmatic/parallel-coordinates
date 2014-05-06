@@ -13,12 +13,14 @@ An implementation of parallel coordinates in d3 as a [reusable chart](http://bos
 * [Edward Tufte's "Slopegraphs"](http://charliepark.org/slopegraphs/), Charlie Park
 * [Data Visualization's Final Frontier](http://smartdatacollective.com/j-kevin-byrne/52031/data-visualizations-final-frontier), J. Kevin Byrne
 * [D3JS Parallel Lines and Football](http://dexvis.wordpress.com/2013/01/28/d3js-parallel-lines-and-football/), Patrick Martin
+* [Parallel Coordinates](http://www.parallelcoordinates.de), Julian Heinrich
 
 ### Papers
 
 * [Parallel Coordinates: a tool for visualizing mult-dimensional geometry](http://astrostatistics.psu.edu/su06/inselberg061006.pdf), Alfred Inselberg
 * [Hyperdimensional Data Analysis Using Parallel Coordinates](https://www.cs.ubc.ca/~tmm/courses/cpsc533c-04-fall/readings/wegman.pdf), Edward Wegman [2](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.15.1902&rep=rep1&type=pdf)
 * [On Some Mathametics for Visualizing High Dimensional Data](http://sankhya.isical.ac.in/search/64a2/64a2031.pdf), Edward Wegman, Jeffrey Solka
+* [The State of the Art of Parallel Coordinates](http://diglib.eg.org/EG/DL/conf/EG2013/stars/PDF/095-116.pdf), Julian Heinrich & Daniel Weiskopf
 
 ### Books
 
@@ -38,7 +40,7 @@ An implementation of parallel coordinates in d3 as a [reusable chart](http://bos
 * [Mondrian](http://www.theusrus.de/Mondrian/), Martin Theus
 * [Parvis](http://www.mediavirus.org/parvis/), flo ledermann
 * [Parallel Coordinate Graphics using MATLAB](http://people.ece.cornell.edu/land/PROJECTS/Inselberg/), Bruce R. Land
-* [Parallel Coordinates in pandas, Python](http://pandasplotting.blogspot.com/2012/06/parallel-coordinates.html), Vytautas Jančauskas
+* [Parallel Coordinates in pandas, Python](http://pandasplotting.blogspot.com/2012/06/parallel-coordinates.html), Vytautas Jan��auskas
 * [PointCloudXplore](http://vis.lbl.gov/Vignettes/Drosophila/index.html)
 
 ## API
@@ -332,4 +334,4 @@ $ git submodule update
 
 ## Credits
 
-This library created with examples, suggestions and encouragement from Mike Bostock, Jason Davies, Mary Becica, Stephen Boak, Ziggy Jonsson, Ger Hobbelt, Johan Sundström, Raffael Marty, Hugo Lopez, Bob Monteverde, Vadim Ogievetsky, Chris Rich, Patrick Martin, Sean Parmelee, and Alfred Inselberg.
+This library created with examples, suggestions and encouragement from Mike Bostock, Jason Davies, Mary Becica, Stephen Boak, Ziggy Jonsson, Ger Hobbelt, Johan Sundstr��m, Raffael Marty, Hugo Lopez, Bob Monteverde, Vadim Ogievetsky, Chris Rich, Patrick Martin, Sean Parmelee, and Alfred Inselberg.
