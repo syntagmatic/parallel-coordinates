@@ -36,25 +36,29 @@
 <pre><a href="#" class="show-code" data-code="bundling">Show code</a></pre>
 <script id="bundling">
 var data0 = [
-            [1,2,3,1],
-            [3,1,0,2]
+             [0,0,0,0,0],
+             [4,4,4,4,4],
+             [1,2,3,2,3],
+             [3,2,1,2,1]
           ];
 //interact with this variable from a javascript console
 var pc0;
 
+d3.csv('data/cars.csv', function(data) {
 pc0 = d3.parcoords()("#example0")
-  .data(data0)
+  .data(data)
 	.bundlingStrength(0.5) // set bundling strength
 	.smoothness(0.25)
 	.bundleDimension(1) // bundle on the second dimension
-	.render().interactive();
+	.render()
+	.interactive();
 
 	// bundling strength slider
 	d3.select("#smoothness").on("change", function() {
 		d3.select("#smooth").text(this.value);
-		//pc.smoothness(this.value).render().updateAxes();
 		pc0.smoothness(this.value).render();
 	});
+});
 </script>
 
 <h3>Brushing</h3>

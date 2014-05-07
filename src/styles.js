@@ -20,34 +20,41 @@ pc.axisDots = function() {
 
 // draw single cubic bezier curve
 function single_curve(d, ctx) {
-	var dim = __.dimensions[0];
-	ctx.moveTo(position(dim), yscale[dim](d[dim]));
-	for (var i = 0; i < __.dimensions.length - 1; ++i) {
-		var p = $V([ position(__.dimensions[i]),
-				yscale[__.dimensions[i]](d[__.dimensions[i]]) ]);
-		var pm1 = i == 0 ? null : $V([ position(__.dimensions[i - 1]),
-				yscale[__.dimensions[i - 1]](d[__.dimensions[i - 1]]) ]);
-		var pp1 = $V([ position(__.dimensions[i + 1]),
-				yscale[__.dimensions[i + 1]](d[__.dimensions[i + 1]]) ]);
-		var pp2 = i >= __.dimensions.length - 2 ? null : $V([
-				position(__.dimensions[i + 2]),
-				yscale[__.dimensions[i + 2]](d[__.dimensions[i + 2]]) ]);
 
-		var yi1 = i == 0 ? $V([ p.e(1) + __.smoothness * (pp1.e(1) - p.e(1)),
-				p.e(2) ]) : p.add(pp1.subtract(pm1).x(__.smoothness));
-		var dpp1p = pp1.subtract(p);
-		var zi1 = qp.subtract(dpp1p.x(__.smoothness));
-		ctx.bezierCurveTo(yi1.e(1), yi1.e(2), zi1.e(1), zi1.e(2), qp.e(1), qp
-				.e(2));
+	var centroids = compute_centroids(d);
+	var cps = compute_control_points(centroids);
 
-		var zi2 = qp.add(dpp1p.x(__.smoothness));
-		var yi2 = i >= __.dimensions.length - 2 ? $V([
-				pp1.e(1) + __.smoothness * (pp1.e(1) - p.e(1)), pp1.e(2) ])
-				: pp1.subtract(pp2.subtract(p).x(__.smoothness));
-		ctx.bezierCurveTo(zi2.e(1), zi2.e(2), yi2.e(1), yi2.e(2), pp1.e(1), pp1
-				.e(2));
+	ctx.moveTo(cps[0].e(1), cps[0].e(2));
+	for (var i = 1; i < cps.length; i += 3) {
+		if (__.showControlPoints) {
+			for (var j = 0; j < 3; j++) {
+				ctx.fillRect(cps[i+j].e(1), cps[i+j].e(2), 2, 2);
+				}
+		}
+		ctx.bezierCurveTo(cps[i].e(1), cps[i].e(2), cps[i+1].e(1), cps[i+1].e(2), cps[i+2].e(1), cps[i+2].e(2));
 	}
 };
+
+function compute_centroids(d) {
+	var centroids = [];
+
+	var p = __.dimensions;
+	var cols = p.length;
+	var a = 0.5;			// center between axes
+	for (var i = 0; i < cols; ++i) {
+		var x = position(p[i]);
+		var y = yscale[p[i]](d[p[i]]);
+		centroids.push($V([x, y]));
+
+		if (i < cols - 1) {
+			var cx = x + a * (position(p[i+1]) - x);
+			var cy = y + a * (yscale[p[i+1]](d[p[i+1]]) - y);
+			centroids.push($V([cx, cy]));
+		}
+	}
+
+	return centroids;
+}
 
 function compute_control_points(centroids) {
 
@@ -55,16 +62,20 @@ function compute_control_points(centroids) {
 	var a = __.smoothness;
 	var cps = [];
 
-	for (var col = 0; col < cols; ++col) {
+	cps.push(centroids[0]);
+	cps.push($V([centroids[0].e(1) + a*2*(centroids[1].e(1)-centroids[0].e(1)), centroids[0].e(2)]));
+	for (var col = 1; col < cols - 1; ++col) {
 		var mid = centroids[col];
-		var left = col == 0 ? $V(mid.e(1) - 0.5, mid.e(2)) : centroids[col - 1];
-		var right = col == cols - 1 ? $V(mid.e(1) + 0.5, mid.e(2))
-				: centroids[col + 1];
+		var left = centroids[col - 1];
+		var right = centroids[col + 1];
 
 		var diff = left.subtract(right);
-		cps.push(mid + diff.x(a));
-		cps.push(mid - diff.x(a));
+		cps.push(mid.add(diff.x(a)));
+		cps.push(mid);
+		cps.push(mid.subtract(diff.x(a)));
 	}
+	cps.push($V([centroids[cols-1].e(1) + a*2*(centroids[cols-2].e(1)-centroids[cols-1].e(1)), centroids[cols-1].e(2)]));
+	cps.push(centroids[cols - 1]);
 
 	return cps;
 
