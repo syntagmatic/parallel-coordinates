@@ -16,7 +16,8 @@ d3.parcoords = function(config) {
     bundlingStrength: 0.5,
     bundleDimension: null,
     smoothness: 0.25,
-    showControlPoints: false
+    showControlPoints: false,
+    clusterCentroids : []
   };
 
   extend(__, config);

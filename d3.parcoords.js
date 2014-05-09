@@ -16,7 +16,8 @@ d3.parcoords = function(config) {
     bundlingStrength: 0.5,
     bundleDimension: null,
     smoothness: 0.25,
-    showControlPoints: false
+    showControlPoints: false,
+    clusterCentroids : []
   };
 
   extend(__, config);
@@ -73,11 +74,17 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
   .on("margin", function(d) { pc.resize(); })
   .on("rate", function(d) { rqueue.rate(d.value); })
   .on("data", function(d) {
-    if (flags.shadows) paths(__.data, ctx.shadows);
+    if (flags.shadows){paths(__.data, ctx.shadows);}
   })
   .on("dimensions", function(d) {
     xscale.domain(__.dimensions);
-    if (flags.interactive) pc.render().updateAxes();
+    if (flags.interactive){pc.render().updateAxes();}
+  })
+  .on("bundleDimension", function(d) {
+	  if (!__.dimensions.length) pc.detectDimensions();
+	  if (!(__.dimensions[0] in yscale)) pc.autoscale();
+	  __.bundleDimension = typeof d.value === "number" ? __.dimensions[d.value] : d.value;
+	  __.clusterCentroids = compute_cluster_centroids(__.bundleDimension);
   });
 
 // expose the state of the chart
@@ -97,7 +104,9 @@ d3.rebind(pc, axis, "ticks", "orient", "tickValues", "tickSubdivide", "tickSize"
 function getset(obj,state,events)  {
   d3.keys(state).forEach(function(key) {
     obj[key] = function(x) {
-      if (!arguments.length) return state[key];
+      if (!arguments.length) {
+		return state[key];
+	}
       var old = state[key];
       state[key] = x;
       side_effects[key].call(pc,{"value": x, "previous": old});
@@ -176,18 +185,20 @@ pc.detectDimensions = function() {
 
 // a better "typeof" from this post: http://stackoverflow.com/questions/7390426/better-way-to-get-type-of-a-javascript-variable
 pc.toType = function(v) {
-  return ({}).toString.call(v).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
+  return ({}).toString.call(v).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
 };
 
 // try to coerce to number before returning type
 pc.toTypeCoerceNumbers = function(v) {
-  if ((parseFloat(v) == v) && (v != null)) return "number";
+  if ((parseFloat(v) == v) && (v != null)) {
+	return "number";
+}
   return pc.toType(v);
 };
 
 // attempt to determine types of each dimension based on first row of data
 pc.detectDimensionTypes = function(data) {
-  var types = {}
+  var types = {};
   d3.keys(data[0])
     .forEach(function(col) {
       types[col] = pc.toTypeCoerceNumbers(data[0][col]);
@@ -256,26 +267,68 @@ function single_curve(d, ctx) {
 		if (__.showControlPoints) {
 			for (var j = 0; j < 3; j++) {
 				ctx.fillRect(cps[i+j].e(1), cps[i+j].e(2), 2, 2);
-				}
+			}
 		}
 		ctx.bezierCurveTo(cps[i].e(1), cps[i].e(2), cps[i+1].e(1), cps[i+1].e(2), cps[i+2].e(1), cps[i+2].e(2));
 	}
 };
 
-function compute_centroids(d) {
+function compute_cluster_centroids(d) {
+
+	var clusterCentroids = d3.map();
+	var clusterCounts = d3.map();
+	// determine clusterCounts
+	__.data.forEach(function(row) {
+		var scaled = yscale[d](row[d]);
+		if (!clusterCounts.has(scaled)) {
+			clusterCounts.set(scaled, 0);
+		}
+		var count = clusterCounts.get(scaled);
+		clusterCounts.set(scaled, count + 1);
+	});
+
+	__.data.forEach(function(row) {
+		__.dimensions.map(function(p, i) {
+			var scaled = yscale[d](row[d]);
+			if (!clusterCentroids.has(scaled)) {
+				var map = d3.map();
+				clusterCentroids.set(scaled, map);
+			}
+			if (!clusterCentroids.get(scaled).has(p)) {
+				clusterCentroids.get(scaled).set(p, 0);
+			}
+			var value = clusterCentroids.get(scaled).get(p);
+			value += yscale[p](row[p]) / clusterCounts.get(scaled);
+			clusterCentroids.get(scaled).set(p, value);
+		});
+	});
+
+	return clusterCentroids;
+
+}
+
+function compute_centroids(row) {
 	var centroids = [];
 
 	var p = __.dimensions;
 	var cols = p.length;
 	var a = 0.5;			// center between axes
 	for (var i = 0; i < cols; ++i) {
+		// centroids on 'real' axes
 		var x = position(p[i]);
-		var y = yscale[p[i]](d[p[i]]);
+		var y = yscale[p[i]](row[p[i]]);
 		centroids.push($V([x, y]));
 
+		// centroids on 'virtual' axes
 		if (i < cols - 1) {
 			var cx = x + a * (position(p[i+1]) - x);
-			var cy = y + a * (yscale[p[i+1]](d[p[i+1]]) - y);
+			var cy = y + a * (yscale[p[i+1]](row[p[i+1]]) - y);
+			if (__.bundleDimension !== null) {
+				var leftCentroid = __.clusterCentroids.get(yscale[__.bundleDimension](row[__.bundleDimension])).get(p[i]);
+				var rightCentroid = __.clusterCentroids.get(yscale[__.bundleDimension](row[__.bundleDimension])).get(p[i+1]);
+				var centroid = 0.5 * (leftCentroid + rightCentroid);
+				cy = centroid + (1 - __.bundlingStrength) * (cy - centroid);
+			}
 			centroids.push($V([cx, cy]));
 		}
 	}

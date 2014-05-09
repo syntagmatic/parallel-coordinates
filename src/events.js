@@ -27,11 +27,17 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
   .on("margin", function(d) { pc.resize(); })
   .on("rate", function(d) { rqueue.rate(d.value); })
   .on("data", function(d) {
-    if (flags.shadows) paths(__.data, ctx.shadows);
+    if (flags.shadows){paths(__.data, ctx.shadows);}
   })
   .on("dimensions", function(d) {
     xscale.domain(__.dimensions);
-    if (flags.interactive) pc.render().updateAxes();
+    if (flags.interactive){pc.render().updateAxes();}
+  })
+  .on("bundleDimension", function(d) {
+	  if (!__.dimensions.length) pc.detectDimensions();
+	  if (!(__.dimensions[0] in yscale)) pc.autoscale();
+	  __.bundleDimension = typeof d.value === "number" ? __.dimensions[d.value] : d.value;
+	  __.clusterCentroids = compute_cluster_centroids(__.bundleDimension);
   });
 
 // expose the state of the chart
@@ -51,7 +57,9 @@ d3.rebind(pc, axis, "ticks", "orient", "tickValues", "tickSubdivide", "tickSize"
 function getset(obj,state,events)  {
   d3.keys(state).forEach(function(key) {
     obj[key] = function(x) {
-      if (!arguments.length) return state[key];
+      if (!arguments.length) {
+		return state[key];
+	}
       var old = state[key];
       state[key] = x;
       side_effects[key].call(pc,{"value": x, "previous": old});
