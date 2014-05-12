@@ -37,7 +37,16 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
   .on("bundleDimension", function(d) {
 	  if (!__.dimensions.length) pc.detectDimensions();
 	  if (!(__.dimensions[0] in yscale)) pc.autoscale();
-	  __.bundleDimension = typeof d.value === "number" ? __.dimensions[d.value] : d.value;
+	  if (typeof d.value === "number") {
+		  if (d.value < __.dimensions.length) {
+			  __.bundleDimension = __.dimensions[d.value];
+		  } else if (d.value < __.hideAxis.length) {
+			  __.bundleDimension = __.hideAxis[d.value];
+		  }
+	  } else {
+		  __.bundleDimension = d.value;
+	  }
+
 	  __.clusterCentroids = compute_cluster_centroids(__.bundleDimension);
   })
   .on("hideAxis", function(d) {
