@@ -207,6 +207,31 @@ pc.flip = function(d) {
 	pc.createAxes();
 
 	return this;
+};
+
+pc.commonScale = function(type) {
+	var t = type || "number";
+	// scales of the same type
+	var scales = __.dimensions.concat(__.hideAxis).filter(function(p) {
+		return __.types[p] == t;
+	});
+
+	var extent = d3.extent(scales.map(function(p,i) {
+			return yscale[p].domain();
+		}).reduce(function(a,b) {
+			return a.concat(b);
+		}));
+
+	scales.forEach(function(d) {
+		yscale[d].domain(extent);
+	});
+
+	pc.createAxes();
+	if (__.bundleDimension !== null) {
+		pc.bundleDimension(__.bundleDimension);
+	}
+
+	return this;
 };pc.detectDimensions = function() {
   pc.types(pc.detectDimensionTypes(__.data));
   pc.dimensions(d3.keys(pc.types()));
