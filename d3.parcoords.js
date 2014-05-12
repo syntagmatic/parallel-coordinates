@@ -200,6 +200,13 @@ pc.scale = function(d, domain) {
 	pc.createAxes();	// workaround for updateAxes not updating labels
 
 	return this;
+};
+
+pc.flip = function(d) {
+	yscale[d].domain().reverse();
+	pc.createAxes();
+
+	return this;
 };pc.detectDimensions = function() {
   pc.types(pc.detectDimensionTypes(__.data));
   pc.dimensions(d3.keys(pc.types()));

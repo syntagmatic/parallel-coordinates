@@ -64,3 +64,10 @@ pc.scale = function(d, domain) {
 
 	return this;
 };
+
+pc.flip = function(d) {
+	yscale[d].domain().reverse();
+	pc.createAxes();
+
+	return this;
+};
