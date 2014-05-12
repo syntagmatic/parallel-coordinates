@@ -6,7 +6,7 @@ pc.createAxes = function() {
       .data(__.dimensions, function(d) { return d; })
     .enter().append("svg:g")
       .attr("class", "dimension")
-      .attr("transform", function(d) { return "translate(" + xscale(d) + ")"; })
+      .attr("transform", function(d) { return "translate(" + xscale(d) + ")"; });
 
   // Add an axis and title.
   g.append("svg:g")
@@ -23,7 +23,7 @@ pc.createAxes = function() {
       })
       .text(function(d) {
         return d in __.dimensionTitles ? __.dimensionTitles[d] : d;  // dimension display names
-      })
+      });
 
   flags.axes= true;
   return this;
@@ -36,7 +36,7 @@ pc.removeAxes = function() {
 
 pc.updateAxes = function() {
   var g_data = pc.svg.selectAll(".dimension")
-      .data(__.dimensions, function(d) { return d; })
+      .data(__.dimensions, function(d) { return d; });
 
   g_data.enter().append("svg:g")
       .attr("class", "dimension")
@@ -62,7 +62,7 @@ pc.updateAxes = function() {
 
   g.transition().duration(1100)
     .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
-    .style("opacity", 1)
+    .style("opacity", 1);
   if (flags.shadows) paths(__.data, ctx.shadows);
   return this;
 };
@@ -86,7 +86,7 @@ pc.brushable = function() {
     .selectAll("rect")
       .style("visibility", null)
       .attr("x", -15)
-      .attr("width", 30)
+      .attr("width", 30);
   flags.brushable = true;
   return this;
 };
@@ -105,7 +105,7 @@ pc.reorderable = function() {
         __.dimensions.sort(function(a, b) { return position(a) - position(b); });
         xscale.domain(__.dimensions);
         pc.render();
-        g.attr("transform", function(d) { return "translate(" + position(d) + ")"; })
+        g.attr("transform", function(d) { return "translate(" + position(d) + ")"; });
       })
       .on("dragend", function(d) {
         delete this.__origin__;

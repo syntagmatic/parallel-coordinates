@@ -3,6 +3,7 @@
 <link rel="stylesheet" type="text/css" href="d3.parcoords.css">
 <script src="lib/d3/d3.min.js"></script>
 <script src="lib/sylvester.js"></script>
+<script src="lib/underscore.js"></script>
 <script src="lib/slickgrid/jquery-1.7.min.js"></script>
 <script src="d3.parcoords.js"></script>
 <link rel="stylesheet" type="text/css" href="style.css">
@@ -40,9 +41,9 @@ used here can be found in <a href="http://arxiv.org/abs/1109.6073">this paper.</
 <input type="range" min="0" max="1" value="0" step="0.05" id="bundling"/>
 <div id="bundleDimension">Bundle using clusters determined by: </div>
 <div id="example0" class="parcoords"></div>
-<pre><a href="#" class="show-code" data-code="bundling">Show code</a></pre>
+<pre><a href="#" class="show-code" data-code="bundling-code">Show code</a></pre>
 
-<script id="bundling">
+<script id="bundling-code">
 //interact with this variable from a javascript console
 var pc0;
 
@@ -53,6 +54,7 @@ pc0 = d3.parcoords()("#example0")
 	.smoothness(0)
 	.bundleDimension("cylinders")
 	.showControlPoints(false)
+	.hideAxis("cylinders")
 	.render()
 	.brushable()
 	.reorderable()

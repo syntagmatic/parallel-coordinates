@@ -17,7 +17,8 @@ d3.parcoords = function(config) {
     bundleDimension: null,
     smoothness: 0.25,
     showControlPoints: false,
-    clusterCentroids : []
+    clusterCentroids : [],
+    hideAxis : []
   };
 
   extend(__, config);
@@ -47,7 +48,7 @@ var pc = function(selection) {
 };
 var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush"].concat(d3.keys(__))),
     w = function() { return __.width - __.margin.right - __.margin.left; },
-    h = function() { return __.height - __.margin.top - __.margin.bottom },
+    h = function() { return __.height - __.margin.top - __.margin.bottom; },
     flags = {
       brushable: false,
       reorderable: false,
@@ -85,6 +86,9 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
 	  if (!(__.dimensions[0] in yscale)) pc.autoscale();
 	  __.bundleDimension = typeof d.value === "number" ? __.dimensions[d.value] : d.value;
 	  __.clusterCentroids = compute_cluster_centroids(__.bundleDimension);
+  })
+  .on("hideAxis", function(d) {
+	  pc.dimensions(_.without(__.dimensions, d.value));
   });
 
 // expose the state of the chart
@@ -130,21 +134,25 @@ pc.autoscale = function() {
         .domain(d3.extent(__.data, function(d) {
           return d[k] ? d[k].getTime() : null;
         }))
-        .range([h()+1, 1])
+        .range([h()+1, 1]);
     },
     "number": function(k) {
       return d3.scale.linear()
         .domain(d3.extent(__.data, function(d) { return +d[k]; }))
-        .range([h()+1, 1])
+        .range([h()+1, 1]);
     },
     "string": function(k) {
       return d3.scale.ordinal()
         .domain(__.data.map(function(p) { return p[k]; }))
-        .rangePoints([h()+1, 1])
+        .rangePoints([h()+1, 1]);
     }
   };
 
   __.dimensions.forEach(function(k) {
+    yscale[k] = defaultScales[__.types[k]](k);
+  });
+
+  __.hideAxis.forEach(function(k) {
     yscale[k] = defaultScales[__.types[k]](k);
   });
 
@@ -165,7 +173,7 @@ pc.autoscale = function() {
       .style("margin-top", __.margin.top + "px")
       .style("margin-left", __.margin.left + "px")
       .attr("width", w()+2)
-      .attr("height", h()+2)
+      .attr("height", h()+2);
 
   // default styles, needs to be set when canvas width changes
   ctx.foreground.strokeStyle = __.color;
@@ -416,7 +424,7 @@ pc.createAxes = function() {
       .data(__.dimensions, function(d) { return d; })
     .enter().append("svg:g")
       .attr("class", "dimension")
-      .attr("transform", function(d) { return "translate(" + xscale(d) + ")"; })
+      .attr("transform", function(d) { return "translate(" + xscale(d) + ")"; });
 
   // Add an axis and title.
   g.append("svg:g")
@@ -433,7 +441,7 @@ pc.createAxes = function() {
       })
       .text(function(d) {
         return d in __.dimensionTitles ? __.dimensionTitles[d] : d;  // dimension display names
-      })
+      });
 
   flags.axes= true;
   return this;
@@ -446,7 +454,7 @@ pc.removeAxes = function() {
 
 pc.updateAxes = function() {
   var g_data = pc.svg.selectAll(".dimension")
-      .data(__.dimensions, function(d) { return d; })
+      .data(__.dimensions, function(d) { return d; });
 
   g_data.enter().append("svg:g")
       .attr("class", "dimension")
@@ -472,7 +480,7 @@ pc.updateAxes = function() {
 
   g.transition().duration(1100)
     .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
-    .style("opacity", 1)
+    .style("opacity", 1);
   if (flags.shadows) paths(__.data, ctx.shadows);
   return this;
 };
@@ -496,7 +504,7 @@ pc.brushable = function() {
     .selectAll("rect")
       .style("visibility", null)
       .attr("x", -15)
-      .attr("width", 30)
+      .attr("width", 30);
   flags.brushable = true;
   return this;
 };
@@ -515,7 +523,7 @@ pc.reorderable = function() {
         __.dimensions.sort(function(a, b) { return position(a) - position(b); });
         xscale.domain(__.dimensions);
         pc.render();
-        g.attr("transform", function(d) { return "translate(" + position(d) + ")"; })
+        g.attr("transform", function(d) { return "translate(" + position(d) + ")"; });
       })
       .on("dragend", function(d) {
         delete this.__origin__;

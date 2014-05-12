@@ -1,6 +1,6 @@
 var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush"].concat(d3.keys(__))),
     w = function() { return __.width - __.margin.right - __.margin.left; },
-    h = function() { return __.height - __.margin.top - __.margin.bottom },
+    h = function() { return __.height - __.margin.top - __.margin.bottom; },
     flags = {
       brushable: false,
       reorderable: false,
@@ -16,7 +16,8 @@ var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush"].c
     axis = d3.svg.axis().orient("left").ticks(5),
     g, // groups for axes, brushes
     ctx = {},
-    canvas = {};
+    canvas = {},
+    clusterCentroids = [];
 
 // side effects for setters
 var side_effects = d3.dispatch.apply(this,d3.keys(__))
@@ -38,6 +39,9 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
 	  if (!(__.dimensions[0] in yscale)) pc.autoscale();
 	  __.bundleDimension = typeof d.value === "number" ? __.dimensions[d.value] : d.value;
 	  __.clusterCentroids = compute_cluster_centroids(__.bundleDimension);
+  })
+  .on("hideAxis", function(d) {
+	  pc.dimensions(_.without(__.dimensions, d.value));
   });
 
 // expose the state of the chart

@@ -6,21 +6,25 @@ pc.autoscale = function() {
         .domain(d3.extent(__.data, function(d) {
           return d[k] ? d[k].getTime() : null;
         }))
-        .range([h()+1, 1])
+        .range([h()+1, 1]);
     },
     "number": function(k) {
       return d3.scale.linear()
         .domain(d3.extent(__.data, function(d) { return +d[k]; }))
-        .range([h()+1, 1])
+        .range([h()+1, 1]);
     },
     "string": function(k) {
       return d3.scale.ordinal()
         .domain(__.data.map(function(p) { return p[k]; }))
-        .rangePoints([h()+1, 1])
+        .rangePoints([h()+1, 1]);
     }
   };
 
   __.dimensions.forEach(function(k) {
+    yscale[k] = defaultScales[__.types[k]](k);
+  });
+
+  __.hideAxis.forEach(function(k) {
     yscale[k] = defaultScales[__.types[k]](k);
   });
 
@@ -41,7 +45,7 @@ pc.autoscale = function() {
       .style("margin-top", __.margin.top + "px")
       .style("margin-left", __.margin.left + "px")
       .attr("width", w()+2)
-      .attr("height", h()+2)
+      .attr("height", h()+2);
 
   // default styles, needs to be set when canvas width changes
   ctx.foreground.strokeStyle = __.color;
