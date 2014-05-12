@@ -57,3 +57,10 @@ pc.autoscale = function() {
 
   return this;
 };
+
+pc.scale = function(d, domain) {
+	yscale[d].domain(domain);
+	pc.createAxes();	// workaround for updateAxes not updating labels
+
+	return this;
+};

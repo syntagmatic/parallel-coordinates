@@ -54,7 +54,7 @@ pc0 = d3.parcoords()("#example0")
 	.smoothness(0)
 	.bundleDimension("cylinders")
 	.showControlPoints(false)
-	.hideAxis("cylinders")
+	.hideAxis(["cylinders"])
 	.render()
 	.brushable()
 	.reorderable()
@@ -75,7 +75,7 @@ pc0 = d3.parcoords()("#example0")
 	var select = d3.select("#bundleDimension").append("select").on("change", changeBundle);
 	
 	var options = select.selectAll('option')
-		.data(pc0.dimensions());
+		.data(pc0.dimensions().concat(pc0.hideAxis()));
 	
 	options
 		.enter()

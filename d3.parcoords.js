@@ -17,7 +17,6 @@ d3.parcoords = function(config) {
     bundleDimension: null,
     smoothness: 0.25,
     showControlPoints: false,
-    clusterCentroids : [],
     hideAxis : []
   };
 
@@ -64,7 +63,8 @@ var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush"].c
     axis = d3.svg.axis().orient("left").ticks(5),
     g, // groups for axes, brushes
     ctx = {},
-    canvas = {};
+    canvas = {},
+    clusterCentroids = [];
 
 // side effects for setters
 var side_effects = d3.dispatch.apply(this,d3.keys(__))
@@ -185,7 +185,13 @@ pc.autoscale = function() {
 
   return this;
 };
-pc.detectDimensions = function() {
+
+pc.scale = function(d, domain) {
+	yscale[d].domain(domain);
+	pc.createAxes();	// workaround for updateAxes not updating labels
+
+	return this;
+};pc.detectDimensions = function() {
   pc.types(pc.detectDimensionTypes(__.data));
   pc.dimensions(d3.keys(pc.types()));
   return this;
