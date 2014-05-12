@@ -31,6 +31,9 @@
   <li><a href="examples/superformula.html">Superformula</a></li>
 </ul>
 <h3>Bundling</h3>
+Bundling violates the point-line duality but can be used to visualize clusters using geometry only, leaving the color channel free
+for other uses (e.g. statistical coloring, see below). Bundling can be achieved using different algorithms. Details on the algorithm
+used here can be found in <a href="http://arxiv.org/abs/1109.6073">this paper.</a>
 <p>Use this slider to change the curve smoothness. The current value is <strong id="smooth">0.0</strong><br/>
 <input type="range" min="0" max="0.25" value="0.0" step="0.01" id="smoothness"/>
 <p>Use this slider to change the bundling strength. The current value is <strong id="strength">0</strong><br/>
@@ -38,13 +41,8 @@
 <div id="bundleDimension">Bundle using clusters determined by: </div>
 <div id="example0" class="parcoords"></div>
 <pre><a href="#" class="show-code" data-code="bundling">Show code</a></pre>
+
 <script id="bundling">
-var data0 = [
-             [0,0,0,0,0],
-             [4,4,4,4,4],
-             [1,2,3,2,3],
-             [3,2,1,2,1]
-          ];
 //interact with this variable from a javascript console
 var pc0;
 
@@ -57,6 +55,7 @@ pc0 = d3.parcoords()("#example0")
 	.showControlPoints(false)
 	.render()
 	.brushable()
+	.reorderable()
 	.interactive();
 
 	// smoothness
