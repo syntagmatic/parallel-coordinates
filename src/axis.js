@@ -42,7 +42,7 @@ pc.updateAxes = function() {
       .attr("class", "dimension")
       .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
       .style("opacity", 0)
-      .append("svg:g")
+    .append("svg:g")
       .attr("class", "axis")
       .attr("transform", "translate(0,0)")
       .each(function(d) { d3.select(this).call(axis.scale(yscale[d])); })
@@ -63,6 +63,10 @@ pc.updateAxes = function() {
   g.transition().duration(1100)
     .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
     .style("opacity", 1);
+
+  pc.svg.selectAll(".axis").transition().duration(1100)
+  	.each(function(d) { d3.select(this).call(axis.scale(yscale[d])); });
+
   if (flags.shadows) paths(__.data, ctx.shadows);
   return this;
 };

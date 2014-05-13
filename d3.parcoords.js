@@ -166,7 +166,7 @@ pc.autoscale = function() {
   });
 
   // hack to remove ordinal dimensions with many values
-  pc.dimensions(pc.dimensions().concat(pc.hideAxis()).filter(function(p,i) {
+  pc.dimensions(pc.dimensions().filter(function(p,i) {
     var uniques = yscale[p].domain().length;
     if (__.types[p] == "string" && (uniques > 60 || uniques < 2)) {
       return false;
@@ -197,36 +197,46 @@ pc.autoscale = function() {
 
 pc.scale = function(d, domain) {
 	yscale[d].domain(domain);
-	pc.createAxes();	// workaround for updateAxes not updating labels
+	//pc.createAxes();	// workaround for updateAxes not updating labels
 
 	return this;
 };
 
 pc.flip = function(d) {
-	yscale[d].domain().reverse();
-	pc.createAxes();
+	//yscale[d].domain().reverse();					// does not work
+	yscale[d].domain(yscale[d].domain().reverse()); // works
+	//pc.createAxes();
 
 	return this;
 };
 
-pc.commonScale = function(type) {
+pc.commonScale = function(global, type) {
 	var t = type || "number";
-	// scales of the same type
-	var scales = __.dimensions.concat(__.hideAxis).filter(function(p) {
-		return __.types[p] == t;
-	});
+	if (typeof global === 'undefined') {
+		global = true;
+	}
+	if (global) {
+		// scales of the same type
+		var scales = __.dimensions.concat(__.hideAxis).filter(function(p) {
+			return __.types[p] == t;
+		});
 
-	var extent = d3.extent(scales.map(function(p,i) {
-			return yscale[p].domain();
-		}).reduce(function(a,b) {
-			return a.concat(b);
-		}));
+		var extent = d3.extent(scales.map(function(p,i) {
+				return yscale[p].domain();
+			}).reduce(function(a,b) {
+				return a.concat(b);
+			}));
 
-	scales.forEach(function(d) {
-		yscale[d].domain(extent);
-	});
+		scales.forEach(function(d) {
+			yscale[d].domain(extent);
+		});
+	} else {
+		pc.autoscale();
+	}
 
-	pc.createAxes();
+	//pc.createAxes();
+
+	// update centroids
 	if (__.bundleDimension !== null) {
 		pc.bundleDimension(__.bundleDimension);
 	}
@@ -291,43 +301,6 @@ pc.render.queue = function() {
     rqueue(__.data);
   }
 };
-pc.shadows = function() {
-	flags.shadows = true;
-	if (__.data.length > 0) {
-		paths(__.data, ctx.shadows);
-	}
-	return this;
-};
-
-// draw little dots on the axis line where data intersects
-pc.axisDots = function() {
-	var ctx = pc.ctx.marks;
-	ctx.globalAlpha = d3.min([ 1 / Math.pow(data.length, 1 / 2), 1 ]);
-	__.data.forEach(function(d) {
-		__.dimensions.map(function(p, i) {
-			ctx.fillRect(position(p) - 0.75, yscale[p](d[p]) - 0.75, 1.5, 1.5);
-		});
-	});
-	return this;
-};
-
-// draw single cubic bezier curve
-function single_curve(d, ctx) {
-
-	var centroids = compute_centroids(d);
-	var cps = compute_control_points(centroids);
-
-	ctx.moveTo(cps[0].e(1), cps[0].e(2));
-	for (var i = 1; i < cps.length; i += 3) {
-		if (__.showControlPoints) {
-			for (var j = 0; j < 3; j++) {
-				ctx.fillRect(cps[i+j].e(1), cps[i+j].e(2), 2, 2);
-			}
-		}
-		ctx.bezierCurveTo(cps[i].e(1), cps[i].e(2), cps[i+1].e(1), cps[i+1].e(2), cps[i+2].e(1), cps[i+2].e(2));
-	}
-};
-
 function compute_cluster_centroids(d) {
 
 	var clusterCentroids = d3.map();
@@ -414,13 +387,48 @@ function compute_control_points(centroids) {
 
 	return cps;
 
+};pc.shadows = function() {
+	flags.shadows = true;
+	if (__.data.length > 0) {
+		paths(__.data, ctx.shadows);
+	}
+	return this;
+};
+
+// draw little dots on the axis line where data intersects
+pc.axisDots = function() {
+	var ctx = pc.ctx.marks;
+	ctx.globalAlpha = d3.min([ 1 / Math.pow(data.length, 1 / 2), 1 ]);
+	__.data.forEach(function(d) {
+		__.dimensions.map(function(p, i) {
+			ctx.fillRect(position(p) - 0.75, yscale[p](d[p]) - 0.75, 1.5, 1.5);
+		});
+	});
+	return this;
+};
+
+// draw single cubic bezier curve
+function single_curve(d, ctx) {
+
+	var centroids = compute_centroids(d);
+	var cps = compute_control_points(centroids);
+
+	ctx.moveTo(cps[0].e(1), cps[0].e(2));
+	for (var i = 1; i < cps.length; i += 3) {
+		if (__.showControlPoints) {
+			for (var j = 0; j < 3; j++) {
+				ctx.fillRect(cps[i+j].e(1), cps[i+j].e(2), 2, 2);
+			}
+		}
+		ctx.bezierCurveTo(cps[i].e(1), cps[i].e(2), cps[i+1].e(1), cps[i+1].e(2), cps[i+2].e(1), cps[i+2].e(2));
+	}
 };
 
 // draw single polyline
 function color_path(d, ctx) {
 	ctx.strokeStyle = d3.functor(__.color)(d);
 	ctx.beginPath();
-	if (__.bundleDimension === null) {
+	if (__.bundleDimension === null || (__.bundlingStrength === 0 && __.smoothness == 0)) {
 		single_path(d, ctx);
 	} else {
 		single_curve(d, ctx);
@@ -433,7 +441,7 @@ function paths(data, ctx) {
 	ctx.clearRect(-1, -1, w() + 2, h() + 2);
 	ctx.beginPath();
 	data.forEach(function(d) {
-		if (__.bundleDimension === null) {
+		if (__.bundleDimension === null || (__.bundlingStrength === 0 && __.smoothness == 0)) {
 			single_path(d, ctx);
 		} else {
 			single_curve(d, ctx);
@@ -507,7 +515,7 @@ pc.updateAxes = function() {
       .attr("class", "dimension")
       .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
       .style("opacity", 0)
-      .append("svg:g")
+    .append("svg:g")
       .attr("class", "axis")
       .attr("transform", "translate(0,0)")
       .each(function(d) { d3.select(this).call(axis.scale(yscale[d])); })
@@ -528,6 +536,10 @@ pc.updateAxes = function() {
   g.transition().duration(1100)
     .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
     .style("opacity", 1);
+
+  pc.svg.selectAll(".axis").transition().duration(1100)
+  	.each(function(d) { d3.select(this).call(axis.scale(yscale[d])); });
+
   if (flags.shadows) paths(__.data, ctx.shadows);
   return this;
 };

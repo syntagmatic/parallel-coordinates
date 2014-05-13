@@ -29,7 +29,7 @@ pc.autoscale = function() {
   });
 
   // hack to remove ordinal dimensions with many values
-  pc.dimensions(pc.dimensions().concat(pc.hideAxis()).filter(function(p,i) {
+  pc.dimensions(pc.dimensions().filter(function(p,i) {
     var uniques = yscale[p].domain().length;
     if (__.types[p] == "string" && (uniques > 60 || uniques < 2)) {
       return false;
@@ -60,36 +60,42 @@ pc.autoscale = function() {
 
 pc.scale = function(d, domain) {
 	yscale[d].domain(domain);
-	pc.createAxes();	// workaround for updateAxes not updating labels
 
 	return this;
 };
 
 pc.flip = function(d) {
-	yscale[d].domain().reverse();
-	pc.createAxes();
+	//yscale[d].domain().reverse();					// does not work
+	yscale[d].domain(yscale[d].domain().reverse()); // works
 
 	return this;
 };
 
-pc.commonScale = function(type) {
+pc.commonScale = function(global, type) {
 	var t = type || "number";
-	// scales of the same type
-	var scales = __.dimensions.concat(__.hideAxis).filter(function(p) {
-		return __.types[p] == t;
-	});
+	if (typeof global === 'undefined') {
+		global = true;
+	}
+	if (global) {
+		// scales of the same type
+		var scales = __.dimensions.concat(__.hideAxis).filter(function(p) {
+			return __.types[p] == t;
+		});
 
-	var extent = d3.extent(scales.map(function(p,i) {
-			return yscale[p].domain();
-		}).reduce(function(a,b) {
-			return a.concat(b);
-		}));
+		var extent = d3.extent(scales.map(function(p,i) {
+				return yscale[p].domain();
+			}).reduce(function(a,b) {
+				return a.concat(b);
+			}));
 
-	scales.forEach(function(d) {
-		yscale[d].domain(extent);
-	});
+		scales.forEach(function(d) {
+			yscale[d].domain(extent);
+		});
+	} else {
+		pc.autoscale();
+	}
 
-	pc.createAxes();
+	// update centroids
 	if (__.bundleDimension !== null) {
 		pc.bundleDimension(__.bundleDimension);
 	}
