@@ -76,12 +76,13 @@ pc.commonScale = function(global, type) {
 	if (typeof global === 'undefined') {
 		global = true;
 	}
-	if (global) {
-		// scales of the same type
-		var scales = __.dimensions.concat(__.hideAxis).filter(function(p) {
-			return __.types[p] == t;
-		});
 
+	// scales of the same type
+	var scales = __.dimensions.concat(__.hideAxis).filter(function(p) {
+		return __.types[p] == t;
+	});
+
+	if (global) {
 		var extent = d3.extent(scales.map(function(p,i) {
 				return yscale[p].domain();
 			}).reduce(function(a,b) {
@@ -91,8 +92,11 @@ pc.commonScale = function(global, type) {
 		scales.forEach(function(d) {
 			yscale[d].domain(extent);
 		});
+
 	} else {
-		pc.autoscale();
+		scales.forEach(function(k) {
+			yscale[k].domain(d3.extent(__.data, function(d) { return +d[k]; }));
+		});
 	}
 
 	// update centroids
