@@ -40,7 +40,7 @@ An implementation of parallel coordinates in d3 as a [reusable chart](http://bos
 * [Mondrian](http://www.theusrus.de/Mondrian/), Martin Theus
 * [Parvis](http://www.mediavirus.org/parvis/), flo ledermann
 * [Parallel Coordinate Graphics using MATLAB](http://people.ece.cornell.edu/land/PROJECTS/Inselberg/), Bruce R. Land
-* [Parallel Coordinates in pandas, Python](http://pandasplotting.blogspot.com/2012/06/parallel-coordinates.html), Vytautas Jan��auskas
+* [Parallel Coordinates in pandas, Python](http://pandasplotting.blogspot.com/2012/06/parallel-coordinates.html), Vytautas Jančauskas
 * [PointCloudXplore](http://vis.lbl.gov/Vignettes/Drosophila/index.html)
 
 ## API
@@ -334,4 +334,4 @@ $ git submodule update
 
 ## Credits
 
-This library created with examples, suggestions and encouragement from Mike Bostock, Jason Davies, Mary Becica, Stephen Boak, Ziggy Jonsson, Ger Hobbelt, Johan Sundstr��m, Raffael Marty, Hugo Lopez, Bob Monteverde, Vadim Ogievetsky, Chris Rich, Patrick Martin, Sean Parmelee, and Alfred Inselberg.
+This library created with examples, suggestions and encouragement from Mike Bostock, Jason Davies, Mary Becica, Stephen Boak, Ziggy Jonsson, Ger Hobbelt, Johan Sundström, Raffael Marty, Hugo Lopez, Bob Monteverde, Vadim Ogievetsky, Chris Rich, Patrick Martin, Sean Parmelee, and Alfred Inselberg.
