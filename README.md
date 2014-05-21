@@ -20,7 +20,7 @@ An implementation of parallel coordinates in d3 as a [reusable chart](http://bos
 * [Parallel Coordinates: a tool for visualizing mult-dimensional geometry](http://astrostatistics.psu.edu/su06/inselberg061006.pdf), Alfred Inselberg
 * [Hyperdimensional Data Analysis Using Parallel Coordinates](https://www.cs.ubc.ca/~tmm/courses/cpsc533c-04-fall/readings/wegman.pdf), Edward Wegman [2](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.15.1902&rep=rep1&type=pdf)
 * [On Some Mathametics for Visualizing High Dimensional Data](http://sankhya.isical.ac.in/search/64a2/64a2031.pdf), Edward Wegman, Jeffrey Solka
-* [The State of the Art of Parallel Coordinates](http://diglib.eg.org/EG/DL/conf/EG2013/stars/PDF/095-116.pdf), Julian Heinrich & Daniel Weiskopf
+* [The State of the Art of Parallel Coordinates](http://classes.soe.ucsc.edu/cmps261/Fall13/papers/hcmarsh/StateXofXtheXArtXofXParallelXCoordinates.pdf), Julian Heinrich & Daniel Weiskopf
 
 ### Books
 
