@@ -13,12 +13,14 @@ An implementation of parallel coordinates in d3 as a [reusable chart](http://bos
 * [Edward Tufte's "Slopegraphs"](http://charliepark.org/slopegraphs/), Charlie Park
 * [Data Visualization's Final Frontier](http://smartdatacollective.com/j-kevin-byrne/52031/data-visualizations-final-frontier), J. Kevin Byrne
 * [D3JS Parallel Lines and Football](http://dexvis.wordpress.com/2013/01/28/d3js-parallel-lines-and-football/), Patrick Martin
+* [Parallel Coordinates](http://www.parallelcoordinates.de), Julian Heinrich
 
 ### Papers
 
 * [Parallel Coordinates: a tool for visualizing mult-dimensional geometry](http://astrostatistics.psu.edu/su06/inselberg061006.pdf), Alfred Inselberg
 * [Hyperdimensional Data Analysis Using Parallel Coordinates](https://www.cs.ubc.ca/~tmm/courses/cpsc533c-04-fall/readings/wegman.pdf), Edward Wegman [2](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.15.1902&rep=rep1&type=pdf)
 * [On Some Mathametics for Visualizing High Dimensional Data](http://sankhya.isical.ac.in/search/64a2/64a2031.pdf), Edward Wegman, Jeffrey Solka
+* [The State of the Art of Parallel Coordinates](http://diglib.eg.org/EG/DL/conf/EG2013/stars/PDF/095-116.pdf), Julian Heinrich & Daniel Weiskopf
 
 ### Books
 

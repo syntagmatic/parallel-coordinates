@@ -6,21 +6,25 @@ pc.autoscale = function() {
         .domain(d3.extent(__.data, function(d) {
           return d[k] ? d[k].getTime() : null;
         }))
-        .range([h()+1, 1])
+        .range([h()+1, 1]);
     },
     "number": function(k) {
       return d3.scale.linear()
         .domain(d3.extent(__.data, function(d) { return +d[k]; }))
-        .range([h()+1, 1])
+        .range([h()+1, 1]);
     },
     "string": function(k) {
       return d3.scale.ordinal()
         .domain(__.data.map(function(p) { return p[k]; }))
-        .rangePoints([h()+1, 1])
+        .rangePoints([h()+1, 1]);
     }
   };
 
   __.dimensions.forEach(function(k) {
+    yscale[k] = defaultScales[__.types[k]](k);
+  });
+
+  __.hideAxis.forEach(function(k) {
     yscale[k] = defaultScales[__.types[k]](k);
   });
 
@@ -41,7 +45,7 @@ pc.autoscale = function() {
       .style("margin-top", __.margin.top + "px")
       .style("margin-left", __.margin.left + "px")
       .attr("width", w()+2)
-      .attr("height", h()+2)
+      .attr("height", h()+2);
 
   // default styles, needs to be set when canvas width changes
   ctx.foreground.strokeStyle = __.color;
@@ -52,4 +56,53 @@ pc.autoscale = function() {
   ctx.shadows.strokeStyle = "#dadada";
 
   return this;
+};
+
+pc.scale = function(d, domain) {
+	yscale[d].domain(domain);
+
+	return this;
+};
+
+pc.flip = function(d) {
+	//yscale[d].domain().reverse();					// does not work
+	yscale[d].domain(yscale[d].domain().reverse()); // works
+
+	return this;
+};
+
+pc.commonScale = function(global, type) {
+	var t = type || "number";
+	if (typeof global === 'undefined') {
+		global = true;
+	}
+
+	// scales of the same type
+	var scales = __.dimensions.concat(__.hideAxis).filter(function(p) {
+		return __.types[p] == t;
+	});
+
+	if (global) {
+		var extent = d3.extent(scales.map(function(p,i) {
+				return yscale[p].domain();
+			}).reduce(function(a,b) {
+				return a.concat(b);
+			}));
+
+		scales.forEach(function(d) {
+			yscale[d].domain(extent);
+		});
+
+	} else {
+		scales.forEach(function(k) {
+			yscale[k].domain(d3.extent(__.data, function(d) { return +d[k]; }));
+		});
+	}
+
+	// update centroids
+	if (__.bundleDimension !== null) {
+		pc.bundleDimension(__.bundleDimension);
+	}
+
+	return this;
 };

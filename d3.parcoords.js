@@ -12,7 +12,12 @@ d3.parcoords = function(config) {
     margin: { top: 24, right: 0, bottom: 12, left: 0 },
     color: "#069",
     composite: "source-over",
-    alpha: 0.7
+    alpha: 0.7,
+    bundlingStrength: 0.5,
+    bundleDimension: null,
+    smoothness: 0.25,
+    showControlPoints: false,
+    hideAxis : []
   };
 
   extend(__, config);
@@ -42,7 +47,7 @@ var pc = function(selection) {
 };
 var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush"].concat(d3.keys(__))),
     w = function() { return __.width - __.margin.right - __.margin.left; },
-    h = function() { return __.height - __.margin.top - __.margin.bottom },
+    h = function() { return __.height - __.margin.top - __.margin.bottom; },
     flags = {
       brushable: false,
       reorderable: false,
@@ -58,7 +63,8 @@ var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush"].c
     axis = d3.svg.axis().orient("left").ticks(5),
     g, // groups for axes, brushes
     ctx = {},
-    canvas = {};
+    canvas = {},
+    clusterCentroids = [];
 
 // side effects for setters
 var side_effects = d3.dispatch.apply(this,d3.keys(__))
@@ -69,11 +75,29 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
   .on("margin", function(d) { pc.resize(); })
   .on("rate", function(d) { rqueue.rate(d.value); })
   .on("data", function(d) {
-    if (flags.shadows) paths(__.data, ctx.shadows);
+    if (flags.shadows){paths(__.data, ctx.shadows);}
   })
   .on("dimensions", function(d) {
     xscale.domain(__.dimensions);
-    if (flags.interactive) pc.render().updateAxes();
+    if (flags.interactive){pc.render().updateAxes();}
+  })
+  .on("bundleDimension", function(d) {
+	  if (!__.dimensions.length) pc.detectDimensions();
+	  if (!(__.dimensions[0] in yscale)) pc.autoscale();
+	  if (typeof d.value === "number") {
+		  if (d.value < __.dimensions.length) {
+			  __.bundleDimension = __.dimensions[d.value];
+		  } else if (d.value < __.hideAxis.length) {
+			  __.bundleDimension = __.hideAxis[d.value];
+		  }
+	  } else {
+		  __.bundleDimension = d.value;
+	  }
+
+	  __.clusterCentroids = compute_cluster_centroids(__.bundleDimension);
+  })
+  .on("hideAxis", function(d) {
+	  pc.dimensions(_.without(__.dimensions, d.value));
   });
 
 // expose the state of the chart
@@ -93,7 +117,9 @@ d3.rebind(pc, axis, "ticks", "orient", "tickValues", "tickSubdivide", "tickSize"
 function getset(obj,state,events)  {
   d3.keys(state).forEach(function(key) {
     obj[key] = function(x) {
-      if (!arguments.length) return state[key];
+      if (!arguments.length) {
+		return state[key];
+	}
       var old = state[key];
       state[key] = x;
       side_effects[key].call(pc,{"value": x, "previous": old});
@@ -117,21 +143,25 @@ pc.autoscale = function() {
         .domain(d3.extent(__.data, function(d) {
           return d[k] ? d[k].getTime() : null;
         }))
-        .range([h()+1, 1])
+        .range([h()+1, 1]);
     },
     "number": function(k) {
       return d3.scale.linear()
         .domain(d3.extent(__.data, function(d) { return +d[k]; }))
-        .range([h()+1, 1])
+        .range([h()+1, 1]);
     },
     "string": function(k) {
       return d3.scale.ordinal()
         .domain(__.data.map(function(p) { return p[k]; }))
-        .rangePoints([h()+1, 1])
+        .rangePoints([h()+1, 1]);
     }
   };
 
   __.dimensions.forEach(function(k) {
+    yscale[k] = defaultScales[__.types[k]](k);
+  });
+
+  __.hideAxis.forEach(function(k) {
     yscale[k] = defaultScales[__.types[k]](k);
   });
 
@@ -152,7 +182,7 @@ pc.autoscale = function() {
       .style("margin-top", __.margin.top + "px")
       .style("margin-left", __.margin.left + "px")
       .attr("width", w()+2)
-      .attr("height", h()+2)
+      .attr("height", h()+2);
 
   // default styles, needs to be set when canvas width changes
   ctx.foreground.strokeStyle = __.color;
@@ -164,7 +194,55 @@ pc.autoscale = function() {
 
   return this;
 };
-pc.detectDimensions = function() {
+
+pc.scale = function(d, domain) {
+	yscale[d].domain(domain);
+
+	return this;
+};
+
+pc.flip = function(d) {
+	//yscale[d].domain().reverse();					// does not work
+	yscale[d].domain(yscale[d].domain().reverse()); // works
+
+	return this;
+};
+
+pc.commonScale = function(global, type) {
+	var t = type || "number";
+	if (typeof global === 'undefined') {
+		global = true;
+	}
+
+	// scales of the same type
+	var scales = __.dimensions.concat(__.hideAxis).filter(function(p) {
+		return __.types[p] == t;
+	});
+
+	if (global) {
+		var extent = d3.extent(scales.map(function(p,i) {
+				return yscale[p].domain();
+			}).reduce(function(a,b) {
+				return a.concat(b);
+			}));
+
+		scales.forEach(function(d) {
+			yscale[d].domain(extent);
+		});
+
+	} else {
+		scales.forEach(function(k) {
+			yscale[k].domain(d3.extent(__.data, function(d) { return +d[k]; }));
+		});
+	}
+
+	// update centroids
+	if (__.bundleDimension !== null) {
+		pc.bundleDimension(__.bundleDimension);
+	}
+
+	return this;
+};pc.detectDimensions = function() {
   pc.types(pc.detectDimensionTypes(__.data));
   pc.dimensions(d3.keys(pc.types()));
   return this;
@@ -172,18 +250,20 @@ pc.detectDimensions = function() {
 
 // a better "typeof" from this post: http://stackoverflow.com/questions/7390426/better-way-to-get-type-of-a-javascript-variable
 pc.toType = function(v) {
-  return ({}).toString.call(v).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
+  return ({}).toString.call(v).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
 };
 
 // try to coerce to number before returning type
 pc.toTypeCoerceNumbers = function(v) {
-  if ((parseFloat(v) == v) && (v != null)) return "number";
+  if ((parseFloat(v) == v) && (v != null)) {
+	return "number";
+}
   return pc.toType(v);
 };
 
 // attempt to determine types of each dimension based on first row of data
 pc.detectDimensionTypes = function(data) {
-  var types = {}
+  var types = {};
   d3.keys(data[0])
     .forEach(function(col) {
       types[col] = pc.toTypeCoerceNumbers(data[0][col]);
@@ -221,60 +301,171 @@ pc.render.queue = function() {
     rqueue(__.data);
   }
 };
-pc.shadows = function() {
-  flags.shadows = true;
-  if (__.data.length > 0) paths(__.data, ctx.shadows);
-  return this;
+function compute_cluster_centroids(d) {
+
+	var clusterCentroids = d3.map();
+	var clusterCounts = d3.map();
+	// determine clusterCounts
+	__.data.forEach(function(row) {
+		var scaled = yscale[d](row[d]);
+		if (!clusterCounts.has(scaled)) {
+			clusterCounts.set(scaled, 0);
+		}
+		var count = clusterCounts.get(scaled);
+		clusterCounts.set(scaled, count + 1);
+	});
+
+	__.data.forEach(function(row) {
+		__.dimensions.map(function(p, i) {
+			var scaled = yscale[d](row[d]);
+			if (!clusterCentroids.has(scaled)) {
+				var map = d3.map();
+				clusterCentroids.set(scaled, map);
+			}
+			if (!clusterCentroids.get(scaled).has(p)) {
+				clusterCentroids.get(scaled).set(p, 0);
+			}
+			var value = clusterCentroids.get(scaled).get(p);
+			value += yscale[p](row[p]) / clusterCounts.get(scaled);
+			clusterCentroids.get(scaled).set(p, value);
+		});
+	});
+
+	return clusterCentroids;
+
+}
+
+function compute_centroids(row) {
+	var centroids = [];
+
+	var p = __.dimensions;
+	var cols = p.length;
+	var a = 0.5;			// center between axes
+	for (var i = 0; i < cols; ++i) {
+		// centroids on 'real' axes
+		var x = position(p[i]);
+		var y = yscale[p[i]](row[p[i]]);
+		centroids.push($V([x, y]));
+
+		// centroids on 'virtual' axes
+		if (i < cols - 1) {
+			var cx = x + a * (position(p[i+1]) - x);
+			var cy = y + a * (yscale[p[i+1]](row[p[i+1]]) - y);
+			if (__.bundleDimension !== null) {
+				var leftCentroid = __.clusterCentroids.get(yscale[__.bundleDimension](row[__.bundleDimension])).get(p[i]);
+				var rightCentroid = __.clusterCentroids.get(yscale[__.bundleDimension](row[__.bundleDimension])).get(p[i+1]);
+				var centroid = 0.5 * (leftCentroid + rightCentroid);
+				cy = centroid + (1 - __.bundlingStrength) * (cy - centroid);
+			}
+			centroids.push($V([cx, cy]));
+		}
+	}
+
+	return centroids;
+}
+
+function compute_control_points(centroids) {
+
+	var cols = centroids.length;
+	var a = __.smoothness;
+	var cps = [];
+
+	cps.push(centroids[0]);
+	cps.push($V([centroids[0].e(1) + a*2*(centroids[1].e(1)-centroids[0].e(1)), centroids[0].e(2)]));
+	for (var col = 1; col < cols - 1; ++col) {
+		var mid = centroids[col];
+		var left = centroids[col - 1];
+		var right = centroids[col + 1];
+
+		var diff = left.subtract(right);
+		cps.push(mid.add(diff.x(a)));
+		cps.push(mid);
+		cps.push(mid.subtract(diff.x(a)));
+	}
+	cps.push($V([centroids[cols-1].e(1) + a*2*(centroids[cols-2].e(1)-centroids[cols-1].e(1)), centroids[cols-1].e(2)]));
+	cps.push(centroids[cols - 1]);
+
+	return cps;
+
+};pc.shadows = function() {
+	flags.shadows = true;
+	if (__.data.length > 0) {
+		paths(__.data, ctx.shadows);
+	}
+	return this;
 };
 
 // draw little dots on the axis line where data intersects
 pc.axisDots = function() {
-  var ctx = pc.ctx.marks;
-  ctx.globalAlpha = d3.min([1/Math.pow(data.length, 1/2), 1]);
-  __.data.forEach(function(d) {
-    __.dimensions.map(function(p,i) {
-      ctx.fillRect(position(p)-0.75,yscale[p](d[p])-0.75,1.5,1.5);
-    });
-  });
-  return this;
+	var ctx = pc.ctx.marks;
+	ctx.globalAlpha = d3.min([ 1 / Math.pow(data.length, 1 / 2), 1 ]);
+	__.data.forEach(function(d) {
+		__.dimensions.map(function(p, i) {
+			ctx.fillRect(position(p) - 0.75, yscale[p](d[p]) - 0.75, 1.5, 1.5);
+		});
+	});
+	return this;
+};
+
+// draw single cubic bezier curve
+function single_curve(d, ctx) {
+
+	var centroids = compute_centroids(d);
+	var cps = compute_control_points(centroids);
+
+	ctx.moveTo(cps[0].e(1), cps[0].e(2));
+	for (var i = 1; i < cps.length; i += 3) {
+		if (__.showControlPoints) {
+			for (var j = 0; j < 3; j++) {
+				ctx.fillRect(cps[i+j].e(1), cps[i+j].e(2), 2, 2);
+			}
+		}
+		ctx.bezierCurveTo(cps[i].e(1), cps[i].e(2), cps[i+1].e(1), cps[i+1].e(2), cps[i+2].e(1), cps[i+2].e(2));
+	}
 };
 
 // draw single polyline
 function color_path(d, ctx) {
-  ctx.strokeStyle = d3.functor(__.color)(d);
-  ctx.beginPath();
-  __.dimensions.map(function(p,i) {
-    if (i == 0) {
-      ctx.moveTo(position(p),yscale[p](d[p]));
-    } else {
-      ctx.lineTo(position(p),yscale[p](d[p]));
-    }
-  });
-  ctx.stroke();
+	ctx.strokeStyle = d3.functor(__.color)(d);
+	ctx.beginPath();
+	if (__.bundleDimension === null || (__.bundlingStrength === 0 && __.smoothness == 0)) {
+		single_path(d, ctx);
+	} else {
+		single_curve(d, ctx);
+	}
+	ctx.stroke();
 };
 
 // draw many polylines of the same color
 function paths(data, ctx) {
-  ctx.clearRect(-1,-1,w()+2,h()+2);
-  ctx.beginPath();
-  data.forEach(function(d) {
-    __.dimensions.map(function(p,i) {
-      if (i == 0) {
-        ctx.moveTo(position(p),yscale[p](d[p]));
-      } else {
-        ctx.lineTo(position(p),yscale[p](d[p]));
-      }
-    });
-  });
-  ctx.stroke();
+	ctx.clearRect(-1, -1, w() + 2, h() + 2);
+	ctx.beginPath();
+	data.forEach(function(d) {
+		if (__.bundleDimension === null || (__.bundlingStrength === 0 && __.smoothness == 0)) {
+			single_path(d, ctx);
+		} else {
+			single_curve(d, ctx);
+		}
+	});
+	ctx.stroke();
 };
 
+function single_path(d, ctx) {
+	__.dimensions.map(function(p, i) {
+		if (i == 0) {
+			ctx.moveTo(position(p), yscale[p](d[p]));
+		} else {
+			ctx.lineTo(position(p), yscale[p](d[p]));
+		}
+	});
+}
+
 function path_foreground(d) {
-  return color_path(d, ctx.foreground);
+	return color_path(d, ctx.foreground);
 };
 
 function path_highlight(d) {
-  return color_path(d, ctx.highlight);
+	return color_path(d, ctx.highlight);
 };
 pc.clear = function(layer) {
   ctx[layer].clearRect(0,0,w()+2,h()+2);
@@ -288,7 +479,7 @@ pc.createAxes = function() {
       .data(__.dimensions, function(d) { return d; })
     .enter().append("svg:g")
       .attr("class", "dimension")
-      .attr("transform", function(d) { return "translate(" + xscale(d) + ")"; })
+      .attr("transform", function(d) { return "translate(" + xscale(d) + ")"; });
 
   // Add an axis and title.
   g.append("svg:g")
@@ -305,7 +496,7 @@ pc.createAxes = function() {
       })
       .text(function(d) {
         return d in __.dimensionTitles ? __.dimensionTitles[d] : d;  // dimension display names
-      })
+      });
 
   flags.axes= true;
   return this;
@@ -318,13 +509,13 @@ pc.removeAxes = function() {
 
 pc.updateAxes = function() {
   var g_data = pc.svg.selectAll(".dimension")
-      .data(__.dimensions, function(d) { return d; })
+      .data(__.dimensions, function(d) { return d; });
 
   g_data.enter().append("svg:g")
       .attr("class", "dimension")
       .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
       .style("opacity", 0)
-      .append("svg:g")
+    .append("svg:g")
       .attr("class", "axis")
       .attr("transform", "translate(0,0)")
       .each(function(d) { d3.select(this).call(axis.scale(yscale[d])); })
@@ -344,7 +535,11 @@ pc.updateAxes = function() {
 
   g.transition().duration(1100)
     .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
-    .style("opacity", 1)
+    .style("opacity", 1);
+
+  pc.svg.selectAll(".axis").transition().duration(1100)
+  	.each(function(d) { d3.select(this).call(axis.scale(yscale[d])); });
+
   if (flags.shadows) paths(__.data, ctx.shadows);
   return this;
 };
@@ -368,7 +563,7 @@ pc.brushable = function() {
     .selectAll("rect")
       .style("visibility", null)
       .attr("x", -15)
-      .attr("width", 30)
+      .attr("width", 30);
   flags.brushable = true;
   return this;
 };
@@ -387,7 +582,7 @@ pc.reorderable = function() {
         __.dimensions.sort(function(a, b) { return position(a) - position(b); });
         xscale.domain(__.dimensions);
         pc.render();
-        g.attr("transform", function(d) { return "translate(" + position(d) + ")"; })
+        g.attr("transform", function(d) { return "translate(" + position(d) + ")"; });
       })
       .on("dragend", function(d) {
         delete this.__origin__;
