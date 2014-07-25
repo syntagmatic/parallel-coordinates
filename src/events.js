@@ -50,6 +50,7 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
 	  __.clusterCentroids = compute_cluster_centroids(__.bundleDimension);
   })
   .on("hideAxis", function(d) {
+	  if (!__.dimensions.length) pc.detectDimensions();
 	  pc.dimensions(_.without(__.dimensions, d.value));
   });
 
