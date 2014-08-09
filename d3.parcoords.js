@@ -75,8 +75,7 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
   .on("margin", function(d) { pc.resize(); })
   .on("rate", function(d) { rqueue.rate(d.value); })
   .on("data", function(d) {
-    if (flags.shadows){ paths(__.data, ctx.shadows); }
-    pc.detectDimensions();
+    if (flags.shadows){paths(__.data, ctx.shadows);}
   })
   .on("dimensions", function(d) {
     xscale.domain(__.dimensions);
@@ -98,6 +97,7 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
 	  __.clusterCentroids = compute_cluster_centroids(__.bundleDimension);
   })
   .on("hideAxis", function(d) {
+	  if (!__.dimensions.length) pc.detectDimensions();
 	  pc.dimensions(_.without(__.dimensions, d.value));
   });
 
