@@ -45,7 +45,7 @@ var pc = function(selection) {
 
   return pc;
 };
-var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush"].concat(d3.keys(__))),
+var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush", "brushend"].concat(d3.keys(__))),
     w = function() { return __.width - __.margin.right - __.margin.left; },
     h = function() { return __.height - __.margin.top - __.margin.bottom; },
     flags = {
@@ -560,6 +560,9 @@ pc.brushable = function() {
               d3.event.sourceEvent.stopPropagation();
             })
             .on("brush", pc.brush)
+            .on("brushend", function() {
+              events.brushend.call(pc, __.brushed);
+            })
         );
       })
     .selectAll("rect")
