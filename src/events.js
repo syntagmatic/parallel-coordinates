@@ -1,4 +1,4 @@
-var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush"].concat(d3.keys(__))),
+var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush", "brushend"].concat(d3.keys(__))),
     w = function() { return __.width - __.margin.right - __.margin.left; },
     h = function() { return __.height - __.margin.top - __.margin.bottom; },
     flags = {
