@@ -95,6 +95,24 @@ pc.brushable = function() {
   return this;
 };
 
+pc.brushExtents = function() {
+  var extents = {};
+  __.dimensions.forEach(function(d) {
+    var brush = yscale[d].brush;
+    if (!brush.empty()) {
+      // https://github.com/mbostock/d3/wiki/SVG-Controls#brush_extent
+      // NOTE: According to the documentation, inversion is required *if* the
+      //       brush is moved by the user (on mousemove following a mousedown).
+      //       However, this gets me the wrong values, so no inversion here.
+      //       See issue: mbostock/d3 #1981
+      var extent = brush.extent();
+      extent.sort(d3.ascending);
+      extents[d] = extent;
+    }
+  });
+  return extents;
+};
+
 // Jason Davies, http://bl.ocks.org/1341281
 pc.reorderable = function() {
   if (!g) pc.createAxes();
