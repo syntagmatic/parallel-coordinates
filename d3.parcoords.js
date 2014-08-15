@@ -541,6 +541,8 @@ pc.updateAxes = function() {
   	.each(function(d) { d3.select(this).call(axis.scale(yscale[d])); });
 
   if (flags.shadows) paths(__.data, ctx.shadows);
+  if (flags.brushable) pc.brushable();
+  if (flags.reorderable) pc.reorderable();
   return this;
 };
 
