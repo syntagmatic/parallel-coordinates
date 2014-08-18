@@ -9,7 +9,7 @@ pc.render = function() {
   return this;
 };
 
-pc.render.default = function() {
+pc.render['default'] = function() {
   pc.clear('foreground');
   if (__.brushed) {
     __.brushed.forEach(path_foreground);
