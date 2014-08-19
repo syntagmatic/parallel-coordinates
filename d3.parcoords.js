@@ -98,7 +98,7 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
   })
   .on("hideAxis", function(d) {
 	  if (!__.dimensions.length) pc.detectDimensions();
-	  pc.dimensions(_.without(__.dimensions, d.value));
+	  pc.dimensions(without(__.dimensions, d.value));
   });
 
 // expose the state of the chart
@@ -135,6 +135,10 @@ function extend(target, source) {
     target[key] = source[key];
   }
   return target;
+};
+
+function without(arr, item) {
+  return arr.filter(function(elem) { return item.indexOf(elem) === -1; })
 };
 pc.autoscale = function() {
   // yscale
