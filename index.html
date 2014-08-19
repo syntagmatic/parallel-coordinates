@@ -1,14 +1,16 @@
 <!doctype html>
 <title>Parallel Coordinates</title>
 <link rel="stylesheet" type="text/css" href="d3.parcoords.css">
-<script src="lib/d3/d3.min.js"></script>
-<script src="lib/sylvester.js"></script>
-<script src="lib/underscore.js"></script>
-<script src="lib/slickgrid/jquery-1.7.min.js"></script>
+<script src="examples/lib/d3.min.js"></script>
+<script src="examples/lib/sylvester.js"></script>
+<script src="examples/lib/underscore.js"></script>
+<script src="examples/lib/slickgrid/jquery-1.7.min.js"></script>
+<script src="examples/lib/underscore.js"></script>
+<script src="examples/lib/underscore.math.js"></script>
 <script src="d3.parcoords.js"></script>
 <link rel="stylesheet" type="text/css" href="style.css">
 <a href="https://github.com/syntagmatic/parallel-coordinates"><img style="position: absolute; top: 0; right: 0; border: 0;" src="forkme.png" alt="Fork me on GitHub"></a>
-<h1>Parallel Coordinates <small>(0.3.1)</small></h1>
+<h1>Parallel Coordinates <small>(0.4.0)</small></h1>
 <p style="color: #a00;"></p>
 <p>A visual toolkit for <a href="http://www.cs.ucdavis.edu/~ma/ECS289H/papers/Inselberg1997.pdf">multidimensional detectives</a>.</p>
 <p><strong><a href="d3.parcoords.js">d3.parcoords.js</a></strong> <small> - requires <strong><a href="http://d3js.org/">D3.js</a></strong></small><br/>
@@ -48,7 +50,7 @@ var blue_to_brown = d3.scale.linear()
 var pc1;
 
 // load csv file and create the chart
-d3.csv('data/cars.csv', function(data) {
+d3.csv('examples/data/cars.csv', function(data) {
   pc1 = d3.parcoords()("#example1")
     .data(data)
     .color(function(d) { return blue_to_brown(d['economy (mpg)']); })  // quantitative color scale
@@ -282,8 +284,6 @@ d3.selectAll(".parcoords-coloring")
 -->
 
 <pre><a href="#" class="show-code" data-code="zscore">Show code</a></pre>
-<script src="lib/underscore.js"></script>
-<script src="lib/underscore.math.js"></script>
 <script id="zscore">// this section uses underscore.js and underscore.math
 var pcz;
 
@@ -294,7 +294,7 @@ var zcolorscale = d3.scale.linear()
   .interpolate(d3.interpolateLab);
 
 // load csv file and create the chart
-d3.csv('data/cars.csv', function(data) {
+d3.csv('examples/data/cars.csv', function(data) {
   pcz = d3.parcoords()("#example-zscore")
     .data(data)
     .render()
@@ -423,7 +423,7 @@ d3.select("#compositing-opacity").on("change", function() {
 var pc_progressive;
 
 // load csv file and create the chart
-d3.csv('data/nutrients.csv', function(data) {
+d3.csv('examples/data/nutrients.csv', function(data) {
   var colorgen = d3.scale.category20();
   var colors = {};
   _(data).chain()
@@ -466,7 +466,7 @@ used here can be found in <a href="http://arxiv.org/abs/1109.6073">this paper.</
 //interact with this variable from a javascript console
 var pc0;
 
-d3.csv('data/cars.csv', function(data) {
+d3.csv('examples/data/cars.csv', function(data) {
 pc0 = d3.parcoords()("#example0")
   .data(data)
 	.bundlingStrength(0) // set bundling strength
@@ -540,6 +540,14 @@ For past versions of parallel coordinates that demonstrate various features and 
 <h3>Changes</h3>
 
 <p>
+  4.0:
+    <a href="https://github.com/syntagmatic/parallel-coordinates/issues/58">Repo reorganization</a><br/>
+  3.2:
+    <a href="https://github.com/syntagmatic/parallel-coordinates/pull/53">Bug</a>
+    <a href="https://github.com/syntagmatic/parallel-coordinates/pull/54">fixes</a>,
+    <a href="https://github.com/syntagmatic/parallel-coordinates/pull/55">brushevents </a> and
+    <a href="https://github.com/syntagmatic/parallel-coordinates/pull/56">extents</a>
+    <br/>
   3.1: <a href="https://github.com/syntagmatic/parallel-coordinates/pull/46">Brush and resize bugfixes</a><br/>
   3.0: <a href="https://github.com/syntagmatic/parallel-coordinates/pull/33">Non-selectable CSS</a>, <a href="https://github.com/syntagmatic/parallel-coordinates/pull/42">bundling, axis inversion and axis hiding</a><br/>
   2.2: <a href="https://github.com/syntagmatic/parallel-coordinates/issues/20">Added Date dimension type</a><br/>
