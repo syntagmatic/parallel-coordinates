@@ -90,6 +90,11 @@ function selected() {
   var actives = __.dimensions.filter(is_brushed),
       extents = actives.map(function(p) { return yscale[p].brush.extent(); });
 
+  // We don't want to return the full data set when there are no axes brushed.
+  // Actually, when there are no axes brushed, by definition, no items are
+  // selected. So, let's avoid the filtering and just return false.
+  if (actives.length === 0) return false;
+
   // test if within range
   var within = {
     "date": function(d,p,dimension) {
