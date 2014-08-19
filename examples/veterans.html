@@ -2,16 +2,16 @@
 <title>Veterans</title>
 
 <!-- SlickGrid -->
-<link rel="stylesheet" href="../lib/slickgrid/slick.grid.css" type="text/css"/>
-<link rel="stylesheet" href="../lib/slickgrid/jquery-ui-1.8.16.custom.css" type="text/css"/>
-<link rel="stylesheet" href="../lib/slickgrid/examples.css" type="text/css"/>
-<link rel="stylesheet" href="../lib/slickgrid/slick.pager.css" type="text/css"/>
-<script src="../lib/slickgrid/jquery-1.7.min.js"></script>
-<script src="../lib/slickgrid/jquery.event.drag-2.0.min.js"></script>
-<script src="../lib/slickgrid/slick.core.js"></script>
-<script src="../lib/slickgrid/slick.grid.js"></script>
-<script src="../lib/slickgrid/slick.pager.js"></script>
-<script src="../lib/slickgrid/slick.dataview.js"></script>
+<link rel="stylesheet" href="lib/slickgrid/slick.grid.css" type="text/css"/>
+<link rel="stylesheet" href="lib/slickgrid/jquery-ui-1.8.16.custom.css" type="text/css"/>
+<link rel="stylesheet" href="lib/slickgrid/examples.css" type="text/css"/>
+<link rel="stylesheet" href="lib/slickgrid/slick.pager.css" type="text/css"/>
+<script src="lib/slickgrid/jquery-1.7.min.js"></script>
+<script src="lib/slickgrid/jquery.event.drag-2.0.min.js"></script>
+<script src="lib/slickgrid/slick.core.js"></script>
+<script src="lib/slickgrid/slick.grid.js"></script>
+<script src="lib/slickgrid/slick.pager.js"></script>
+<script src="lib/slickgrid/slick.dataview.js"></script>
 <!-- End SlickGrid -->
 
 <link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
@@ -44,10 +44,10 @@ text {
   font: 10px sans-serif;
 }
 </style>
-<script src="../lib/d3.min.js"></script>
+<script src="lib/d3.min.js"></script>
 <script src="../d3.parcoords.js"></script>
-<script src="../lib/underscore.js"></script>
-<script src="../lib/divgrid.js"></script>
+<script src="lib/underscore.js"></script>
+<script src="lib/divgrid.js"></script>
 <div id="example" class="parcoords" style="height:240px;"></div>
 <div id="grid"></div>
 <div id="pager"></div>
@@ -64,7 +64,7 @@ var parcoords = d3.parcoords()("#example")
   });
 
 // load csv file and create the chart
-d3.csv('../data/ngl_wyoming.csv', function(data) {
+d3.csv('data/ngl_wyoming.csv', function(data) {
   // process veterans dataset
   var dateParse = d3.time.format("%m/%d/%Y").parse;
 

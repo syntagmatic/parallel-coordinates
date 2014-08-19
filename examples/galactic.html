@@ -10,7 +10,7 @@ text {
 }
 </style>
 <link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
-<script src="../lib/d3.min.js"></script>
+<script src="lib/d3.min.js"></script>
 <script src="../d3.parcoords.js"></script>
 <div id="example" class="parcoords" style="width:4800px;height:600px;"></div>
 <p><a href="http://astrostatistics.psu.edu/datasets/COMBO17.html">Source</a></p>
@@ -22,7 +22,7 @@ var blue_to_brown = d3.scale.linear()
 var color = function(d) { return blue_to_brown(d['Rmag']); };
 
 // load csv file and create the chart
-d3.csv('../data/COMBO17.csv', function(data) {
+d3.csv('data/COMBO17.csv', function(data) {
 
   blue_to_brown
     .domain(d3.extent(data, function(d) { return d['Rmag'] }))

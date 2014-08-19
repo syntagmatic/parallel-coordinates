@@ -2,10 +2,10 @@
 <title>Brushing Example</title>
 <link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
 <link rel="stylesheet" type="text/css" href="style.css">
-<script src="../lib/d3.min.js"></script>
+<script src="lib/d3.min.js"></script>
 <script src="../d3.parcoords.js"></script>
 <div id="example" class="parcoords" style="width:960px;height:200px;"></div>
-<p>Loads an external <a href="../data/cars.csv">csv file</a>, creates a custom <a href="https://github.com/mbostock/d3/wiki/Quantitative-Scales#wiki-quantitative">quantitative color scale</a> using <a href="http://bl.ocks.org/3014589">L*a*b interpolation</a>, and enables brushing.
+<p>Loads an external <a href="data/cars.csv">csv file</a>, creates a custom <a href="https://github.com/mbostock/d3/wiki/Quantitative-Scales#wiki-quantitative">quantitative color scale</a> using <a href="http://bl.ocks.org/3014589">L*a*b interpolation</a>, and enables brushing.
 
 <p><button id="btnReset">Reset Brushes</button>
 <script>
@@ -22,7 +22,7 @@ var parcoords = d3.parcoords()("#example")
     .alpha(0.4);
 
 // load csv file and create the chart
-d3.csv('../data/cars.csv', function(data) {
+d3.csv('data/cars.csv', function(data) {
   parcoords
     .data(data)
     .render()
