@@ -667,48 +667,27 @@ function dimensionsForPoint(p) {
   return dims;
 }
 
-function initDrag(cfg, ev) {
-  var left, righ;
-
-  cfg.p1 = [ev.x - ev.dx, ev.y - ev.dy - __.margin.top];
-  cfg.p2 = [ev.x, ev.y];
+function onDragStart(cfg) {
   // First we need to determine between which two axes the pinch was started.
   // This will determine the freedom of movement, because a pinch can
   // logically only happen between two axes, so no movement outside these axes
   // should be allowed.
-  __.dimensions.some(function(dim, index) {
-    if (xscale(dim) < cfg.p1[0]) {
-      // TODO: Make sure that the start is between two axes (and not before
-      //       the first, or after the last.
-      var next = __.dimensions[index + 1];
-      left = { dim: dim, x: xscale(dim) };
-      right = { dim: next, x: xscale(next) };
-      return false;
-    }
-    return true;
-  });
-  cfg.minX = left.x;
-  cfg.maxX = right.x;
-  return cfg;
-}
-
-function onDragStart(cfg) {
   return function() {
-    cfg.p1 = undefined;
+    var p = d3.mouse(canvas["pinch"]),
+        dims = dimensionsForPoint(p);
+
+    cfg.minX = xscale(dims.left),
+    cfg.maxX = xscale(dims.right);
+
+    // Make sure that the point is within the bounds
+    cfg.p1[0] = Math.min(Math.max(cfg.minX, p[0]), cfg.maxX);
+    cfg.p1[1] = p[1];
   };
 }
 
 function onDrag(cfg) {
   return function() {
     var ev = d3.event;
-    
-    // We initialize the drag here in stead of on dragstart, as dragstart
-    // doesn't give us a convenient mouse position.
-    // FIXME: Try harder to get the correct mouse position in dragstart to avoid
-    //        this check for every drag event.
-    if (cfg.p1 === undefined) {
-      cfg = initDrag(cfg, ev);
-    }
 
     // Make sure that the point is within the bounds
     cfg.p2[0] = Math.min(Math.max(cfg.minX, ev.x), cfg.maxX);
@@ -730,7 +709,7 @@ function removePinch() {
 }
 
 pc.pinchable = function() {
-  var cfg = { p1: undefined, p2: undefined, minX: 0, maxX: 0 },
+  var cfg = { p1: [0, 0], p2: [0, 0], minX: 0, maxX: 0 },
       drag = d3.behavior.drag();
 
   drag
