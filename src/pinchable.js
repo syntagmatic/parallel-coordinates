@@ -1,12 +1,11 @@
 // bl.ocks.org/syntagmatic/5441022
 
-function drawPinchline(cfg) {
+function drawPinchline(p1, p2) {
   var pinchCtx = ctx["pinch"];
-  pinchCtx.clearRect(cfg.minX, 0, cfg.maxX - cfg.minX, h() + 2);
   pinchCtx.strokeStyle = "#0f8";
   pinchCtx.beginPath();
-  pinchCtx.moveTo(cfg.p1[0], cfg.p1[1]);
-  pinchCtx.lineTo(cfg.p2[0], cfg.p2[1]);
+  pinchCtx.moveTo(p1[0], p1[1]);
+  pinchCtx.lineTo(p2[0], p2[1]);
   pinchCtx.stroke();
 }
 
@@ -61,7 +60,8 @@ function onDrag(cfg) {
     cfg.p2[0] = Math.min(Math.max(cfg.minX, ev.x), cfg.maxX);
     cfg.p2[1] = ev.y - __.margin.top;
 
-    drawPinchline(cfg);
+    ctx["pinch"].clearRect(cfg.minX, 0, cfg.maxX - cfg.minX, h() + 2);
+    drawPinchline(cfg.p1, cfg.p2);
     //mouseMove(d3.event.x,d3.event.y);
   }
 }
