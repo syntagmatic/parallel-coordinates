@@ -1,0 +1,41 @@
+<!doctype html>
+<title>Brushing Example</title>
+<link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<script src="lib/d3.min.js"></script>
+<script src="../d3.parcoords.js"></script>
+<div id="example" class="parcoords" style="width:960px;height:200px;"></div>
+<p>Loads an external <a href="data/cars.csv">csv file</a>, creates a custom <a href="https://github.com/mbostock/d3/wiki/Quantitative-Scales#wiki-quantitative">quantitative color scale</a> using <a href="http://bl.ocks.org/3014589">L*a*b interpolation</a>, and enables brushing.
+
+<p><button id="btnReset">Reset Brushes</button>
+<script>
+// quantitative color scale
+var blue_to_brown = d3.scale.linear()
+  .domain([9, 50])
+  .range(["steelblue", "brown"])
+  .interpolate(d3.interpolateLab);
+
+var color = function(d) { return blue_to_brown(d['economy (mpg)']); };
+
+var parcoords = d3.parcoords()("#example")
+    .color(color)
+    .alpha(0.4);
+
+// load csv file and create the chart
+d3.csv('data/cars.csv', function(data) {
+  parcoords
+    .data(data)
+    .detectDimensions()
+    .autoscale()
+    .createAxes()
+    .reorderable()
+    .render()
+    .shadows()
+    .pinchable();  // enable pinch selection 
+});
+
+d3.select('#btnReset').on('click', function() {parcoords.brushReset();})
+</script>
+
+
+
