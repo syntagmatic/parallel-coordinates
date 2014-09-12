@@ -124,7 +124,12 @@ function removePinch() {
 }
 
 pc.pinchable = function() {
-  var cfg = { p1: [0, 0], p2: [0, 0], minX: 0, maxX: 0 },
+  var cfg = {       // Holds the configuration of the current pinch
+        p1: [0, 0], // Start point of the pinch
+        p2: [0, 0], // End point of the pinch
+        minX: 0,    // The minimum x-value that the start and the end point may take
+        maxX: 0     // The maximum x-value that the start and end point may take
+      },            // All above coords are in visualization space.
       drag = d3.behavior.drag();
 
   cfg.width = function() {
