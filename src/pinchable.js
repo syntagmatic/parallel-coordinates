@@ -43,7 +43,7 @@ function onDragStart(cfg) {
     var p = d3.mouse(canvas["pinch"]),
         dims = dimensionsForPoint(p);
 
-    cfg.minX = xscale(dims.left),
+    cfg.minX = xscale(dims.left);
     cfg.maxX = xscale(dims.right);
 
     // Make sure that the point is within the bounds
