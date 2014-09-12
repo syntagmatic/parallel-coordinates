@@ -43,6 +43,7 @@ function onDragStart(cfg) {
     var p = d3.mouse(canvas["pinch"]),
         dims = dimensionsForPoint(p);
 
+    cfg.dims = dims;
     cfg.minX = xscale(dims.left);
     cfg.maxX = xscale(dims.right);
 
@@ -66,6 +67,50 @@ function onDrag(cfg) {
   }
 }
 
+function onDragEnd(cfg) {
+  return function() {
+    var test = containmentTest(cfg),
+        d1 = cfg.dims.left,
+        d2 = cfg.dims.right,
+        y1 = yscale[d1],
+        y2 = yscale[d2],
+        brushed = [];
+
+    __.data.forEach(function(d) {
+      var point = [y1(d[d1]) - cfg.minX, y2(d[d2]) - cfg.minX];
+      if (test(point)) {
+        brushed.push(d);
+      }
+    });
+
+    __.brushed = brushed;
+    events.brushend.call(pc, __.brushed);
+    pc.render();
+  }
+}
+
+function containmentTest(cfg) {
+  var p1 = [cfg.p1[0] - cfg.minX, cfg.p1[1] - cfg.minX],
+      p2 = [cfg.p2[0] - cfg.minX, cfg.p2[1] - cfg.minX],
+      m1 = 1 - cfg.width() / p1[0],
+      b1 = p1[1] * (1 - m1),
+      m2 = 1 - cfg.width() / p2[0],
+      b2 = p2[1] * (1 - m2);
+
+  // test if point falls between lines
+  return function(p) {
+    var x = p[0],
+        y = p[1],
+        y1 = m1 * x + b1,
+        y2 = m2 * x + b2;
+
+    if (y > Math.min(y1, y2) && y < Math.max(y1, y2))
+      return true;
+
+    return false;
+  };
+};
+
 function removePinch() {
   var p = d3.mouse(canvas["pinch"]),
       dims = dimensionsForPoint(p),
@@ -80,9 +125,14 @@ pc.pinchable = function() {
   var cfg = { p1: [0, 0], p2: [0, 0], minX: 0, maxX: 0 },
       drag = d3.behavior.drag();
 
+  cfg.width = function() {
+    return cfg.maxX - cfg.minX;
+  };
+
   drag
     .on("dragstart", onDragStart(cfg))
-    .on("drag", onDrag(cfg));
+    .on("drag", onDrag(cfg))
+    .on("dragend", onDragEnd(cfg));
 
   d3.select(canvas["pinch"])
     .on("click", removePinch)
