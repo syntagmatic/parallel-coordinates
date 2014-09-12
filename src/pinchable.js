@@ -119,6 +119,8 @@ function removePinch() {
       pinchCtx = ctx["pinch"];
 
   pinchCtx.clearRect(minX, 0, maxX - minX, h() + 2);
+  __.brushed = false;
+  pc.render();
 }
 
 pc.pinchable = function() {
