@@ -632,7 +632,7 @@ pc.adjacent_pairs = function(arr) {
 };
 // bl.ocks.org/syntagmatic/5441022
 
-function drawPinchline(p1, p2) {
+function drawStrum(p1, p2) {
   var pinchCtx = ctx["pinch"];
   pinchCtx.strokeStyle = "#0f8";
   pinchCtx.beginPath();
@@ -669,67 +669,76 @@ function dimensionsForPoint(p) {
   return dims;
 }
 
-function onDragStart(cfg) {
-  // First we need to determine between which two axes the pinch was started.
-  // This will determine the freedom of movement, because a pinch can
+function onDragStart(strums) {
+  // First we need to determine between which two axes the sturm was started.
+  // This will determine the freedom of movement, because a strum can
   // logically only happen between two axes, so no movement outside these axes
   // should be allowed.
   return function() {
     var p = d3.mouse(canvas["pinch"]),
-        dims = dimensionsForPoint(p);
+        dims = dimensionsForPoint(p),
+        strum = {
+          p1: p,
+          dims: dims,
+          minX: xscale(dims.left),
+          maxX: xscale(dims.right)
+        };
 
-    cfg.dims = dims;
-    cfg.minX = xscale(dims.left);
-    cfg.maxX = xscale(dims.right);
+    strums[dims.i] = strum;
+    strums.active = dims.i;
 
     // Make sure that the point is within the bounds
-    cfg.p1[0] = Math.min(Math.max(cfg.minX, p[0]), cfg.maxX);
-    cfg.p1[1] = p[1];
+    strum.p1[0] = Math.min(Math.max(strum.minX, p[0]), strum.maxX);
+    strum.p1[1] = p[1];
+    strum.p2 = strum.p1.slice();
   };
 }
 
-function onDrag(cfg) {
+function onDrag(strums) {
   return function() {
-    var ev = d3.event;
+    var ev = d3.event,
+        strum = strums[strums.active];
 
     // Make sure that the point is within the bounds
-    cfg.p2[0] = Math.min(Math.max(cfg.minX, ev.x), cfg.maxX);
-    cfg.p2[1] = ev.y - __.margin.top;
+    strum.p2[0] = Math.min(Math.max(strum.minX, ev.x), strum.maxX);
+    strum.p2[1] = ev.y - __.margin.top;
 
-    ctx["pinch"].clearRect(cfg.minX, 0, cfg.maxX - cfg.minX, h() + 2);
-    drawPinchline(cfg.p1, cfg.p2);
+    ctx["pinch"].clearRect(strum.minX, 0, strum.maxX - strum.minX, h() + 2);
+    drawStrum(strum.p1, strum.p2);
     //mouseMove(d3.event.x,d3.event.y);
   }
 }
 
-function onDragEnd(cfg) {
+function onDragEnd(strums) {
   return function() {
-    var test = containmentTest(cfg),
-        d1 = cfg.dims.left,
-        d2 = cfg.dims.right,
+    var strum = strums[strums.active],
+        test = containmentTest(strum, strums.width()),
+        d1 = strum.dims.left,
+        d2 = strum.dims.right,
         y1 = yscale[d1],
         y2 = yscale[d2],
         brushed = [];
 
     __.data.forEach(function(d) {
-      var point = [y1(d[d1]) - cfg.minX, y2(d[d2]) - cfg.minX];
+      var point = [y1(d[d1]) - strum.minX, y2(d[d2]) - strum.minX];
       if (test(point)) {
         brushed.push(d);
       }
     });
 
+    strums.active = undefined;
     __.brushed = brushed;
     events.brushend.call(pc, __.brushed);
     pc.render();
   }
 }
 
-function containmentTest(cfg) {
-  var p1 = [cfg.p1[0] - cfg.minX, cfg.p1[1] - cfg.minX],
-      p2 = [cfg.p2[0] - cfg.minX, cfg.p2[1] - cfg.minX],
-      m1 = 1 - cfg.width() / p1[0],
+function containmentTest(strum, width) {
+  var p1 = [strum.p1[0] - strum.minX, strum.p1[1] - strum.minX],
+      p2 = [strum.p2[0] - strum.minX, strum.p2[1] - strum.minX],
+      m1 = 1 - width / p1[0],
       b1 = p1[1] * (1 - m1),
-      m2 = 1 - cfg.width() / p2[0],
+      m2 = 1 - width / p2[0],
       b2 = p2[1] * (1 - m2);
 
   // test if point falls between lines
@@ -746,38 +755,48 @@ function containmentTest(cfg) {
   };
 };
 
-function removePinch() {
-  var p = d3.mouse(canvas["pinch"]),
-      dims = dimensionsForPoint(p),
-      minX = xscale(dims.left),
-      maxX = xscale(dims.right),
-      pinchCtx = ctx["pinch"];
+function removeStrum(strums) {
+  return function() {
+    var p = d3.mouse(canvas["pinch"]),
+        dims = dimensionsForPoint(p),
+        minX = xscale(dims.left),
+        maxX = xscale(dims.right),
+        pinchCtx = ctx["pinch"];
 
-  pinchCtx.clearRect(minX, 0, maxX - minX, h() + 2);
-  __.brushed = false;
-  pc.render();
+    delete strums[dims.i];
+    pinchCtx.clearRect(minX, 0, maxX - minX, h() + 2);
+    __.brushed = false;
+    pc.render();
+  };
 }
 
 pc.pinchable = function() {
-  var cfg = {       // Holds the configuration of the current pinch
-        p1: [0, 0], // Start point of the pinch
-        p2: [0, 0], // End point of the pinch
-        minX: 0,    // The minimum x-value that the start and the end point may take
-        maxX: 0     // The maximum x-value that the start and end point may take
-      },            // All above coords are in visualization space.
+  var strums = {},
       drag = d3.behavior.drag();
+  
+  // Map of current strums. Strums are stored per segment of the PC. A segment,
+  // being the area between two axes. The left most area is indexed at 0.
+  strums.active = undefined;
+  // Returns the width of the PC segment where currently a strum is being
+  // placed. NOTE: even though they are evenly spaced in our current 
+  // implementation, we keep for when non-even spaced segments are supported as
+  // well. 
+  strums.width = function() {
+    var strum = strums[strums.active];
 
-  cfg.width = function() {
-    return cfg.maxX - cfg.minX;
-  };
+    if (strum === undefined) 
+      return undefined;
+
+    return strum.maxX - strum.minX;
+  }
 
   drag
-    .on("dragstart", onDragStart(cfg))
-    .on("drag", onDrag(cfg))
-    .on("dragend", onDragEnd(cfg));
+    .on("dragstart", onDragStart(strums))
+    .on("drag", onDrag(strums))
+    .on("dragend", onDragEnd(strums));
 
   d3.select(canvas["pinch"])
-    .on("click", removePinch)
+    .on("click", removeStrum(strums))
     .call(drag);
 }
 pc.interactive = function() {
