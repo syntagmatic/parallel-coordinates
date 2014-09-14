@@ -10,10 +10,11 @@ function drawPinchline(p1, p2) {
 }
 
 function dimensionsForPoint(p) {
-  var dims = { left: undefined, right: undefined }
+  var dims = { i: -1, left: undefined, right: undefined }
   __.dimensions.some(function(dim, i) {
     if (xscale(dim) < p[0]) {
       var next = __.dimensions[i + 1];
+      dims.i = i;
       dims.left = dim;
       dims.right = next;
       return false;
@@ -23,10 +24,12 @@ function dimensionsForPoint(p) {
 
   if (dims.left === undefined) {
     // Event on the left side of the first axis.
+    dims.i = 0;
     dims.left = __.dimensions[0];
     dims.right = __.dimensions[1];
   } else if (dims.right === undefined) {
     // Event on the right side of the last axis
+    dims.i = __.dimensions.length - 1;
     dims.right = dims.left;
     dims.left = __.dimensions[__.dimensions.length - 2];
   }
