@@ -79,19 +79,27 @@ function onDrag(strums) {
 
 function onDragEnd(strums) {
   return function() {
-    var strum = strums[strums.active],
-        test = containmentTest(strum, strums.width()),
-        d1 = strum.dims.left,
-        d2 = strum.dims.right,
-        y1 = yscale[d1],
-        y2 = yscale[d2],
-        brushed = [];
+    var brushed = __.data,
+        ids = Object.getOwnPropertyNames(strums).filter(function(d) { 
+          return !isNaN(d); 
+        });
 
-    __.data.forEach(function(d) {
-      var point = [y1(d[d1]) - strum.minX, y2(d[d2]) - strum.minX];
-      if (test(point)) {
-        brushed.push(d);
-      }
+    brushed = brushed.filter(function(d) {
+      // Yes, double negation. However, this avoids each strum being tested for
+      // each data item, even though when the first strum already doesn't
+      // contain the item. So, even though it doesn't reduces the worst case
+      // scenario O(n * N), with n being the number of strums and N the number
+      // of data items, it does improve the average run time.
+      return !ids.some(function(id) {
+        var strum = strums[id],
+            test = containmentTest(strum, strums.width()),
+            d1 = strum.dims.left,
+            d2 = strum.dims.right,
+            y1 = yscale[d1],
+            y2 = yscale[d2],
+            point = [y1(d[d1]) - strum.minX, y2(d[d2]) - strum.minX];
+        return !test(point);
+      });
     });
 
     strums.active = undefined;
@@ -133,8 +141,7 @@ function removeStrum(strums) {
 
     delete strums[dims.i];
     pinchCtx.clearRect(minX, 0, maxX - minX, h() + 2);
-    __.brushed = false;
-    pc.render();
+    onDragEnd(strums)();
   };
 }
 
