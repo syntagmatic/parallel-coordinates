@@ -700,7 +700,7 @@ function onDrag(strums) {
         strum = strums[strums.active];
 
     // Make sure that the point is within the bounds
-    strum.p2[0] = Math.min(Math.max(strum.minX, ev.x), strum.maxX);
+    strum.p2[0] = Math.min(Math.max(strum.minX + 1, ev.x), strum.maxX);
     strum.p2[1] = ev.y - __.margin.top;
 
     ctx["pinch"].clearRect(strum.minX, 0, strum.maxX - strum.minX, h() + 2);
