@@ -823,10 +823,24 @@ pc.pinchable = function() {
       return !isNaN(d); 
     });
 
-    if (ids.length > 0) { // We have some strums, which need to be removed.
+    // Checks if the first dimension is directly left of the second dimension.
+    function consecutive(first, second) {
+      var length = __.dimensions.length;
+      return __.dimensions.some(function(d, i) {
+        return (d === first)
+          ? i + i < length && __.dimensions[i + 1] === second
+          : false;
+      });
+    }
+
+    if (ids.length > 0) { // We have some strums, which might need to be removed.
       ids.forEach(function(d) {
+        var dims = strums[d].dims;
         strums.active = d;
-        removeStrum(strums);
+        // If the two dimensions of the current strum are not next to each other
+        // any more, than we'll need to remove the strum. Otherwise we keep it.
+        if (!consecutive(dims.left, dims.right))
+          removeStrum(strums);
       });
       onDragEnd(strums)();
     }
