@@ -627,6 +627,7 @@ pc.reorderable = function() {
         if (orderChanged) {
           events.axesreorder.call(pc, __.dimensions);
         }
+
         delete this.__origin__;
         delete dragging[d];
         d3.select(this).transition().attr("transform", "translate(" + xscale(d) + ")");
@@ -731,7 +732,7 @@ function onDragEnd(strums) {
 
     // Okay, somewhat unexpected, but not totally unsurprising, a mousclick is
     // considered a drag without move. So we have to deal with that case
-    if (strum.p1[0] === strum.p2[0] && strum.p1[1] === strum.p2[1]) {
+    if (strum && strum.p1[0] === strum.p2[0] && strum.p1[1] === strum.p2[1]) {
       removeStrum(strums);
     }
 
@@ -816,6 +817,20 @@ pc.pinchable = function() {
 
     return strum.maxX - strum.minX;
   }
+
+  pc.on("axesreorder", function() {
+    var ids = Object.getOwnPropertyNames(strums).filter(function(d) { 
+      return !isNaN(d); 
+    });
+
+    if (ids.length > 0) { // We have some strums, which need to be removed.
+      ids.forEach(function(d) {
+        strums.active = d;
+        removeStrum(strums);
+      });
+      onDragEnd(strums)();
+    }
+  });
 
   drag
     .on("dragstart", onDragStart(strums))
