@@ -80,9 +80,19 @@ function onDrag(strums) {
 function onDragEnd(strums) {
   return function() {
     var brushed = __.data,
-        ids = Object.getOwnPropertyNames(strums).filter(function(d) { 
-          return !isNaN(d); 
-        });
+        ids = [],
+        strum = strums[strums.active];
+
+    // Okay, somewhat unexpected, but not totally unsurprising, a mousclick is
+    // considered a drag without move. So we have to deal with that case
+    if (strum.p1[0] === strum.p2[0] && strum.p1[1] === strum.p2[1]) {
+      removeStrum(strums);
+    }
+
+    // Get the ids of the currently active strums.
+    ids = Object.getOwnPropertyNames(strums).filter(function(d) { 
+      return !isNaN(d); 
+    });
 
     brushed = brushed.filter(function(d) {
       // Yes, double negation. However, this avoids each strum being tested for
@@ -92,7 +102,7 @@ function onDragEnd(strums) {
       // of data items, it does improve the average run time.
       return !ids.some(function(id) {
         var strum = strums[id],
-            test = containmentTest(strum, strums.width()),
+            test = containmentTest(strum, strums.width(id)),
             d1 = strum.dims.left,
             d2 = strum.dims.right,
             y1 = yscale[d1],
@@ -103,7 +113,7 @@ function onDragEnd(strums) {
     });
 
     strums.active = undefined;
-    __.brushed = brushed;
+    __.brushed = brushed.length === __.data.length ? false : brushed;
     events.brushend.call(pc, __.brushed);
     pc.render();
   }
@@ -132,17 +142,12 @@ function containmentTest(strum, width) {
 };
 
 function removeStrum(strums) {
-  return function() {
-    var p = d3.mouse(canvas["pinch"]),
-        dims = dimensionsForPoint(p),
-        minX = xscale(dims.left),
-        maxX = xscale(dims.right),
-        pinchCtx = ctx["pinch"];
+  var strum = strums[strums.active],
+      pinchCtx = ctx["pinch"];
 
-    delete strums[dims.i];
-    pinchCtx.clearRect(minX, 0, maxX - minX, h() + 2);
-    onDragEnd(strums)();
-  };
+  delete strums[strums.active];
+  strums.active = undefined;
+  pinchCtx.clearRect(strum.minX, 0, strum.maxX - strum.minX, h() + 2);
 }
 
 pc.pinchable = function() {
@@ -156,11 +161,12 @@ pc.pinchable = function() {
   // placed. NOTE: even though they are evenly spaced in our current 
   // implementation, we keep for when non-even spaced segments are supported as
   // well. 
-  strums.width = function() {
-    var strum = strums[strums.active];
+  strums.width = function(id) {
+    var strum = strums[id];
 
-    if (strum === undefined) 
+    if (strum === undefined) {
       return undefined;
+    }
 
     return strum.maxX - strum.minX;
   }
@@ -171,6 +177,5 @@ pc.pinchable = function() {
     .on("dragend", onDragEnd(strums));
 
   d3.select(canvas["pinch"])
-    .on("click", removeStrum(strums))
     .call(drag);
 }
