@@ -122,10 +122,16 @@ pc.brushExtents = function() {
 pc.reorderable = function() {
   if (!g) pc.createAxes();
 
+  // Keep track of the order of the axes to verify if the order has actually
+  // changed after a drag ends. Changed order might have consequence (e.g.
+  // strums that need to be reset).
+  var dimsAtDragstart;
+
   g.style("cursor", "move")
     .call(d3.behavior.drag()
       .on("dragstart", function(d) {
         dragging[d] = this.__origin__ = xscale(d);
+        dimsAtDragstart = __.dimensions.slice();
       })
       .on("drag", function(d) {
         dragging[d] = Math.min(w(), Math.max(0, this.__origin__ += d3.event.dx));
@@ -135,6 +141,15 @@ pc.reorderable = function() {
         g.attr("transform", function(d) { return "translate(" + position(d) + ")"; });
       })
       .on("dragend", function(d) {
+        // Let's see if the order has changed and send out an event if so.
+        var orderChanged = dimsAtDragstart.some(function(d, i) {
+          return d !== __.dimensions[i];
+        });
+
+        if (orderChanged) {
+          events.axesreorder.call(pc, __.dimensions);
+        }
+
         delete this.__origin__;
         delete dragging[d];
         d3.select(this).transition().attr("transform", "translate(" + xscale(d) + ")");
