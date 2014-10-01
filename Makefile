@@ -11,7 +11,7 @@ TARGETS= \
 	styles.js \
 	clear.js \
 	axis.js \
-	pinchable.js \
+	strumable.js \
 	interactive.js \
 	end.js \
 	renderQueue.js
