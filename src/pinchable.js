@@ -1,12 +1,24 @@
 // bl.ocks.org/syntagmatic/5441022
 
-function drawStrum(p1, p2) {
-  var pinchCtx = ctx["pinch"];
-  pinchCtx.strokeStyle = "#0f8";
-  pinchCtx.beginPath();
-  pinchCtx.moveTo(p1[0], p1[1]);
-  pinchCtx.lineTo(p2[0], p2[1]);
-  pinchCtx.stroke();
+function drawStrum(strum) {
+  var svg = pc.selection.select("svg").select("g#strums"),
+      id = strum.dims.i;
+
+  var line = svg.selectAll("line#strum-" + id)
+    .data([strum]);
+
+  line.enter()
+    .append("line")
+    .attr("id", "strum-" + id)
+    .attr("class", "strum");
+
+  line
+    .attr("x1", function(d) { return d.p1[0]; })
+    .attr("y1", function(d) { return d.p1[1]; })
+    .attr("x2", function(d) { return d.p2[0]; })
+    .attr("y2", function(d) { return d.p2[1]; })
+    .attr("stroke", "black")
+    .attr("stroke-width", 2);
 }
 
 function dimensionsForPoint(p) {
@@ -70,10 +82,7 @@ function onDrag(strums) {
     // Make sure that the point is within the bounds
     strum.p2[0] = Math.min(Math.max(strum.minX + 1, ev.x), strum.maxX);
     strum.p2[1] = ev.y - __.margin.top;
-
-    ctx["pinch"].clearRect(strum.minX, 0, strum.maxX - strum.minX, h() + 2);
-    drawStrum(strum.p1, strum.p2);
-    //mouseMove(d3.event.x,d3.event.y);
+    drawStrum(strum);
   }
 }
 
@@ -143,11 +152,11 @@ function containmentTest(strum, width) {
 
 function removeStrum(strums) {
   var strum = strums[strums.active],
-      pinchCtx = ctx["pinch"];
+      svg = pc.selection.select("svg").select("g#strums");
 
   delete strums[strums.active];
   strums.active = undefined;
-  pinchCtx.clearRect(strum.minX, 0, strum.maxX - strum.minX, h() + 2);
+  svg.selectAll("line#strum-" + strum.dims.i).remove();
 }
 
 pc.pinchable = function() {
@@ -198,6 +207,12 @@ pc.pinchable = function() {
       onDragEnd(strums)();
     }
   });
+
+  // Add a new svg group in which we draw the strums.
+  pc.selection.select("svg").append("g")
+    .attr("id", "strums")
+    .attr("transform", "translate(" + __.margin.left + "," + __.margin.top + ")");
+
 
   drag
     .on("dragstart", onDragStart(strums))
