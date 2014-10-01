@@ -31,7 +31,7 @@ d3.csv('data/cars.csv', function(data) {
     .reorderable()
     .render()
     .shadows()
-    .pinchable();  // enable pinch selection 
+    .strumable();  // enable strum selection 
 });
 
 d3.select('#btnReset').on('click', function() {parcoords.brushReset();})

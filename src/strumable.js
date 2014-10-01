@@ -159,7 +159,7 @@ function removeStrum(strums) {
   svg.selectAll("line#strum-" + strum.dims.i).remove();
 }
 
-pc.pinchable = function() {
+pc.strumable = function() {
   var strums = {},
       drag = d3.behavior.drag();
   
