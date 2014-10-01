@@ -28,7 +28,7 @@ var pc = function(selection) {
   __.height = selection[0][0].clientHeight;
 
   // canvas data layers
-  ["shadows", "marks", "foreground", "highlight", "pinch"].forEach(function(layer) {
+  ["shadows", "marks", "foreground", "highlight", "strums"].forEach(function(layer) {
     canvas[layer] = selection
       .append("canvas")
       .attr("class", layer)[0][0];
@@ -702,7 +702,7 @@ function onDragStart(strums) {
   // logically only happen between two axes, so no movement outside these axes
   // should be allowed.
   return function() {
-    var p = d3.mouse(canvas["pinch"]),
+    var p = d3.mouse(canvas["strums"]),
         dims = dimensionsForPoint(p),
         strum = {
           p1: p,
@@ -729,10 +729,7 @@ function onDrag(strums) {
     // Make sure that the point is within the bounds
     strum.p2[0] = Math.min(Math.max(strum.minX + 1, ev.x), strum.maxX);
     strum.p2[1] = ev.y - __.margin.top;
-
-    ctx["pinch"].clearRect(strum.minX, 0, strum.maxX - strum.minX, h() + 2);
     drawStrum(strum);
-    //mouseMove(d3.event.x,d3.event.y);
   }
 }
 
@@ -863,13 +860,20 @@ pc.pinchable = function() {
     .attr("id", "strums")
     .attr("transform", "translate(" + __.margin.left + "," + __.margin.top + ")");
 
-
   drag
     .on("dragstart", onDragStart(strums))
     .on("drag", onDrag(strums))
     .on("dragend", onDragEnd(strums));
 
-  d3.select(canvas["pinch"])
+  // NOTE: The styling needs to be done here and not in the css. This is because
+  //       for 1D brushing, the canvas layers should not listen to
+  //       pointer-events.
+  // FIXME: Like brushable, strumming can only be enabled and not disabled at
+  //        this point. So, if we want to be able to switch between the two (or
+  //        possibly more in the future) methods.
+  d3.select(canvas["strums"])
+    .style("pointer-events", "auto")
+    .style("z-index", 1000)
     .call(drag);
 }
 pc.interactive = function() {

@@ -55,7 +55,7 @@ function onDragStart(strums) {
   // logically only happen between two axes, so no movement outside these axes
   // should be allowed.
   return function() {
-    var p = d3.mouse(canvas["pinch"]),
+    var p = d3.mouse(canvas["strums"]),
         dims = dimensionsForPoint(p),
         strum = {
           p1: p,
@@ -213,12 +213,19 @@ pc.pinchable = function() {
     .attr("id", "strums")
     .attr("transform", "translate(" + __.margin.left + "," + __.margin.top + ")");
 
-
   drag
     .on("dragstart", onDragStart(strums))
     .on("drag", onDrag(strums))
     .on("dragend", onDragEnd(strums));
 
-  d3.select(canvas["pinch"])
+  // NOTE: The styling needs to be done here and not in the css. This is because
+  //       for 1D brushing, the canvas layers should not listen to
+  //       pointer-events.
+  // FIXME: Like brushable, strumming can only be enabled and not disabled at
+  //        this point. So, if we want to be able to switch between the two (or
+  //        possibly more in the future) methods.
+  d3.select(canvas["strums"])
+    .style("pointer-events", "auto")
+    .style("z-index", 1000)
     .call(drag);
 }

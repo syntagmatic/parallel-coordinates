@@ -6,11 +6,6 @@
   pointer-events: none;
 }
 
-.parcoords > canvas.pinch {
-  pointer-events: auto;
-  z-index: 1000;
-}
-
 .parcoords rect.background {
   fill: transparent;
 }
