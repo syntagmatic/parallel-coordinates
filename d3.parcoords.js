@@ -430,8 +430,8 @@ function single_curve(d, ctx) {
 };
 
 // draw single polyline
-function color_path(d, ctx) {
-	ctx.strokeStyle = d3.functor(__.color)(d);
+function color_path(d, i, ctx) {
+	ctx.strokeStyle = d3.functor(__.color)(d, i);
 	ctx.beginPath();
 	if (__.bundleDimension === null || (__.bundlingStrength === 0 && __.smoothness == 0)) {
 		single_path(d, ctx);
@@ -465,12 +465,12 @@ function single_path(d, ctx) {
 	});
 }
 
-function path_foreground(d) {
-	return color_path(d, ctx.foreground);
+function path_foreground(d, i) {
+	return color_path(d, i, ctx.foreground);
 };
 
-function path_highlight(d) {
-	return color_path(d, ctx.highlight);
+function path_highlight(d, i) {
+	return color_path(d, i, ctx.highlight);
 };
 pc.clear = function(layer) {
   ctx[layer].clearRect(0,0,w()+2,h()+2);
@@ -783,9 +783,15 @@ d3.renderQueue = (function(func) {
     function doFrame() {
       if (!valid) return true;
       if (_i > _queue.length) return true;
-      var chunk = _queue.slice(_i,_i+_rate);
       _i += _rate;
-      chunk.map(func);
+
+      // Typical d3 behavior is to pass a data item *and* its index. As the
+      // render queue splits the original data set, we'll have to be slightly
+      // more carefull about passing the correct index with the data item.
+      var end = Math.min(_i + _rate, _queue.length);
+      for (var i = _i; i < end; i++) {
+        func(_queue[i], i);
+      }
     }
 
     d3.timer(doFrame);

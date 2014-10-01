@@ -36,8 +36,8 @@ function single_curve(d, ctx) {
 };
 
 // draw single polyline
-function color_path(d, ctx) {
-	ctx.strokeStyle = d3.functor(__.color)(d);
+function color_path(d, i, ctx) {
+	ctx.strokeStyle = d3.functor(__.color)(d, i);
 	ctx.beginPath();
 	if (__.bundleDimension === null || (__.bundlingStrength === 0 && __.smoothness == 0)) {
 		single_path(d, ctx);
@@ -71,10 +71,10 @@ function single_path(d, ctx) {
 	});
 }
 
-function path_foreground(d) {
-	return color_path(d, ctx.foreground);
+function path_foreground(d, i) {
+	return color_path(d, i, ctx.foreground);
 };
 
-function path_highlight(d) {
-	return color_path(d, ctx.highlight);
+function path_highlight(d, i) {
+	return color_path(d, i, ctx.highlight);
 };

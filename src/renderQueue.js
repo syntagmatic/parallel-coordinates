@@ -19,9 +19,15 @@ d3.renderQueue = (function(func) {
     function doFrame() {
       if (!valid) return true;
       if (_i > _queue.length) return true;
-      var chunk = _queue.slice(_i,_i+_rate);
       _i += _rate;
-      chunk.map(func);
+
+      // Typical d3 behavior is to pass a data item *and* its index. As the
+      // render queue splits the original data set, we'll have to be slightly
+      // more carefull about passing the correct index with the data item.
+      var end = Math.min(_i + _rate, _queue.length);
+      for (var i = _i; i < end; i++) {
+        func(_queue[i], i);
+      }
     }
 
     d3.timer(doFrame);
