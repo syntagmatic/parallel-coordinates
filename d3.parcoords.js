@@ -783,7 +783,6 @@ d3.renderQueue = (function(func) {
     function doFrame() {
       if (!valid) return true;
       if (_i > _queue.length) return true;
-      _i += _rate;
 
       // Typical d3 behavior is to pass a data item *and* its index. As the
       // render queue splits the original data set, we'll have to be slightly
@@ -792,6 +791,7 @@ d3.renderQueue = (function(func) {
       for (var i = _i; i < end; i++) {
         func(_queue[i], i);
       }
+      _i += _rate;
     }
 
     d3.timer(doFrame);
