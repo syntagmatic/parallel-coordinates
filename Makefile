@@ -23,7 +23,11 @@ d3.parcoords.js: $(addprefix src/, $(TARGETS))
 	uglifyjs -o $@ $<
 	echo >> $@
 
+
+test:
+	@npm test
+
 clean:
 	rm -f d3.parcoords.js
 
-.PHONY: clean
+.PHONY: clean test

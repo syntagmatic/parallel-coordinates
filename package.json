@@ -1,0 +1,31 @@
+{
+  "name": "d3.parcoords.js",
+  "version": "0.4.0",
+  "description": "Parallel Coordinates: A visual toolkit for multidimensional detectives",
+  "keywords": [
+    "d3",
+    "visualization",
+    "parallel coordinates"
+  ],
+  "homepage": "http://syntagmatic.github.io/parallel-coordinates/",
+  "author": {
+    "name": "Kai Chang",
+    "url": "http://exposedata.com/"
+  },
+  "contributors": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/syntagmatic/parallel-coordinates.git"
+  },
+  "devDependencies": {
+    "vows": "0.7.0"
+  },
+  "scripts": {
+    "test": "vows; echo"
+  },
+  "licenses": [
+    {
+      "url": "https://github.com/syntagmatic/parallel-coordinates/blob/master/LICENSE"
+    }
+  ]
+}
