@@ -11,6 +11,7 @@ TARGETS= \
 	styles.js \
 	clear.js \
 	axis.js \
+	brushes/brushmode.js \
 	brushes/2D.strums.js \
 	interactive.js \
 	end.js \

@@ -646,6 +646,23 @@ pc.adjacent_pairs = function(arr) {
   };
   return ret;
 };
+
+var brushModes = {
+  "None": {
+    install: function(pc) {
+      // Nothing to be done.
+    },
+
+    uninstall: function(pc) {
+      // Nothing to be done.
+    }
+  }
+}
+
+pc.brushModes = function() {
+  return Object.getOwnPropertyNames(brushModes);
+};
+
 // bl.ocks.org/syntagmatic/5441022
 
 function drawStrum(strum) {
