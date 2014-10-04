@@ -1,3 +1,4 @@
+// brush mode: 2D-strums
 // bl.ocks.org/syntagmatic/5441022
 
 function drawStrum(strum) {
