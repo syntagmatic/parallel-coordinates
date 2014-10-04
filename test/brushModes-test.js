@@ -22,8 +22,8 @@ suite.addBatch({
        'the brush mode "None"': function(pc) {
          assert.notStrictEqual(pc.brushModes().indexOf("None"), -1);
        },
-       'the brush mode "1D-Axes"': function(pc) {
-         assert.notStrictEqual(pc.brushModes().indexOf("1D-Axis"), -1);
+       'the brush mode "1D-axes"': function(pc) {
+         assert.notStrictEqual(pc.brushModes().indexOf("1D-axes"), -1);
        },
        'the brush mode "2D-strums"': function(pc) {
          assert.notStrictEqual(pc.brushModes().indexOf("2D-strums"), -1);
