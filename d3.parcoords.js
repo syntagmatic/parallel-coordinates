@@ -894,6 +894,14 @@ pc.strumable = function() {
     .style("z-index", 1000)
     .call(drag);
 }
+
+brushModes["2D-strums"] = {
+  install: function() {
+  },
+  uninstall: function() {
+  }
+}
+
 pc.interactive = function() {
   flags.interactive = true;
   return this;
