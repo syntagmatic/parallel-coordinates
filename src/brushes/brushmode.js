@@ -16,12 +16,12 @@ pc.brushModes = function() {
 };
 
 pc.brushMode = function(mode) {
-  if (pc.brushModes().indexOf(mode) === -1) {
-    throw "pc.brushmode: Unsupported brush mode: " + mode;
-  }
-
   if (arguments.length === 0) {
     return __.brushMode;
+  }
+
+  if (pc.brushModes().indexOf(mode) === -1) {
+    throw "pc.brushmode: Unsupported brush mode: " + mode;
   }
 
   // Make sure that we don't trigger unnecessary events by checking if the mode
