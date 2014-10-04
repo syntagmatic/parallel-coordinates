@@ -17,7 +17,7 @@ suite.addBatch({
     'has by default': {
        topic: d3Parcoords(),
        'three brush modes': function(pc) {
-          assert.equal(pc.brushModes().length, 3);
+          assert.strictEqual(pc.brushModes().length, 3);
        }
     },
   }
