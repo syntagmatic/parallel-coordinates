@@ -3,6 +3,44 @@
 (function() {
   var brushes = {};
 
+  function is_brushed(p) {
+    return !brushes[p].empty();
+  };
+
+  // data within extents
+  function selected() {
+    var actives = __.dimensions.filter(is_brushed),
+        extents = actives.map(function(p) { return brushes[p].extent(); });
+
+    // We don't want to return the full data set when there are no axes brushed.
+    // Actually, when there are no axes brushed, by definition, no items are
+    // selected. So, let's avoid the filtering and just return false.
+    //if (actives.length === 0) return false;
+
+    // Resolves broken examples for now. They expect to get the full dataset back from empty brushes
+    if (actives.length === 0) return __.data;
+
+    // test if within range
+    var within = {
+      "date": function(d,p,dimension) {
+        return extents[dimension][0] <= d[p] && d[p] <= extents[dimension][1]
+      },
+      "number": function(d,p,dimension) {
+        return extents[dimension][0] <= d[p] && d[p] <= extents[dimension][1]
+      },
+      "string": function(d,p,dimension) {
+        return extents[dimension][0] <= yscale[p](d[p]) && yscale[p](d[p]) <= extents[dimension][1]
+      }
+    };
+
+    return __.data
+      .filter(function(d) {
+        return actives.every(function(p, dimension) {
+          return within[__.types[p]](d,p,dimension);
+        });
+      });
+  };
+
   function brushExtents() {
     var extents = {};
     __.dimensions.forEach(function(d) {
