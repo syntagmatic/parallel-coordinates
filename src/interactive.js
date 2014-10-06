@@ -17,20 +17,6 @@ pc.ctx = ctx;
 pc.canvas = canvas;
 pc.g = function() { return g; };
 
-pc.brushReset = function(dimension) {
-  __.brushed = false;
-  if (g) {
-    g.selectAll('.brush')
-      .each(function(d) {
-        d3.select(this).call(
-          yscale[d].brush.clear()
-        );
-      });
-    pc.render();
-  }
-  return this;
-};
-
 // rescale for height, width and margins
 // TODO currently assumes chart is brushable, and destroys old brushes
 pc.resize = function() {
