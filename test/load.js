@@ -24,7 +24,7 @@ module.exports = (function() {
 
   function topic(cb, html) {
     var html = arguments.length >= 2
-      ? "<html><head></head><body></body></html>"
+      ? '<html><head></head><body></body></html>'
       : html;
 
     // d3 expects a global 'document' variable.
@@ -38,7 +38,7 @@ module.exports = (function() {
   return topic;
 })();
 
-process.on("uncaughtException", function(e) {
+process.on('uncaughtException', function(e) {
   console.trace(e.stack);
 });
 
