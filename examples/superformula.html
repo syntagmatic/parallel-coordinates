@@ -81,7 +81,7 @@ var svg = d3.select("#superformula").append("svg")
 var parcoords = d3.parcoords()("#example")
   .data(data)
   .render()
-  .brushable()
+  .brushMode("1D-axes")
   .on("brush", function(items) {
     var selected = items.map(function(d) { return d.key; });
     svg.selectAll("path")

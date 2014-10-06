@@ -39,7 +39,12 @@ suite.addBatch({
         // Okay, let's see if brushExtents is there now, and if it is a function.
         assert.notStrictEqual(pc.brushExtents, undefined);
         assert.strictEqual(typeof(pc.brushExtents), "Function");
+      },
+      'have brush mode 2D-strums': function(pc) {
+        pc.brushMode("2D-strums");
+        assert.strictEqual(pc.brushMode(), "2D-strums");
       }
+    },
   }
 });
 

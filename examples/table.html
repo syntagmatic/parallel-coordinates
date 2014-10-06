@@ -37,7 +37,7 @@ d3.csv('data/cars.csv', function(data) {
   parcoords
     .data(data)
     .render()
-    .brushable();  // enable brushing
+    .brushMode("1D-axes");  // enable brushing
 
   // create data table, row hover highlighting
   var grid = d3.divgrid();

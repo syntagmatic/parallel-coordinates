@@ -35,7 +35,7 @@ $.getJSON('http://www.reddit.com/.json?limit=100&jsonp=?', function(raw) {
     .detectDimensions()
     .dimensions(dimensions)
     .render()
-    .brushable();  // enable brushing
+    .brushMode("1D-axes");  // enable brushing
 
   // thumbnails
   updateThumbnails(data);

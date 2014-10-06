@@ -27,7 +27,7 @@ d3.csv('data/cars.csv', function(data) {
     .data(data)
     .render()
     .shadows()
-    .brushable();  // enable brushing
+    .brushMode("1D-axes");  // enable brushing
 });
 
 d3.select('#btnReset').on('click', function() {parcoords.brushReset();})

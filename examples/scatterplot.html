@@ -56,7 +56,7 @@ d3.csv('data/nutrients.csv', function(data) {
     .margin({ top: 24, left: 140, bottom: 12, right: 0 })
     .mode("queue")
     .render()
-    .brushable();  // enable brushing
+    .brushMode("1D-axes");  // enable brushing
 
   scatter.data(data)("#scatter");
 

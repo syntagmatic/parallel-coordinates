@@ -33,7 +33,7 @@ d3.csv('data/COMBO17.csv', function(data) {
     .alpha(0.4)
     .mode("queue")
     .render()
-    .brushable()
+    .brushMode("1D-axes")
     .reorderable();
 
   pc.ctx.foreground.lineWidth = 2.5;

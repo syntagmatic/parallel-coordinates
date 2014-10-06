@@ -68,7 +68,7 @@ d3.csv('data/nutrients.csv', function(data) {
     .data(data)
     .render()
     .reorderable()
-    .brushable();
+    .brushMode("1D-axes");
 
   // setting up grid
   var column_keys = d3.keys(data[0]);
