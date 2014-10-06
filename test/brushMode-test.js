@@ -7,7 +7,11 @@ var vows = require('vows'),
 function d3Parcoords() {
   var promise = new(events.EventEmitter);
   load(function(d3) {
-    promise.emit('success', d3.parcoords());
+    var pc = d3.parcoords();
+
+    d3.select('body').append('div').attr('id', 'test');
+    pc('div#test');
+    promise.emit('success', pc);
   });
   return promise;
 }
