@@ -632,7 +632,9 @@ pc.brushMode = function(mode) {
   if (mode !== __.brushMode) {
     // When changing brush modes, the first thing we need to do is clearing any
     // brushes from the current mode, if any.
-    pc.brushReset();
+    if (__.brushMode !== "None") {
+      pc.brushReset();
+    }
 
     // Next, we need to 'uninstall' the current brushMode.
     brushModes[__.brushMode].uninstall(pc);

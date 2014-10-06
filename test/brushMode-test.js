@@ -22,6 +22,10 @@ suite.addBatch({
        topic: d3Parcoords(),
        'the brush mode "None"': function(pc) {
          assert.strictEqual(pc.brushMode(), "None");
+         // Make sure that no brush related methods are exposed when the brush
+         // mode is set to "None"
+         assert.strictEqual(pc.brushExtents, undefined);
+         assert.strictEqual(pc.brushReset, undefined);
        }
     },
   }
