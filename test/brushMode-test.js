@@ -28,6 +28,18 @@ suite.addBatch({
          assert.strictEqual(pc.brushReset, undefined);
        }
     },
+    'can be configured to': {
+      topic: d3Parcoords(),
+      'have brush mode 1D-axes': function(pc) {
+        // brushExtents is a function that should be install by 1D-axes, as this
+        // only makes sense when 1D brushing is active.
+        assert.strictEqual(pc.brushExtents, undefined);
+        pc.brushMode("1D-axes");
+        assert.strictEqual(pc.brushMode(), "1D-axes");
+        // Okay, let's see if brushExtents is there now, and if it is a function.
+        assert.notStrictEqual(pc.brushExtents, undefined);
+        assert.strictEqual(typeof(pc.brushExtents), "Function");
+      }
   }
 });
 
