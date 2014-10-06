@@ -1,4 +1,5 @@
 var smash = require("smash"),
+    canvas = require("canvas"),
     jsdom = require("jsdom");
 
 module.exports = (function() {
