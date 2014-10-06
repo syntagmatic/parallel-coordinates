@@ -44,7 +44,7 @@
   function brushExtents() {
     var extents = {};
     __.dimensions.forEach(function(d) {
-      var brush = yscale[d].brush;
+      var brush = brushes[d];
       if (!brush.empty()) {
         var extent = brush.extent();
         extent.sort(d3.ascending);
@@ -60,7 +60,9 @@
     brush
       .y(yscale[axis])
       .on("brushstart", function() { d3.event.sourceEvent.stopPropagation() })
-      .on("brush", pc.brush)
+      .on("brush", function() {
+        brushUpdated(selected());
+      })
       .on("brushend", function() {
         events.brushend.call(pc, __.brushed);
       });
@@ -75,7 +77,7 @@
       g.selectAll('.brush')
         .each(function(d) {
           d3.select(this).call(
-            yscale[d].brush.clear()
+            brushes[d].clear()
           );
         });
       pc.render();

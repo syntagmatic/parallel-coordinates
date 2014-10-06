@@ -614,6 +614,17 @@ var brushModes = {
   }
 }
 
+// This function can be used for 'live' updates of brushes. That is, during the
+// specification of a brush, this method can be called to update the view.
+//
+// @param newSelection - The new set of data items that is currently contained
+//                       by the brushes
+function brushUpdated(newSelection) {
+  __.brushed = newSelection;
+  events.brush.call(pc,__.brushed);
+  pc.render();
+}
+
 pc.brushModes = function() {
   return Object.getOwnPropertyNames(brushModes);
 };
@@ -692,7 +703,7 @@ pc.brushMode = function(mode) {
   function brushExtents() {
     var extents = {};
     __.dimensions.forEach(function(d) {
-      var brush = yscale[d].brush;
+      var brush = brushes[d];
       if (!brush.empty()) {
         var extent = brush.extent();
         extent.sort(d3.ascending);
@@ -708,7 +719,9 @@ pc.brushMode = function(mode) {
     brush
       .y(yscale[axis])
       .on("brushstart", function() { d3.event.sourceEvent.stopPropagation() })
-      .on("brush", pc.brush)
+      .on("brush", function() {
+        brushUpdated(selected());
+      })
       .on("brushend", function() {
         events.brushend.call(pc, __.brushed);
       });
@@ -723,7 +736,7 @@ pc.brushMode = function(mode) {
       g.selectAll('.brush')
         .each(function(d) {
           d3.select(this).call(
-            yscale[d].brush.clear()
+            brushes[d].clear()
           );
         });
       pc.render();

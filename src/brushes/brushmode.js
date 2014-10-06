@@ -11,6 +11,17 @@ var brushModes = {
   }
 }
 
+// This function can be used for 'live' updates of brushes. That is, during the
+// specification of a brush, this method can be called to update the view.
+//
+// @param newSelection - The new set of data items that is currently contained
+//                       by the brushes
+function brushUpdated(newSelection) {
+  __.brushed = newSelection;
+  events.brush.call(pc,__.brushed);
+  pc.render();
+}
+
 pc.brushModes = function() {
   return Object.getOwnPropertyNames(brushModes);
 };
