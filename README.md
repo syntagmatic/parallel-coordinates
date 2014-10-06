@@ -319,18 +319,37 @@ The following methods are available from [d3.svg.axis](https://github.com/mbosto
 
 ## Developing
 
-### D3
-
-D3 is included as a submodule. To pull down D3:
-
-```javascript
-$ git submodule init
-$ git submodule update
-```
+The 'examples' directory contain a number of examples that demonstrate the
+various function of d3.parcoords.js. If you make any chances make sure to verify
+that these examples still work as expected.
 
 ### Build
 
-`make` runs the Makefile to concatenate parcoords.js
+`make` runs the Makefile to concatenate d3.parcoords.js. This needs to be done
+after each modification to files in the src/ directory.
+
+### Test framework
+
+Recently (as of Oct. 2014), we started to implement a vows-based test suite to
+more rigorously and in a more automated way, test the functionality of
+d3.parcoords.js. The test suite itself can be found under tests/.
+
+To run the tests you'll need some initial setup. First, you'll need to have
+nodejs and npm installed. Next, to run the tests, first run:
+
+```javascript
+$ npm install
+```
+
+** NOTE: *** The node canvas package, which is a requirement, might need some
+additional software to be installed. Please refer to this [page](https://github.com/Automattic/node-canvas/wiki/_pages)
+for further instructions.
+
+Now you should be able to run the test suite:
+
+```javascript
+$ make test
+```
 
 ## Credits
 
