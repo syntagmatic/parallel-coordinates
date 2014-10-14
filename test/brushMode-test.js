@@ -5,7 +5,7 @@ var vows = require('vows'),
     suite = vows.describe('brushMode');
 
 function d3Parcoords() {
-  var promise = new(events.EventEmitter);
+  var promise = new events.EventEmitter();
   load(function(d3) {
     var pc = d3.parcoords();
 
