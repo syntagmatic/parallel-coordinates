@@ -102,6 +102,12 @@ suite.addBatch({
       'there should be a listener set on the axesreorder signal': function(ev, d3, pc) {
          assert.notStrictEqual(pc.on('axesreorder.strums'), undefined);
          assert.strictEqual(typeof(pc.on('axesreorder.strums')), 'function');
+      },
+      'there should be a g#strums element': function(ev, d3, pc) {
+        var svg = d3.select('div#test').select('svg'),
+            g = svg.selectAll('g#strums');
+
+        assert.strictEqual(g.size(), 1);
       }
     }
   }
