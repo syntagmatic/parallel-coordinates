@@ -937,7 +937,7 @@ pc.brushMode = function(mode) {
     svg.selectAll("line#strum-" + strum.dims.i).remove();
   }
 
-  pc.strummable = function() {
+  function strummable() {
     var strums = {},
         drag = d3.behavior.drag();
 
@@ -1009,8 +1009,7 @@ pc.brushMode = function(mode) {
   }
 
   brushModes["2D-strums"] = {
-    install: function() {
-    },
+    install: strummable,
     uninstall: function() {
     }
   };

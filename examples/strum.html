@@ -35,7 +35,7 @@ d3.csv('data/cars.csv', function(data) {
     .reorderable()
     .render()
     .shadows()
-    .strumable();  // enable strum selection 
+    .brushMode("2D-strums");  // enable strum selection 
 });
 
 d3.select('#btnReset').on('click', function() {parcoords.brushReset();})
