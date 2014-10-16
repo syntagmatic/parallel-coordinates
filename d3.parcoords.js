@@ -777,6 +777,7 @@ pc.brushMode = function(mode) {
 // bl.ocks.org/syntagmatic/5441022
 
 (function() {
+  var strumCanvas;
 
   function drawStrum(strum) {
     var svg = pc.selection.select("svg").select("g#strums"),
@@ -833,7 +834,7 @@ pc.brushMode = function(mode) {
     // logically only happen between two axes, so no movement outside these axes
     // should be allowed.
     return function() {
-      var p = d3.mouse(canvas["strums"]),
+      var p = d3.mouse(strumCanvas),
           dims = dimensionsForPoint(p),
           strum = {
             p1: p,
@@ -941,6 +942,14 @@ pc.brushMode = function(mode) {
     var strums = {},
         drag = d3.behavior.drag();
 
+    // Add a canvas to catch the mouse events, used to set the strums.
+    strumCanvas = pc.selection.insert("canvas", "svg")
+      .attr("class", "strums")
+      .style("margin-top", __.margin.top + "px")
+      .style("margin-left", __.margin.left + "px")
+      .attr("width", w()+2)
+      .attr("height", h()+2)[0][0];
+
     // Map of current strums. Strums are stored per segment of the PC. A segment,
     // being the area between two axes. The left most area is indexed at 0.
     strums.active = undefined;
@@ -1002,7 +1011,7 @@ pc.brushMode = function(mode) {
     // FIXME: Like brushable, strumming can only be enabled and not disabled at
     //        this point. So, if we want to be able to switch between the two (or
     //        possibly more in the future) methods.
-    d3.select(canvas["strums"])
+    d3.select(strumCanvas)
       .style("pointer-events", "auto")
       .style("z-index", 1000)
       .call(drag);
