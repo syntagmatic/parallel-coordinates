@@ -88,7 +88,16 @@ suite.addBatch({
         dimensions = svg.select('g').selectAll('.brush');
         assert.strictEqual(dimensions.size(), 0);
       }
+    },
+    '2D-strums': {
+      topic: d3ParcoordsWith('2D-strums'),
+      'there should be a canvas.strums element': function(ev, d3, pc) {
+        var div = d3.select('div#test'),
+            canvas = div.selectAll('canvas');
 
+        assert.strictEqual(canvas.size(), 5);
+        assert.strictEqual(d3.select(canvas[0][4]).attr("class"), "strums");
+      }
     }
   }
 });
