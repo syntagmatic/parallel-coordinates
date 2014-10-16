@@ -11,7 +11,11 @@
 You start a strum be clicking and dragging within one of the segments (area between two axes).
 After releasing the mouse button, the selection will contain all lines that pass through all of the active strums.
 
-<p><button id="btnReset">Reset Brushes</button>
+<p>
+  <button id="btnReset">Reset Brushes</button>
+  <button id="btnToggle">Enable/disable brushing</button>
+</p>
+
 <script>
 // quantitative color scale
 var blue_to_brown = d3.scale.linear()
@@ -38,7 +42,14 @@ d3.csv('data/cars.csv', function(data) {
     .brushMode("2D-strums");  // enable strum selection 
 });
 
-d3.select('#btnReset').on('click', function() {parcoords.brushReset();})
+d3.select('#btnReset').on('click', function() {parcoords.brushReset();});
+d3.select('#btnToggle').on('click', function() {
+  if (parcoords.brushMode() === '2D-strums') {
+    parcoords.brushMode('None');
+  } else {
+    parcoords.brushMode('2D-strums');
+  }
+});
 </script>
 
 
