@@ -107,6 +107,8 @@
   brushModes["1D-axes"] = {
     install: install,
     uninstall: function() {
+      g.selectAll(".brush").remove();
+      brushes = {};
       pc.brushExtent = undefined;
       pc.brushReset = undefined;
     }
