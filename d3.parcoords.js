@@ -967,7 +967,7 @@ pc.brushMode = function(mode) {
       return strum.maxX - strum.minX;
     }
 
-    pc.on("axesreorder", function() {
+    pc.on("axesreorder.strums", function() {
       var ids = Object.getOwnPropertyNames(strums).filter(function(d) {
         return !isNaN(d);
       });

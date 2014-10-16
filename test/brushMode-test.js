@@ -51,6 +51,7 @@ suite.addBatch({
          // mode is set to "None"
          assert.strictEqual(pc.brushExtents, undefined);
          assert.strictEqual(pc.brushReset, undefined);
+         assert.strictEqual(pc.on('axesreorder.strums'), undefined);
        }
     },
     'can be configured to': {
@@ -97,6 +98,10 @@ suite.addBatch({
 
         assert.strictEqual(canvas.size(), 5);
         assert.strictEqual(d3.select(canvas[0][4]).attr("class"), "strums");
+      },
+      'there should be a listener set on the axesreorder signal': function(ev, d3, pc) {
+         assert.notStrictEqual(pc.on('axesreorder.strums'), undefined);
+         assert.strictEqual(typeof(pc.on('axesreorder.strums')), 'function');
       }
     }
   }
