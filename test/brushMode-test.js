@@ -108,6 +108,27 @@ suite.addBatch({
             g = svg.selectAll('g#strums');
 
         assert.strictEqual(g.size(), 1);
+      },
+      'and it is set back to none': {
+        topic: d3ParcoordsWith('2D-strums'),
+        'there should be no canvas.strums element': function(ev, d3, pc) {
+          var div, canvas;
+
+          pc.brushMode('None');
+
+          div = d3.select('div#test');
+          canvas = div.selectAll('canvas.strum');
+          assert.strictEqual(canvas.size(), 0);
+        },
+        'there shoulde be no listener set on the axesreorder.strum event': function(ev, d3, pc) {
+          assert.strictEqual(pc.on('axesreorder.strums'), undefined);
+        },
+        'there should be no g#strums element': function(ev, d3, pc) {
+          var svg = d3.select('div#test').select('svg'),
+              g = svg.selectAll('g#strums');
+
+          assert.strictEqual(g.size(), 0);
+        }
       }
     }
   }
