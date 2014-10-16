@@ -163,6 +163,20 @@
     svg.selectAll("line#strum-" + strum.dims.i).remove();
   }
 
+  function brushReset(strums) {
+    return function() {
+      var ids = Object.getOwnPropertyNames(strums).filter(function(d) {
+        return !isNaN(d);
+      });
+
+      ids.forEach(function(d) {
+        strums.active = d;
+        removeStrum(strums);
+      });
+      onDragEnd(strums)();
+    };
+  }
+
   function install() {
     var strums = {},
         drag = d3.behavior.drag();
@@ -224,6 +238,9 @@
     pc.selection.select("svg").append("g")
       .attr("id", "strums")
       .attr("transform", "translate(" + __.margin.left + "," + __.margin.top + ")");
+
+    // Install the required brushReset function
+    pc.brushReset = brushReset(strums);
 
     drag
       .on("dragstart", onDragStart(strums))
