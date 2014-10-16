@@ -75,9 +75,9 @@ suite.addBatch({
   'When d3.parcoords has brushMode': {
     '1D-axes': {
       topic: d3ParcoordsWith1DBrush(),
-      'there should be three g.dimension elements': function(ev, d3, pc) {
+      'there should be three g.brush elements': function(ev, d3, pc) {
         var svg = d3.select('div#test').select('svg'),
-            dimensions = svg.select('g').selectAll('.dimension');
+            dimensions = svg.select('g').selectAll('.brush');
 
         assert.strictEqual(dimensions.size(), 3);
       }
