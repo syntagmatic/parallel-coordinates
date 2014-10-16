@@ -80,6 +80,14 @@ suite.addBatch({
             dimensions = svg.select('g').selectAll('.brush');
 
         assert.strictEqual(dimensions.size(), 3);
+      },
+      'there should be no g.brush elements when the brush mode is set back to none': function(ev, d3, pc) {
+        var svg = d3.select('div#test').select('svg'),
+            dimensions;
+
+        pc.brushMode('None');
+        dimensions = svg.select('g').selectAll('.brush');
+        assert.strictEqual(dimensions.size(), 0);
       }
 
     }
