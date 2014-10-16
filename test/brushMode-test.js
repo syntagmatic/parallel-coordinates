@@ -24,8 +24,7 @@ function d3Parcoords() {
   });
   return promise;
 }
-
-function d3ParcoordsWith1DBrush() {
+function d3ParcoordsWith(brushMode) {
   var promise = new events.EventEmitter();
 
   load(function(d3) {
@@ -35,7 +34,7 @@ function d3ParcoordsWith1DBrush() {
     pc('div#test')
       .data(testData)
       .render()
-      .brushMode('1D-axes');
+      .brushMode(brushMode);
 
     promise.emit('success', d3, pc);
   });
@@ -74,7 +73,7 @@ suite.addBatch({
   },
   'When d3.parcoords has brushMode': {
     '1D-axes': {
-      topic: d3ParcoordsWith1DBrush(),
+      topic: d3ParcoordsWith('1D-axes'),
       'there should be three g.brush elements': function(ev, d3, pc) {
         var svg = d3.select('div#test').select('svg'),
             dimensions = svg.select('g').selectAll('.brush');
