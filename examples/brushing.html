@@ -8,13 +8,15 @@
 <p>Loads an external <a href="data/cars.csv">csv file</a>, creates a custom <a href="https://github.com/mbostock/d3/wiki/Quantitative-Scales#wiki-quantitative">quantitative color scale</a> using <a href="http://bl.ocks.org/3014589">L*a*b interpolation</a>, and enables brushing.
 
 <p>
-  <button id="btnReset">Reset Brushes</button>
-  <button id="btnToggle">Disable brushing</button>
-  <label for="sltPredicate">Predicate:</label>
+  <label for="sltBrushMode">Brush mode:</label>
+  <select id="sltBrushMode">
+  </select>
+  <label id="lblPredicate" for="sltPredicate">Predicate:</label>
   <select id="sltPredicate">
     <option>AND</option>
     <option>OR</option>
   </select>
+  <button id="btnReset">Reset Brushes</button>
 </p>
 <script>
 // quantitative color scale
@@ -38,20 +40,33 @@ d3.csv('data/cars.csv', function(data) {
     .brushMode("1D-axes");  // enable brushing
 });
 
-d3.select('#btnReset').on('click', function() {parcoords.brushReset();})
-d3.select('#btnToggle').on('click', function() {
-  if (parcoords.brushMode() === '1D-axes') {
-    parcoords.brushMode('None');
-    d3.select(this).text('Enable brushing');
-    d3.select('label').style('visibility', 'hidden');
-    d3.select('#sltPredicate').style('visibility', 'hidden');
-  } else {
-    parcoords.brushMode('1D-axes');
-    d3.select(this).text('Disable brushing');
-    d3.select('label').style('visibility', 'visible');
-    d3.select('#sltPredicate').style('visibility', 'visible');
+var sltBrushMode = d3.select('#sltBrushMode')
+
+sltBrushMode.selectAll('option')
+  .data(parcoords.brushModes())
+  .enter()
+    .append('option')
+    .text(function(d) { return d; });
+
+sltBrushMode.on('change', function() {
+  parcoords.brushMode(this.value);
+  switch(this.value) {
+  case 'None':
+    d3.select("#lblPredicate").style("visibility", "hidden");
+    d3.select("#sltPredicate").style("visibility", "hidden");
+    d3.select("#btnReset").style("visibility", "hidden");
+    break;
+  default:
+    d3.select("#lblPredicate").style("visibility", "visible");
+    d3.select("#sltPredicate").style("visibility", "visible");
+    d3.select("#btnReset").style("visibility", "visible");
+    break;
   }
 });
+
+sltBrushMode.property('value', '1D-axes');
+
+d3.select('#btnReset').on('click', function() {parcoords.brushReset();})
 d3.select('#sltPredicate').on('change', function() {
   parcoords.brushPredicate(this.value);
 });
