@@ -35,9 +35,18 @@
 
     return __.data
       .filter(function(d) {
-        return actives.every(function(p, dimension) {
-          return within[__.types[p]](d,p,dimension);
-        });
+        switch(brush.predicate) {
+        case "AND":
+          return actives.every(function(p, dimension) {
+            return within[__.types[p]](d,p,dimension);
+          });
+        case "OR":
+          return actives.some(function(p, dimension) {
+            return within[__.types[p]](d,p,dimension);
+          });
+        default:
+          throw "Unknown brush predicate " + __.brushPredicate;
+        }
       });
   };
 
@@ -111,6 +120,7 @@
       brushes = {};
       delete pc.brushExtent;
       delete pc.brushReset;
-    }
+    },
+    selected: selected
   }
 })();

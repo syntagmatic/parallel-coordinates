@@ -2,11 +2,16 @@
 var brush = {
   modes: {
     "None": {
-      install: function(pc) {}, // Nothing to be done.
-      uninstall: function(pc) {} // Nothing to be done.
+      install: function(pc) {},           // Nothing to be done.
+      uninstall: function(pc) {},         // Nothing to be done.
+      selected: function() { return []; } // Nothing to return
     }
   },
   mode: "None",
+  predicate: "AND",
+  currentMode: function() {
+    return this.modes[this.mode];
+  }
 };
 
 // This function can be used for 'live' updates of brushes. That is, during the
@@ -18,6 +23,20 @@ function brushUpdated(newSelection) {
   __.brushed = newSelection;
   events.brush.call(pc,__.brushed);
   pc.render();
+}
+
+function brushPredicate(predicate) {
+  if (!arguments.length) { return brush.predicate; }
+
+  predicate = String(predicate).toUpperCase();
+  if (predicate !== "AND" && predicate !== "OR") {
+    throw "Invalid predicate " + predicate;
+  }
+
+  brush.predicate = predicate;
+  __.brushed = brush.currentMode().selected();
+  pc.render();
+  return pc;
 }
 
 pc.brushModes = function() {
@@ -47,6 +66,11 @@ pc.brushMode = function(mode) {
     // Finally, we can install the requested one.
     brush.mode = mode;
     brush.modes[brush.mode].install();
+    if (mode === "None") {
+      delete pc.brushPredicate;
+    } else {
+      pc.brushPredicate = brushPredicate;
+    }
   }
 
   return pc;
