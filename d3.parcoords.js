@@ -604,11 +604,16 @@ pc.adjacent_pairs = function(arr) {
 var brush = {
   modes: {
     "None": {
-      install: function(pc) {}, // Nothing to be done.
-      uninstall: function(pc) {} // Nothing to be done.
+      install: function(pc) {},           // Nothing to be done.
+      uninstall: function(pc) {},         // Nothing to be done.
+      selected: function() { return []; } // Nothing to return
     }
   },
   mode: "None",
+  predicate: "AND",
+  currentMode: function() {
+    return this.modes[this.mode];
+  }
 };
 
 // This function can be used for 'live' updates of brushes. That is, during the
@@ -620,6 +625,20 @@ function brushUpdated(newSelection) {
   __.brushed = newSelection;
   events.brush.call(pc,__.brushed);
   pc.render();
+}
+
+function brushPredicate(predicate) {
+  if (!arguments.length) { return brush.predicate; }
+
+  predicate = String(predicate).toUpperCase();
+  if (predicate !== "AND" && predicate !== "OR") {
+    throw "Invalid predicate " + predicate;
+  }
+
+  brush.predicate = predicate;
+  __.brushed = brush.currentMode().selected();
+  pc.render();
+  return pc;
 }
 
 pc.brushModes = function() {
@@ -649,6 +668,9 @@ pc.brushMode = function(mode) {
     // Finally, we can install the requested one.
     brush.mode = mode;
     brush.modes[brush.mode].install();
+    if (mode === "None") { delete pc.brushPredicate; }
+    else { pc.brushPredicate = brushPredicate; }
+
   }
 
   return pc;
@@ -661,7 +683,7 @@ pc.brushMode = function(mode) {
 
   function is_brushed(p) {
     return !brushes[p].empty();
-  };
+  }
 
   // data within extents
   function selected() {
@@ -691,9 +713,18 @@ pc.brushMode = function(mode) {
 
     return __.data
       .filter(function(d) {
-        return actives.every(function(p, dimension) {
-          return within[__.types[p]](d,p,dimension);
-        });
+        switch(brush.predicate) {
+        case "AND":
+          return actives.every(function(p, dimension) {
+            return within[__.types[p]](d,p,dimension);
+          });
+        case "OR":
+          return actives.some(function(p, dimension) {
+            return within[__.types[p]](d,p,dimension);
+          });
+        default:
+          throw "Unknown brush predicate " + __.brushPredicate;
+        }
       });
   };
 
@@ -757,6 +788,7 @@ pc.brushMode = function(mode) {
 
     pc.brushExtents = brushExtents;
     pc.brushReset = brushReset;
+
     return pc;
   }
 
@@ -765,9 +797,10 @@ pc.brushMode = function(mode) {
     uninstall: function() {
       g.selectAll(".brush").remove();
       brushes = {};
-      delete pc.brushExtent;
+      delete pc.brushExtents;
       delete pc.brushReset;
-    }
+    },
+    selected: selected
   }
 })();
 // brush mode: 2D-strums
