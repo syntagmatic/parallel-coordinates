@@ -668,9 +668,11 @@ pc.brushMode = function(mode) {
     // Finally, we can install the requested one.
     brush.mode = mode;
     brush.modes[brush.mode].install();
-    if (mode === "None") { delete pc.brushPredicate; }
-    else { pc.brushPredicate = brushPredicate; }
-
+    if (mode === "None") {
+      delete pc.brushPredicate;
+    } else {
+      pc.brushPredicate = brushPredicate;
+    }
   }
 
   return pc;
@@ -788,7 +790,6 @@ pc.brushMode = function(mode) {
 
     pc.brushExtents = brushExtents;
     pc.brushReset = brushReset;
-
     return pc;
   }
 
