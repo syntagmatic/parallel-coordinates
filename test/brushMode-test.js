@@ -49,8 +49,9 @@ suite.addBatch({
          assert.strictEqual(pc.brushMode(), "None");
          // Make sure that no brush related methods are exposed when the brush
          // mode is set to "None"
-         assert.strictEqual(pc.brushExtents, undefined);
-         assert.strictEqual(pc.brushReset, undefined);
+         assert(!pc.hasOwnProperty('brushPredicate'));
+         assert(!pc.hasOwnProperty('brushExtents'));
+         assert(!pc.hasOwnProperty('brushReset'));
          assert.strictEqual(pc.on('axesreorder.strums'), undefined);
        }
     },
@@ -59,16 +60,26 @@ suite.addBatch({
       'have brush mode 1D-axes': function(pc) {
         // brushExtents is a function that should be install by 1D-axes, as this
         // only makes sense when 1D brushing is active.
-        assert.strictEqual(pc.brushExtents, undefined);
+        assert(!pc.hasOwnProperty("brushExtents"));
         pc.brushMode("1D-axes");
         assert.strictEqual(pc.brushMode(), "1D-axes");
-        // Okay, let's see if brushExtents is there now, and if it is a function.
-        assert.notStrictEqual(pc.brushExtents, undefined);
+        // Make sure that the expected functions are installed.
+        assert(pc.hasOwnProperty('brushPredicate'));
+        assert.strictEqual(typeof(pc.brushPredicate), 'function');
+        assert(pc.hasOwnProperty('brushExtents'));
         assert.strictEqual(typeof(pc.brushExtents), 'function');
+        assert(pc.hasOwnProperty('brushReset'));
+        assert.strictEqual(typeof(pc.brushReset), 'function');
       },
       'have brush mode 2D-strums': function(pc) {
         pc.brushMode("2D-strums");
         assert.strictEqual(pc.brushMode(), "2D-strums");
+        // Make sure that the expected functions are installed.
+        assert(pc.hasOwnProperty('brushPredicate'));
+        assert.strictEqual(typeof(pc.brushPredicate), 'function');
+        assert(pc.hasOwnProperty('brushReset'));
+        // brushExtents is specific for the 1D brush so net expecting it here
+        assert(!pc.hasOwnProperty('brushExtents'), 'but has unexpected brushExtends property');
       }
     },
   },
