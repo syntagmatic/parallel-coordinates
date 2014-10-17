@@ -259,7 +259,7 @@
       .call(drag);
   }
 
-  brushModes["2D-strums"] = {
+  brush.modes["2D-strums"] = {
     install: install,
     uninstall: function() {
       pc.selection.select("canvas.strums").remove();

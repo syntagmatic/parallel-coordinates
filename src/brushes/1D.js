@@ -104,7 +104,7 @@
     return pc;
   }
 
-  brushModes["1D-axes"] = {
+  brush.modes["1D-axes"] = {
     install: install,
     uninstall: function() {
       g.selectAll(".brush").remove();

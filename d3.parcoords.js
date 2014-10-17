@@ -4,7 +4,6 @@ d3.parcoords = function(config) {
     dimensions: [],
     dimensionTitles: {},
     types: {},
-    brushMode: "None",
     brushed: false,
     mode: "default",
     rate: 20,
@@ -602,17 +601,15 @@ pc.adjacent_pairs = function(arr) {
   return ret;
 };
 
-var brushModes = {
-  "None": {
-    install: function(pc) {
-      // Nothing to be done.
-    },
-
-    uninstall: function(pc) {
-      // Nothing to be done.
+var brush = {
+  modes: {
+    "None": {
+      install: function(pc) {}, // Nothing to be done.
+      uninstall: function(pc) {} // Nothing to be done.
     }
-  }
-}
+  },
+  mode: "None",
+};
 
 // This function can be used for 'live' updates of brushes. That is, during the
 // specification of a brush, this method can be called to update the view.
@@ -626,12 +623,12 @@ function brushUpdated(newSelection) {
 }
 
 pc.brushModes = function() {
-  return Object.getOwnPropertyNames(brushModes);
+  return Object.getOwnPropertyNames(brush.modes);
 };
 
 pc.brushMode = function(mode) {
   if (arguments.length === 0) {
-    return __.brushMode;
+    return brush.mode;
   }
 
   if (pc.brushModes().indexOf(mode) === -1) {
@@ -640,18 +637,18 @@ pc.brushMode = function(mode) {
 
   // Make sure that we don't trigger unnecessary events by checking if the mode
   // actually changes.
-  if (mode !== __.brushMode) {
+  if (mode !== brush.mode) {
     // When changing brush modes, the first thing we need to do is clearing any
     // brushes from the current mode, if any.
-    if (__.brushMode !== "None") {
+    if (brush.mode !== "None") {
       pc.brushReset();
     }
 
     // Next, we need to 'uninstall' the current brushMode.
-    brushModes[__.brushMode].uninstall(pc);
+    brush.modes[brush.mode].uninstall(pc);
     // Finally, we can install the requested one.
-    __.brushMode = mode;
-    brushModes[__.brushMode].install();
+    brush.mode = mode;
+    brush.modes[brush.mode].install();
   }
 
   return pc;
@@ -763,7 +760,7 @@ pc.brushMode = function(mode) {
     return pc;
   }
 
-  brushModes["1D-axes"] = {
+  brush.modes["1D-axes"] = {
     install: install,
     uninstall: function() {
       g.selectAll(".brush").remove();
@@ -1034,7 +1031,7 @@ pc.brushMode = function(mode) {
       .call(drag);
   }
 
-  brushModes["2D-strums"] = {
+  brush.modes["2D-strums"] = {
     install: install,
     uninstall: function() {
       pc.selection.select("canvas.strums").remove();

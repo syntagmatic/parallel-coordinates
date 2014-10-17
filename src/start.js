@@ -4,7 +4,6 @@ d3.parcoords = function(config) {
     dimensions: [],
     dimensionTitles: {},
     types: {},
-    brushMode: "None",
     brushed: false,
     mode: "default",
     rate: 20,
