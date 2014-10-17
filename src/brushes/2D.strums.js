@@ -265,7 +265,7 @@
       pc.selection.select("canvas.strums").remove();
       pc.selection.select("svg").select("g#strums").remove();
       pc.on("axesreorder.strums", undefined);
-      pc.brushReset = undefined;
+      delete pc.brushReset;
 
       strumCanvas = undefined;
     }

@@ -109,8 +109,8 @@
     uninstall: function() {
       g.selectAll(".brush").remove();
       brushes = {};
-      pc.brushExtent = undefined;
-      pc.brushReset = undefined;
+      delete pc.brushExtent;
+      delete pc.brushReset;
     }
   }
 })();

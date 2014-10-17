@@ -765,8 +765,8 @@ pc.brushMode = function(mode) {
     uninstall: function() {
       g.selectAll(".brush").remove();
       brushes = {};
-      pc.brushExtent = undefined;
-      pc.brushReset = undefined;
+      delete pc.brushExtent;
+      delete pc.brushReset;
     }
   }
 })();
@@ -1037,7 +1037,7 @@ pc.brushMode = function(mode) {
       pc.selection.select("canvas.strums").remove();
       pc.selection.select("svg").select("g#strums").remove();
       pc.on("axesreorder.strums", undefined);
-      pc.brushReset = undefined;
+      delete pc.brushReset;
 
       strumCanvas = undefined;
     }
