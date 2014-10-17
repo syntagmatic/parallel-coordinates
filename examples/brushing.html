@@ -9,7 +9,12 @@
 
 <p>
   <button id="btnReset">Reset Brushes</button>
-  <button id="btnToggle">Enable/disable brushing</button>
+  <button id="btnToggle">Disable brushing</button>
+  <label for="sltPredicate">Predicate:</label>
+  <select id="sltPredicate">
+    <option>AND</option>
+    <option>OR</option>
+  </select>
 </p>
 <script>
 // quantitative color scale
@@ -37,9 +42,19 @@ d3.select('#btnReset').on('click', function() {parcoords.brushReset();})
 d3.select('#btnToggle').on('click', function() {
   if (parcoords.brushMode() === '1D-axes') {
     parcoords.brushMode('None');
+    d3.select(this).text('Enable brushing');
+    d3.select('label').style('visibility', 'hidden');
+    d3.select('#sltPredicate').style('visibility', 'hidden');
   } else {
     parcoords.brushMode('1D-axes');
+    d3.select(this).text('Disable brushing');
+    d3.select('label').style('visibility', 'visible');
+    d3.select('#sltPredicate').style('visibility', 'visible');
   }
+});
+d3.select('#sltPredicate').on('change', function() {
+  console.log(parcoords);
+  parcoords.brushPredicate(this.value);
 });
 </script>
 
