@@ -118,7 +118,7 @@
     uninstall: function() {
       g.selectAll(".brush").remove();
       brushes = {};
-      delete pc.brushExtent;
+      delete pc.brushExtents;
       delete pc.brushReset;
     },
     selected: selected
