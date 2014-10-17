@@ -5,7 +5,7 @@
 
   function is_brushed(p) {
     return !brushes[p].empty();
-  };
+  }
 
   // data within extents
   function selected() {
