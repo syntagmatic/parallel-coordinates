@@ -808,7 +808,8 @@ pc.brushMode = function(mode) {
 // bl.ocks.org/syntagmatic/5441022
 
 (function() {
-  var strumCanvas;
+  var strums = {},
+      strumCanvas;
 
   function drawStrum(strum) {
     var svg = pc.selection.select("svg").select("g#strums"),
@@ -859,7 +860,7 @@ pc.brushMode = function(mode) {
     return dims;
   }
 
-  function onDragStart(strums) {
+  function onDragStart() {
     // First we need to determine between which two axes the sturm was started.
     // This will determine the freedom of movement, because a strum can
     // logically only happen between two axes, so no movement outside these axes
@@ -884,7 +885,7 @@ pc.brushMode = function(mode) {
     };
   }
 
-  function onDrag(strums) {
+  function onDrag() {
     return function() {
       var ev = d3.event,
           strum = strums[strums.active];
@@ -893,49 +894,7 @@ pc.brushMode = function(mode) {
       strum.p2[0] = Math.min(Math.max(strum.minX + 1, ev.x), strum.maxX);
       strum.p2[1] = ev.y - __.margin.top;
       drawStrum(strum);
-    }
-  }
-
-  function onDragEnd(strums) {
-    return function() {
-      var brushed = __.data,
-          ids = [],
-          strum = strums[strums.active];
-
-      // Okay, somewhat unexpected, but not totally unsurprising, a mousclick is
-      // considered a drag without move. So we have to deal with that case
-      if (strum && strum.p1[0] === strum.p2[0] && strum.p1[1] === strum.p2[1]) {
-        removeStrum(strums);
-      }
-
-      // Get the ids of the currently active strums.
-      ids = Object.getOwnPropertyNames(strums).filter(function(d) {
-        return !isNaN(d);
-      });
-
-      brushed = brushed.filter(function(d) {
-        // Yes, double negation. However, this avoids each strum being tested for
-        // each data item, even though when the first strum already doesn't
-        // contain the item. So, even though it doesn't reduces the worst case
-        // scenario O(n * N), with n being the number of strums and N the number
-        // of data items, it does improve the average run time.
-        return !ids.some(function(id) {
-          var strum = strums[id],
-              test = containmentTest(strum, strums.width(id)),
-              d1 = strum.dims.left,
-              d2 = strum.dims.right,
-              y1 = yscale[d1],
-              y2 = yscale[d2],
-              point = [y1(d[d1]) - strum.minX, y2(d[d2]) - strum.minX];
-          return !test(point);
-        });
-      });
-
-      strums.active = undefined;
-      __.brushed = brushed.length === __.data.length ? false : brushed;
-      events.brushend.call(pc, __.brushed);
-      pc.render();
-    }
+    };
   }
 
   function containmentTest(strum, width) {
@@ -958,15 +917,68 @@ pc.brushMode = function(mode) {
 
       return false;
     };
-  };
+  }
 
-  function removeStrum(strums) {
+  function selected() {
+    var ids = Object.getOwnPropertyNames(strums),
+        brushed = __.data;
+
+    // Get the ids of the currently active strums.
+    ids = ids.filter(function(d) {
+      return !isNaN(d);
+    });
+
+    function crossesStrum(d, id) {
+      var strum = strums[id],
+          test = containmentTest(strum, strums.width(id)),
+          d1 = strum.dims.left,
+          d2 = strum.dims.right,
+          y1 = yscale[d1],
+          y2 = yscale[d2],
+          point = [y1(d[d1]) - strum.minX, y2(d[d2]) - strum.minX];
+      return test(point);
+    }
+
+    if (ids.length === 0) { return brushed; }
+
+    return brushed.filter(function(d) {
+      switch(brush.predicate) {
+      case "AND":
+        return ids.every(function(id) { return crossesStrum(d, id); });
+      case "OR":
+        return ids.some(function(id) { return crossesStrum(d, id); });
+      default:
+        throw "Unknown brush predicate " + __.brushPredicate;
+      }
+    });
+  }
+
+  function removeStrum() {
     var strum = strums[strums.active],
         svg = pc.selection.select("svg").select("g#strums");
 
     delete strums[strums.active];
     strums.active = undefined;
     svg.selectAll("line#strum-" + strum.dims.i).remove();
+  }
+
+  function onDragEnd() {
+    return function() {
+      var brushed = __.data,
+          strum = strums[strums.active];
+
+      // Okay, somewhat unexpected, but not totally unsurprising, a mousclick is
+      // considered a drag without move. So we have to deal with that case
+      if (strum && strum.p1[0] === strum.p2[0] && strum.p1[1] === strum.p2[1]) {
+        removeStrum(strums);
+      }
+
+      brushed = selected(strums);
+      strums.active = undefined;
+      __.brushed = brushed.length === __.data.length ? false : brushed;
+      events.brushend.call(pc, __.brushed);
+      pc.render();
+    };
   }
 
   function brushReset(strums) {
@@ -984,8 +996,7 @@ pc.brushMode = function(mode) {
   }
 
   function install() {
-    var strums = {},
-        drag = d3.behavior.drag();
+    var drag = d3.behavior.drag();
 
     // Add a canvas to catch the mouse events, used to set the strums.
     strumCanvas = pc.selection.insert("canvas", "svg")
@@ -1074,7 +1085,8 @@ pc.brushMode = function(mode) {
       delete pc.brushReset;
 
       strumCanvas = undefined;
-    }
+    },
+    selected: selected
   };
 
 })();
