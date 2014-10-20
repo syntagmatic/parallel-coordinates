@@ -27,7 +27,7 @@
   }
 
   function dimensionsForPoint(p) {
-    var dims = { i: -1, left: undefined, right: undefined }
+    var dims = { i: -1, left: undefined, right: undefined };
     __.dimensions.some(function(dim, i) {
       if (xscale(dim) < p[0]) {
         var next = __.dimensions[i + 1];
@@ -106,12 +106,13 @@
           y1 = m1 * x + b1,
           y2 = m2 * x + b2;
 
-      if (y > Math.min(y1, y2) && y < Math.max(y1, y2))
+      if (y > Math.min(y1, y2) && y < Math.max(y1, y2)) {
         return true;
+      }
 
       return false;
     };
-  };
+  }
 
   function selected() {
     var ids = Object.getOwnPropertyNames(strums),
@@ -215,7 +216,7 @@
       }
 
       return strum.maxX - strum.minX;
-    }
+    };
 
     pc.on("axesreorder.strums", function() {
       var ids = Object.getOwnPropertyNames(strums).filter(function(d) {
@@ -238,8 +239,9 @@
           strums.active = d;
           // If the two dimensions of the current strum are not next to each other
           // any more, than we'll need to remove the strum. Otherwise we keep it.
-          if (!consecutive(dims.left, dims.right))
+          if (!consecutive(dims.left, dims.right)) {
             removeStrum(strums);
+          }
         });
         onDragEnd(strums)();
       }
@@ -283,5 +285,5 @@
     selected: selected
   };
 
-})();
+}());
 
