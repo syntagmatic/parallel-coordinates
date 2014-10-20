@@ -18,6 +18,13 @@
   </select>
   <button id="btnReset">Reset Brushes</button>
 </p>
+
+<p id="pStrums" style="visibility: hidden;">Strumming is a 2D selection brushing method, also called pinches by Alfred Inselberg.
+You start a strum be clicking and dragging within one of the segments (area between two axes).
+After releasing the mouse button, the selection will contain all lines that pass through all of the active strums.
+
+
+
 <script>
 // quantitative color scale
 var blue_to_brown = d3.scale.linear()
@@ -52,11 +59,16 @@ sltBrushMode.on('change', function() {
   parcoords.brushMode(this.value);
   switch(this.value) {
   case 'None':
+    d3.select("#pStrums").style("visibility", "hidden");
     d3.select("#lblPredicate").style("visibility", "hidden");
     d3.select("#sltPredicate").style("visibility", "hidden");
     d3.select("#btnReset").style("visibility", "hidden");
     break;
+  case '2D-strums':
+    d3.select("#pStrums").style("visibility", "visible");
+    break;
   default:
+    d3.select("#pStrums").style("visibility", "hidden");
     d3.select("#lblPredicate").style("visibility", "visible");
     d3.select("#sltPredicate").style("visibility", "visible");
     d3.select("#btnReset").style("visibility", "visible");
