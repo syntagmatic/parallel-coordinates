@@ -56,7 +56,7 @@ d3.csv('examples/data/cars.csv', function(data) {
     .color(function(d) { return blue_to_brown(d['economy (mpg)']); })  // quantitative color scale
     .alpha(0.4)
     .render()
-    .brushable()  // enable brushing
+    .brushMode("1D-axes")  // enable brushing
     .interactive()  // command line mode
 
   var explore_count = 0;
@@ -299,7 +299,7 @@ d3.csv('examples/data/cars.csv', function(data) {
     .data(data)
     .render()
     .alpha(0.6)
-    .brushable()  // enable brushing
+    .brushMode("1D-axes")  // enable brushing
     .interactive()  // command line mode
 
   change_color("weight (lb)");
@@ -442,7 +442,7 @@ d3.csv('examples/data/nutrients.csv', function(data) {
     .margin({ top: 24, left: 150, bottom: 12, right: 0 })
     .mode("queue")
     .render()
-    .brushable()  // enable brushing
+    .brushMode("1D-axes")  // enable brushing
     .interactive()  // command line mode
 
   pc_progressive.svg.selectAll("text")
@@ -475,7 +475,7 @@ pc0 = d3.parcoords()("#example0")
 	.showControlPoints(false)
 	.hideAxis(["cylinders"])
 	.render()
-	.brushable()
+	.brushMode("1D-axes")
 	.reorderable()
 	.interactive();
 
