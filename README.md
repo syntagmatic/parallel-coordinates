@@ -154,19 +154,16 @@ Remove SVG axes.
 
 Update SVG axes. Call this after updating the dimension order.
 
-<a name="parcoords_brushable" href="#parcoords_brushable">#</a> parcoords.<b>brushable</b>()
+<a name="parcoords_brushMode" href="#parcoords_brushMode">#</a> parcoords.<b>brushMode</b>(*mode*)
 
-Enable brushing of axes. Automatically creates axes if they don't exist.
-
-Click and drag vertically on an axis line to create a brush. The brush is both draggable and resizeable. 
-
-To delete an axis, click the axis line (behind the brush extent).
-
-The behavior is identical to that of the [original d3.js parallel coordinates](http://bl.ocks.org/1341021).
+```
+1D-axes
+2D-strums
+```
 
 <a name="parcoords_brushed" href="#parcoords_brushed">#</a> parcoords.<b>brushed</b>()
 
-For <a href="#parcoords_brushable">brushable</a> plots, returns the selected data.
+For <a href="#parcoords_brushMode">brushable</a> plots, returns the selected data.
 
 <a name="parcoords_brushReset" href="#parcoords_brushReset">#</a> parcoords.<b>brushReset</b>()
 
