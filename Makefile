@@ -15,6 +15,7 @@ TARGETS= \
 	brushes/1D.js \
 	brushes/2D.strums.js \
 	interactive.js \
+	version.js \
 	end.js \
 	renderQueue.js
 
