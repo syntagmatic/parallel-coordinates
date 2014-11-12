@@ -1,3 +1,43 @@
+/**
+ * Original Code taken from https://github.com/syntagmatic/parallel-coordinates
+ * Small modifications done by Michael Hund (michael.hund@uni-konstanz.de) to
+ * allow null values. The following two methods have been modified (documentation
+ * inside the methods):
+ *   - #pc.autoscale()
+ *   - #single_path()
+ *
+ * In order to use null values, you have to specify the type of each dimension
+ * manually, otherwise the heuristic to determine the type will fail, if the
+ * first data row contains a null value.
+ *
+ * Example:
+ * var data = [
+ *   {name: null, protein: 0, calcium: 0.024, sodium: 0.002, my:15},
+ *   {name: "ich", protein: 0.85, calcium: 0.024, sodium: 0.714,my:16},
+ *   {name: "Coffeecake", protein: 1.0, calcium: 0.054, sodium: 0.351,my:14},
+ *   {name: "Pork", protein: 28.5, calcium: 0.016, sodium: 0.056,my:13},
+ *   {name: "me", protein: null, calcium: 0.03, sodium: 0.5,my:12}
+ *   ];
+ *
+ * var types = {
+ *    "name":"string",
+ *    "protein":"number",
+ *    "calcium":"number",
+ *    "sodium":"number",
+ *    "my":"number"
+ * };
+ *
+ * var pc = d3.parcoords()("#parCoord")
+ *   .data(data)
+ *   .ticks(3)
+ *   .dimensions(['my','name','sodium','protein','calcium'])
+ *   .types(types) // specify the types here
+ *   .render()
+ *   .createAxes()
+ *   .brushMode("1D-axes");
+ *
+ */
+
 d3.parcoords = function(config) {
   var __ = {
     data: [],
@@ -155,11 +195,18 @@ pc.autoscale = function() {
         .domain(d3.extent(__.data, function(d) { return +d[k]; }))
         .range([h()+1, 1]);
     },
-    "string": function(k) {
-      return d3.scale.ordinal()
-        .domain(__.data.map(function(p) { return p[k]; }))
-        .rangePoints([h()+1, 1]);
-    }
+
+      "string": function(k) {
+          return d3.scale.ordinal()
+              .domain(__.data.filter(function(d){
+                  // filter out the null values, so that they do not occur in the plot
+                  // k --> dim index
+                  // d --> whole data record
+                  return d[k] != null;
+              }).map(function(p) {
+                  return p[k]; }))
+              .rangePoints([h()+1, 1]);
+      }
   };
 
   __.dimensions.forEach(function(k) {
@@ -456,11 +503,66 @@ function paths(data, ctx) {
 };
 
 function single_path(d, ctx) {
+
 	__.dimensions.map(function(p, i) {
-		if (i == 0) {
-			ctx.moveTo(position(p), yscale[p](d[p]));
+
+        // p = dimension name
+        // i = dimension position
+
+        // Basic idea:
+        // - Do not draw null values (you have to consider the dimensions
+        //   before and after a null value dimension in order to draw correctly).
+        // - Pay attention to the boundaries.
+        // - Draw small 'ticks' to show the the value of a dimension which is
+        //   in between two null-value dimensions (e.g. 'value', null, 'someValue', null)
+        //   --> draw a small tick for 'someValue'
+        // - Draw also small 'ticks' if a null value is in the second or second last dimension
+        //   Example: 'value', null, ... or ... null, 'value' (draw a tick for 'value')
+
+		if (i == 0 && d[p] != null) {
+
+            // if the first dimension is null, draw a small line,
+            // so that we see the actual value
+            if(d[__.dimensions[i+1]] == null){
+                // the next dimension is null
+                ctx.moveTo(position(p) - 15, yscale[p](d[p]));
+                ctx.lineTo(position(p) + 15, yscale[p](d[p]));
+
+            }
+
+            ctx.moveTo(position(p), yscale[p](d[p]));
+
 		} else {
-			ctx.lineTo(position(p), yscale[p](d[p]));
+
+            // do not draw anything, if the current value for dimension is not available
+            if(d[p] == null) {
+                ctx.moveTo(position(p), yscale[p](d[p]));
+
+            }else{
+
+                // the current dimension is not null
+                // check if the previous dimension was null, if so, do not draw anything
+                var prevVal = d[__.dimensions[i-1]];
+
+                if(prevVal != null){
+                    // the previous dimension was not null, draw the line
+                    ctx.lineTo(position(p), yscale[p](d[p]));
+                }else{
+                    // the previous dimension was null, so we do not draw a line
+                    // However,
+                    //  (1) if this is the last dimension, we have to draw a small line, so that we know the value
+                    //  (2) if the previous and the next dimension are null, we have to draw a small line
+                    if(i == __.dimensions.length - 1){
+                        ctx.moveTo(position(p) - 15, yscale[p](d[p]));
+                        ctx.lineTo(position(p) + 15, yscale[p](d[p]));
+                    }else if(d[__.dimensions[i+1]] == null){
+                        ctx.moveTo(position(p) - 15, yscale[p](d[p]));
+                        ctx.lineTo(position(p) + 15, yscale[p](d[p]));
+                    }
+                    ctx.moveTo(position(p), yscale[p](d[p]));
+                }
+            }
+
 		}
 	});
 }
