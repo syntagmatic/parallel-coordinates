@@ -3,14 +3,15 @@
 
 (function() {
   var strums = {},
-      strumCanvas;
+      strumRect;
 
   function drawStrum(strum) {
     var svg = pc.selection.select("svg").select("g#strums"),
-        id = strum.dims.i;
-
-    var line = svg.selectAll("line#strum-" + id)
-      .data([strum]);
+        id = strum.dims.i,
+        points = [strum.p1, strum.p2],
+        line = svg.selectAll("line#strum-" + id).data([strum]),
+        circles = svg.selectAll("circle#strum-" + id).data(points),
+        drag = d3.behavior.drag();
 
     line.enter()
       .append("line")
@@ -24,6 +25,34 @@
       .attr("y2", function(d) { return d.p2[1]; })
       .attr("stroke", "black")
       .attr("stroke-width", 2);
+
+    drag
+      .on("drag", function(d, i) { 
+        var ev = d3.event;
+        i = i + 1;
+        strum["p" + i][0] = Math.min(Math.max(strum.minX + 1, ev.x), strum.maxX);
+        strum["p" + i][1] = ev.y;
+        drawStrum(strum);
+      })
+      .on("dragend", onDragEnd());
+
+    circles.enter()
+      .append("circle")
+      .attr("id", "strum-" + id)
+      .attr("class", "strum");
+
+    circles
+      .attr("cx", function(d) { return d[0]; })
+      .attr("cy", function(d) { return d[1]; })
+      .attr("r", 5)
+      .style("opacity", 0)
+      .on("mouseover", function() {
+        d3.select(this).style("opacity", 0.8);
+      })
+      .on("mouseout", function() {
+        d3.select(this).style("opacity", 0);
+      })
+      .call(drag);
   }
 
   function dimensionsForPoint(p) {
@@ -60,7 +89,7 @@
     // logically only happen between two axes, so no movement outside these axes
     // should be allowed.
     return function() {
-      var p = d3.mouse(strumCanvas),
+      var p = d3.mouse(strumRect[0][0]),
           dims = dimensionsForPoint(p),
           strum = {
             p1: p,
@@ -74,7 +103,7 @@
 
       // Make sure that the point is within the bounds
       strum.p1[0] = Math.min(Math.max(strum.minX, p[0]), strum.maxX);
-      strum.p1[1] = p[1];
+      strum.p1[1] = p[1] - __.margin.top;
       strum.p2 = strum.p1.slice();
     };
   }
@@ -155,6 +184,7 @@
     delete strums[strums.active];
     strums.active = undefined;
     svg.selectAll("line#strum-" + strum.dims.i).remove();
+    svg.selectAll("circle#strum-" + strum.dims.i).remove();
   }
 
   function onDragEnd() {
@@ -192,14 +222,6 @@
 
   function install() {
     var drag = d3.behavior.drag();
-
-    // Add a canvas to catch the mouse events, used to set the strums.
-    strumCanvas = pc.selection.insert("canvas", "svg")
-      .attr("class", "strums")
-      .style("margin-top", __.margin.top + "px")
-      .style("margin-left", __.margin.left + "px")
-      .attr("width", w()+2)
-      .attr("height", h()+2)[0][0];
 
     // Map of current strums. Strums are stored per segment of the PC. A segment,
     // being the area between two axes. The left most area is indexed at 0.
@@ -263,9 +285,12 @@
     // NOTE: The styling needs to be done here and not in the css. This is because
     //       for 1D brushing, the canvas layers should not listen to
     //       pointer-events.
-    d3.select(strumCanvas)
-      .style("pointer-events", "auto")
-      .style("z-index", 1000)
+    strumRect = pc.selection.select("svg").insert("rect", "g#strums")
+      .attr("x", __.margin.left)
+      .attr("y", __.margin.top)
+      .attr("width", w())
+      .attr("height", h() + 2)
+      .style("opacity", 0)
       .call(drag);
   }
 
@@ -277,7 +302,7 @@
       pc.on("axesreorder.strums", undefined);
       delete pc.brushReset;
 
-      strumCanvas = undefined;
+      strumRect = undefined;
     },
     selected: selected
   };
