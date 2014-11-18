@@ -1069,9 +1069,6 @@ pc.brushMode = function(mode) {
     // NOTE: The styling needs to be done here and not in the css. This is because
     //       for 1D brushing, the canvas layers should not listen to
     //       pointer-events.
-    // FIXME: Like brushable, strumming can only be enabled and not disabled at
-    //        this point. So, if we want to be able to switch between the two (or
-    //        possibly more in the future) methods.
     d3.select(strumCanvas)
       .style("pointer-events", "auto")
       .style("z-index", 1000)
