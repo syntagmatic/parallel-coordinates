@@ -301,7 +301,6 @@
   brush.modes["2D-strums"] = {
     install: install,
     uninstall: function() {
-      pc.selection.select("canvas.strums").remove();
       pc.selection.select("svg").select("g#strums").remove();
       pc.on("axesreorder.strums", undefined);
       delete pc.brushReset;
