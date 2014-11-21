@@ -103,12 +103,12 @@ suite.addBatch({
     },
     '2D-strums': {
       topic: d3ParcoordsWith('2D-strums'),
-      'there should be a canvas.strums element': function(ev, d3, pc) {
+      'there should be a rect#strum-events element': function(ev, d3, pc) {
         var div = d3.select('div#test'),
-            canvas = div.selectAll('canvas');
+            rect = div.selectAll('rect');
 
-        assert.strictEqual(canvas.size(), 5);
-        assert.strictEqual(d3.select(canvas[0][4]).attr("class"), "strums");
+        assert.strictEqual(rect.size(), 1);
+        assert.strictEqual(rect.attr("id"), "strum-events");
       },
       'there should be a listener set on the axesreorder signal': function(ev, d3, pc) {
          assert.notStrictEqual(pc.on('axesreorder.strums'), undefined);
@@ -122,14 +122,14 @@ suite.addBatch({
       },
       'and it is set back to none': {
         topic: d3ParcoordsWith('2D-strums'),
-        'there should be no canvas.strums element': function(ev, d3, pc) {
+        'there should be no rect#strum-events element': function(ev, d3, pc) {
           var div, canvas;
 
           pc.brushMode('None');
 
           div = d3.select('div#test');
-          canvas = div.selectAll('canvas.strum');
-          assert.strictEqual(canvas.size(), 0);
+          rect = div.selectAll('rect#strum-events');
+          assert.strictEqual(rect.size(), 0);
         },
         'there shoulde be no listener set on the axesreorder.strum event': function(ev, d3, pc) {
           assert.strictEqual(pc.on('axesreorder.strums'), undefined);
