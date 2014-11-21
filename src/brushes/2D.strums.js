@@ -31,7 +31,7 @@
         var ev = d3.event;
         i = i + 1;
         strum["p" + i][0] = Math.min(Math.max(strum.minX + 1, ev.x), strum.maxX);
-        strum["p" + i][1] = ev.y;
+        strum["p" + i][1] = Math.min(Math.max(strum.minY, ev.y), strum.maxY);
         drawStrum(strum, i - 1);
       })
       .on("dragend", onDragEnd());
@@ -97,7 +97,9 @@
             p1: p,
             dims: dims,
             minX: xscale(dims.left),
-            maxX: xscale(dims.right)
+            maxX: xscale(dims.right),
+            minY: 0,
+            maxY: h()
           };
 
       strums[dims.i] = strum;
@@ -117,7 +119,7 @@
 
       // Make sure that the point is within the bounds
       strum.p2[0] = Math.min(Math.max(strum.minX + 1, ev.x), strum.maxX);
-      strum.p2[1] = ev.y - __.margin.top;
+      strum.p2[1] = Math.min(Math.max(strum.minY, ev.y - __.margin.top), strum.maxY);
       drawStrum(strum, 1);
     };
   }
