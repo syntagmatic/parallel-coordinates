@@ -290,6 +290,7 @@
     //       for 1D brushing, the canvas layers should not listen to
     //       pointer-events.
     strumRect = pc.selection.select("svg").insert("rect", "g#strums")
+      .attr("id", "strum-events")
       .attr("x", __.margin.left)
       .attr("y", __.margin.top)
       .attr("width", w())
@@ -302,6 +303,7 @@
     install: install,
     uninstall: function() {
       pc.selection.select("svg").select("g#strums").remove();
+      pc.selection.select("svg").select("rect#strum-events").remove();
       pc.on("axesreorder.strums", undefined);
       delete pc.brushReset;
 
