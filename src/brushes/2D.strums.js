@@ -5,7 +5,7 @@
   var strums = {},
       strumRect;
 
-  function drawStrum(strum) {
+  function drawStrum(strum, activePoint) {
     var svg = pc.selection.select("svg").select("g#strums"),
         id = strum.dims.i,
         points = [strum.p1, strum.p2],
@@ -32,7 +32,7 @@
         i = i + 1;
         strum["p" + i][0] = Math.min(Math.max(strum.minX + 1, ev.x), strum.maxX);
         strum["p" + i][1] = ev.y;
-        drawStrum(strum);
+        drawStrum(strum, i - 1);
       })
       .on("dragend", onDragEnd());
 
@@ -45,7 +45,9 @@
       .attr("cx", function(d) { return d[0]; })
       .attr("cy", function(d) { return d[1]; })
       .attr("r", 5)
-      .style("opacity", 0)
+      .style("opacity", function(d, i) {
+        return (activePoint !== undefined && i === activePoint) ? 0.8 : 0;
+      })
       .on("mouseover", function() {
         d3.select(this).style("opacity", 0.8);
       })
@@ -116,7 +118,7 @@
       // Make sure that the point is within the bounds
       strum.p2[0] = Math.min(Math.max(strum.minX + 1, ev.x), strum.maxX);
       strum.p2[1] = ev.y - __.margin.top;
-      drawStrum(strum);
+      drawStrum(strum, 1);
     };
   }
 
