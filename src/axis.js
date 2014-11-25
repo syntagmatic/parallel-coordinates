@@ -117,6 +117,7 @@ pc.reorderable = function() {
         delete dragging[d];
         d3.select(this).transition().attr("transform", "translate(" + xscale(d) + ")");
         pc.render();
+        if (flags.shadows) paths(__.data, ctx.shadows);
       }));
   flags.reorderable = true;
   return this;
