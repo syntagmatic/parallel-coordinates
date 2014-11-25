@@ -501,6 +501,14 @@ pc.createAxes = function() {
       })
       .text(function(d) {
         return d in __.dimensionTitles ? __.dimensionTitles[d] : d;  // dimension display names
+      })
+      .on("dblclick", function(d) {
+        var scale = yscale[d],
+            domain = scale.domain(),
+            newdomain = [domain[1], domain[0]];
+
+        scale.domain(newdomain);
+        pc.updateAxes().render();
       });
 
   flags.axes= true;
