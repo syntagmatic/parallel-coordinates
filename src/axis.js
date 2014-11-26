@@ -78,6 +78,11 @@ pc.updateAxes = function() {
   if (flags.shadows) paths(__.data, ctx.shadows);
   if (flags.brushable) pc.brushable();
   if (flags.reorderable) pc.reorderable();
+  if (pc.brushMode() !== "None") {
+    var mode = pc.brushMode();
+    pc.brushMode("None");
+    pc.brushMode(mode);
+  }
   return this;
 };
 
