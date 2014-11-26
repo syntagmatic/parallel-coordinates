@@ -1,6 +1,7 @@
 d3.parcoords = function(config) {
   var __ = {
     data: [],
+    highlighted: [],
     dimensions: [],
     dimensionTitles: {},
     types: {},
@@ -290,20 +291,27 @@ pc.render['default'] = function() {
   pc.clear('foreground');
   if (__.brushed) {
     __.brushed.forEach(path_foreground);
+    __.highlighted.forEach(path_highlight);
   } else {
     __.data.forEach(path_foreground);
+    __.highlighted.forEach(path_highlight);
   }
 };
 
 var rqueue = d3.renderQueue(path_foreground)
   .rate(50)
-  .clear(function() { pc.clear('foreground'); });
+  .clear(function() {
+    pc.clear('foreground');
+    pc.clear('highlight');
+  });
 
 pc.render.queue = function() {
   if (__.brushed) {
     rqueue(__.brushed);
+    __.highlighted.forEach(path_highlight);
   } else {
     rqueue(__.data);
+    __.highlighted.forEach(path_highlight);
   }
 };
 function compute_cluster_centroids(d) {
@@ -1173,15 +1181,21 @@ pc.resize = function() {
 
 // highlight an array of data
 pc.highlight = function(data) {
+  if (arguments.length === 0) {
+    return __.highlighted;
+  }
+
+  __.highlighted = data;
   pc.clear("highlight");
   d3.select(canvas.foreground).classed("faded", true);
   data.forEach(path_highlight);
-  events.highlight.call(this,data);
+  events.highlight.call(this, data);
   return this;
 };
 
 // clear highlighting
-pc.unhighlight = function(data) {
+pc.unhighlight = function() {
+  __.highlighted = [];
   pc.clear("highlight");
   d3.select(canvas.foreground).classed("faded", false);
   return this;
