@@ -4,6 +4,7 @@ d3.parcoords = function(config) {
     highlighted: [],
     dimensions: [],
     dimensionTitles: {},
+    dimensionTitleRotation: 0,
     types: {},
     brushed: false,
     mode: "default",

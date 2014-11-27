@@ -4,6 +4,7 @@ d3.parcoords = function(config) {
     highlighted: [],
     dimensions: [],
     dimensionTitles: {},
+    dimensionTitleRotation: 0,
     types: {},
     brushed: false,
     mode: "default",
@@ -503,7 +504,7 @@ pc.createAxes = function() {
       .attr({
         "text-anchor": "middle",
         "y": 0,
-        "transform": "translate(0,-12)",
+        "transform": "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")",
         "x": 0,
         "class": "label"
       })
@@ -512,6 +513,15 @@ pc.createAxes = function() {
       })
       .on("dblclick", function(dimension) {
         pc.flip(dimension).updateAxes().render();
+      })
+      .on("wheel", function(d) {
+        var delta = d3.event.wheelDeltaY;
+        delta = delta < 0 ? -5 : delta;
+        delta = delta > 0 ? 5 : delta;
+
+        __.dimensionTitleRotation += delta;
+        pc.svg.selectAll("text.label")
+          .attr("transform", "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")");
       });
 
   flags.axes= true;
@@ -539,15 +549,37 @@ pc.updateAxes = function() {
       .attr({
         "text-anchor": "middle",
         "y": 0,
-        "transform": "translate(0,-12)",
+        "transform": "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")",
         "x": 0,
         "class": "label"
       })
       .text(String)
       .on("dblclick", function(dimension) {
         pc.flip(dimension).updateAxes().render();
+      })
+      .on("wheel", function(d) {
+        var delta = d3.event.wheelDeltaY;
+        delta = delta < 0 ? -5 : delta;
+        delta = delta > 0 ? 5 : delta;
+
+        __.dimensionTitleRotation += delta;
+        pc.svg.selectAll("text.label")
+          .attr("transform", "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")");
       });
 
+  // Update
+  g_data.attr("opacity", 0);
+  g_data.select(".axis")
+    .transition()
+      .duration(1100)
+      .each(function(d) {
+        d3.select(this).call(axis.scale(yscale[d]));
+      });
+  g_data.select(".label")
+    .transition()
+      .duration(1100)
+      .text(String)
+      .attr("transform", "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")");
   g_data.exit().remove();
 
   g = pc.svg.selectAll(".dimension");
