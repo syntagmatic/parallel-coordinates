@@ -534,9 +534,9 @@ pc.removeAxes = function() {
 };
 
 pc.updateAxes = function() {
-  var g_data = pc.svg.selectAll(".dimension")
-      .data(__.dimensions, function(d) { return d; });
+  var g_data = pc.svg.selectAll(".dimension").data(__.dimensions);
 
+  // Enter
   g_data.enter().append("svg:g")
       .attr("class", "dimension")
       .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
@@ -580,16 +580,19 @@ pc.updateAxes = function() {
       .duration(1100)
       .text(String)
       .attr("transform", "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")");
+
+  // Exit
   g_data.exit().remove();
 
   g = pc.svg.selectAll(".dimension");
-
   g.transition().duration(1100)
     .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
     .style("opacity", 1);
 
-  pc.svg.selectAll(".axis").transition().duration(1100)
-  	.each(function(d) { d3.select(this).call(axis.scale(yscale[d])); });
+  pc.svg.selectAll(".axis")
+    .transition()
+      .duration(1100)
+      .each(function(d) { d3.select(this).call(axis.scale(yscale[d])); });
 
   if (flags.shadows) paths(__.data, ctx.shadows);
   if (flags.brushable) pc.brushable();
