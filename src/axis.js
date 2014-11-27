@@ -24,13 +24,8 @@ pc.createAxes = function() {
       .text(function(d) {
         return d in __.dimensionTitles ? __.dimensionTitles[d] : d;  // dimension display names
       })
-      .on("dblclick", function(d) {
-        var scale = yscale[d],
-            domain = scale.domain(),
-            newdomain = [domain[1], domain[0]];
-
-        scale.domain(newdomain);
-        pc.updateAxes().render();
+      .on("dblclick", function(dimension) {
+        pc.flip(dimension).updateAxes().render();
       });
 
   flags.axes= true;
@@ -62,7 +57,10 @@ pc.updateAxes = function() {
         "x": 0,
         "class": "label"
       })
-      .text(String);
+      .text(String)
+      .on("dblclick", function(dimension) {
+        pc.flip(dimension).updateAxes().render();
+      });
 
   g_data.exit().remove();
 
