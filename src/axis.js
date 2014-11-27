@@ -35,6 +35,7 @@ pc.createAxes = function() {
         __.dimensionTitleRotation += delta;
         pc.svg.selectAll("text.label")
           .attr("transform", "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")");
+        d3.event.preventDefault();
       });
 
   flags.axes= true;
@@ -78,6 +79,7 @@ pc.updateAxes = function() {
         __.dimensionTitleRotation += delta;
         pc.svg.selectAll("text.label")
           .attr("transform", "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")");
+        d3.event.preventDefault();
       });
 
   // Update
