@@ -485,6 +485,19 @@ pc.clear = function(layer) {
   ctx[layer].clearRect(0,0,w()+2,h()+2);
   return this;
 };
+function flipAxisAndUpdatePCP(dimension, i) {
+  var g = pc.svg.selectAll(".dimension");
+
+  pc.flip(dimension);
+  d3.select(g[0][i])
+    .transition()
+      .duration(1100)
+      .call(axis.scale(yscale[dimension]));
+
+  pc.render();
+  if (flags.shadows) paths(__.data, ctx.shadows);
+}
+
 pc.createAxes = function() {
   if (g) pc.removeAxes();
 
@@ -511,9 +524,7 @@ pc.createAxes = function() {
       .text(function(d) {
         return d in __.dimensionTitles ? __.dimensionTitles[d] : d;  // dimension display names
       })
-      .on("dblclick", function(dimension) {
-        pc.flip(dimension).updateAxes().render();
-      })
+      .on("dblclick", flipAxisAndUpdatePCP)
       .on("wheel", function(d) {
         var delta = d3.event.wheelDeltaY;
         delta = delta < 0 ? -5 : delta;
@@ -555,9 +566,7 @@ pc.updateAxes = function() {
         "class": "label"
       })
       .text(String)
-      .on("dblclick", function(dimension) {
-        pc.flip(dimension).updateAxes().render();
-      })
+      .on("dblclick", flipAxisAndUpdatePCP)
       .on("wheel", function(d) {
         var delta = d3.event.wheelDeltaY;
         delta = delta < 0 ? -5 : delta;
