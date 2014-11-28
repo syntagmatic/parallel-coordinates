@@ -1069,9 +1069,9 @@ pc.brushMode = function(mode) {
 
       brushed = selected(strums);
       strums.active = undefined;
-      __.brushed = brushed.length === __.data.length ? false : brushed;
-      events.brushend.call(pc, __.brushed);
+      __.brushed = brushed;
       pc.render();
+      events.brushend.call(pc, __.brushed);
     };
   }
 
