@@ -498,6 +498,17 @@ function flipAxisAndUpdatePCP(dimension, i) {
   if (flags.shadows) paths(__.data, ctx.shadows);
 }
 
+function rotateLabels() {
+  var delta = d3.event.wheelDeltaY;
+  delta = delta < 0 ? -5 : delta;
+  delta = delta > 0 ? 5 : delta;
+
+  __.dimensionTitleRotation += delta;
+  pc.svg.selectAll("text.label")
+    .attr("transform", "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")");
+  d3.event.preventDefault();
+}
+
 pc.createAxes = function() {
   if (g) pc.removeAxes();
 
@@ -525,16 +536,7 @@ pc.createAxes = function() {
         return d in __.dimensionTitles ? __.dimensionTitles[d] : d;  // dimension display names
       })
       .on("dblclick", flipAxisAndUpdatePCP)
-      .on("wheel", function(d) {
-        var delta = d3.event.wheelDeltaY;
-        delta = delta < 0 ? -5 : delta;
-        delta = delta > 0 ? 5 : delta;
-
-        __.dimensionTitleRotation += delta;
-        pc.svg.selectAll("text.label")
-          .attr("transform", "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")");
-        d3.event.preventDefault();
-      });
+      .on("wheel", rotateLabels);
 
   flags.axes= true;
   return this;
@@ -567,16 +569,7 @@ pc.updateAxes = function() {
       })
       .text(String)
       .on("dblclick", flipAxisAndUpdatePCP)
-      .on("wheel", function(d) {
-        var delta = d3.event.wheelDeltaY;
-        delta = delta < 0 ? -5 : delta;
-        delta = delta > 0 ? 5 : delta;
-
-        __.dimensionTitleRotation += delta;
-        pc.svg.selectAll("text.label")
-          .attr("transform", "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")");
-        d3.event.preventDefault();
-      });
+      .on("wheel", rotateLabels);
 
   // Update
   g_data.attr("opacity", 0);
