@@ -158,8 +158,25 @@ pc.autoscale = function() {
         .range([h()+1, 1]);
     },
     "string": function(k) {
+      var counts = {},
+          domain = [];
+
+      // Let's get the count for each value so that we can sort the domain based
+      // on the number of items for each value.
+      __.data.map(function(p) {
+        if (counts[p[k]] === undefined) {
+          counts[p[k]] = 1;
+        } else {
+          counts[p[k]] = counts[p[k]] + 1;
+        }
+      });
+
+      domain = Object.getOwnPropertyNames(counts).sort(function(a, b) {
+        return counts[a] - counts[b];
+      });
+
       return d3.scale.ordinal()
-        .domain(__.data.map(function(p) { return p[k]; }))
+        .domain(domain)
         .rangePoints([h()+1, 1]);
     }
   };
