@@ -12,7 +12,7 @@ function flipAxisAndUpdatePCP(dimension, i) {
 }
 
 function rotateLabels() {
-  var delta = d3.event.wheelDeltaY;
+  var delta = d3.event.deltaY;
   delta = delta < 0 ? -5 : delta;
   delta = delta > 0 ? 5 : delta;
 
