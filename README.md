@@ -310,6 +310,43 @@ Custom values must be passed into the original chart config to register events.
 * *"composite"*
 * *"alpha"*
 
+### Null values in dimensions
+The parallel coordinates plot supports null values in the data records. In order to support null values, the data types have to be specified manually, otherwise the heuristic to determine the data type will fail, if the first data record contains a null value.
+
+Example:
+
+    
+
+```javascript
+
+	var data = [
+      {name: null, protein: 0, calcium: 0.024, sodium: 0.002, my:15},
+      {name: "ich", protein: 0.85, calcium: 0.024, sodium: 0.714,my:16},
+      {name: "Coffeecake", protein: 1.0, calcium: 0.054, sodium: 0.351,my:14},
+      {name: "Pork", protein: 28.5, calcium: 0.016, sodium: 0.056,my:13},
+      {name: "me", protein: null, calcium: 0.03, sodium: 0.5,my:12}
+    ];
+
+
+	var types = {
+      "name":"string",
+       "protein":"number",
+       "calcium":"number",
+       "sodium":"number",
+       "my":"number"
+    };
+
+	var pc = d3.parcoords()("#parCoord")
+      .data(data) // here we can do the data filtering
+      .ticks(3)
+      .dimensions(['my','name','sodium','protein','calcium'])
+      .types(types)
+      .render()
+      .createAxes()
+      .brushMode("1D-axes");
+
+```
+
 ### Axes
 
 The following methods are available from [d3.svg.axis](https://github.com/mbostock/d3/wiki/SVG-Axes): ticks, orient, tickValues, tickSubdivide, tickSize, tickPadding, tickFormat.
