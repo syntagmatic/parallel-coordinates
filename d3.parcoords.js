@@ -650,7 +650,7 @@ pc.reorderable = function() {
       })
       .on("dragend", function(d) {
         // Let's see if the order has changed and send out an event if so.
-        var j = __.dimensions.indexOf(d),
+        var j = __.dimensions.indexOf(d, i),
             parent = this.parentElement;
 
         if (i !== j) {
