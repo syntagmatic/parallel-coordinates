@@ -146,12 +146,22 @@ pc.reorderable = function() {
       })
       .on("dragend", function(d) {
         // Let's see if the order has changed and send out an event if so.
-        var orderChanged = dimsAtDragstart.some(function(d, i) {
-          return d !== __.dimensions[i];
-        });
+        var j = __.dimensions.indexOf(d),
+            parent = this.parentElement;
 
-        if (orderChanged) {
+        if (i !== j) {
           events.axesreorder.call(pc, __.dimensions);
+          // We now also want to reorder the actual dom elements that represent
+          // the axes. That is, the g.dimension elements. If we don't do this,
+          // we get a weird and confusing transition when updateAxes is called.
+          // This is due to the fact that, initially the nth g.dimension element
+          // represents the nth axis. However, after a manual reordering,
+          // without reordering the dom elements, the nth dom elements no longer
+          // necessarily represents the nth axis.
+          //
+          // i is the original index of the dom element
+          // j is the new index of the dom element
+          parent.insertBefore(this, parent.children[j + 1])
         }
 
         delete this.__origin__;
