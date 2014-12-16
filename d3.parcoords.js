@@ -648,9 +648,9 @@ pc.reorderable = function() {
         pc.render();
         g.attr("transform", function(d) { return "translate(" + position(d) + ")"; });
       })
-      .on("dragend", function(d) {
+      .on("dragend", function(d, i) {
         // Let's see if the order has changed and send out an event if so.
-        var j = __.dimensions.indexOf(d, i),
+        var j = __.dimensions.indexOf(d),
             parent = this.parentElement;
 
         if (i !== j) {
