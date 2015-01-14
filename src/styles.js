@@ -9,7 +9,7 @@ pc.shadows = function() {
 // draw little dots on the axis line where data intersects
 pc.axisDots = function() {
 	var ctx = pc.ctx.marks;
-	ctx.globalAlpha = d3.min([ 1 / Math.pow(data.length, 1 / 2), 1 ]);
+	ctx.globalAlpha = d3.min([ 1 / Math.pow(__.data.length, 1 / 2), 1 ]);
 	__.data.forEach(function(d) {
 		__.dimensions.map(function(p, i) {
 			ctx.fillRect(position(p) - 0.75, yscale[p](d[p]) - 0.75, 1.5, 1.5);
