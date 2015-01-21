@@ -502,11 +502,12 @@ pc.clear = function(layer) {
   ctx[layer].clearRect(0,0,w()+2,h()+2);
   return this;
 };
-function flipAxisAndUpdatePCP(dimension, i) {
+function flipAxisAndUpdatePCP(dimension) {
   var g = pc.svg.selectAll(".dimension");
 
   pc.flip(dimension);
-  d3.select(g[0][i])
+
+  d3.select(this.parentElement)
     .transition()
       .duration(1100)
       .call(axis.scale(yscale[dimension]));
@@ -630,16 +631,10 @@ pc.updateAxes = function() {
 pc.reorderable = function() {
   if (!g) pc.createAxes();
 
-  // Keep track of the order of the axes to verify if the order has actually
-  // changed after a drag ends. Changed order might have consequence (e.g.
-  // strums that need to be reset).
-  var dimsAtDragstart;
-
   g.style("cursor", "move")
     .call(d3.behavior.drag()
       .on("dragstart", function(d) {
         dragging[d] = this.__origin__ = xscale(d);
-        dimsAtDragstart = __.dimensions.slice();
       })
       .on("drag", function(d) {
         dragging[d] = Math.min(w(), Math.max(0, this.__origin__ += d3.event.dx));
@@ -648,11 +643,14 @@ pc.reorderable = function() {
         pc.render();
         g.attr("transform", function(d) { return "translate(" + position(d) + ")"; });
       })
-      .on("dragend", function(d, i) {
+      .on("dragend", function(d) {
         // Let's see if the order has changed and send out an event if so.
-        var j = __.dimensions.indexOf(d),
+        var i = 0,
+            j = __.dimensions.indexOf(d),
+            elem = this,
             parent = this.parentElement;
 
+        while((elem = elem.previousElementSibling) != null) ++i;
         if (i !== j) {
           events.axesreorder.call(pc, __.dimensions);
           // We now also want to reorder the actual dom elements that represent
@@ -665,7 +663,15 @@ pc.reorderable = function() {
           //
           // i is the original index of the dom element
           // j is the new index of the dom element
-          parent.insertBefore(this, parent.children[j + 1])
+          if (i > j) { // Element moved left
+            parent.insertBefore(this, parent.children[j - 1]);
+          } else {     // Element moved right
+            if ((j + 1) < parent.children.length) {
+              parent.insertBefore(this, parent.children[j + 1]);
+            } else {
+              parent.appendChild(this);
+            }
+          }
         }
 
         delete this.__origin__;
