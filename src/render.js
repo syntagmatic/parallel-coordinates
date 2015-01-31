@@ -11,6 +11,7 @@ pc.render = function() {
 
 pc.render['default'] = function() {
   pc.clear('foreground');
+  pc.clear('highlight');
   if (__.brushed) {
     __.brushed.forEach(path_foreground);
     __.highlighted.forEach(path_highlight);
