@@ -152,9 +152,9 @@ pc.autoscale = function() {
     "number": function(k) {
       var extent = d3.extent(__.data, function(d) { return +d[k]; });
       if (extent[0] === extent[1]) {
-        return d3.scale.linear()
-          .domain([extent[0] - 1, extent[0], extent[0] + 1])
-          .range([h(), h()/2, 1]);
+        return d3.scale.ordinal()
+          .domain([extent[0]])
+          .rangePoints([h()+1, 1]);
       }
       return d3.scale.linear()
         .domain(extent)
