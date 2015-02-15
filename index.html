@@ -53,6 +53,7 @@ var pc1;
 d3.csv('examples/data/cars.csv', function(data) {
   pc1 = d3.parcoords()("#example1")
     .data(data)
+    .hideAxis(["name"])
     .color(function(d) { return blue_to_brown(d['economy (mpg)']); })  // quantitative color scale
     .alpha(0.4)
     .render()
@@ -297,6 +298,7 @@ var zcolorscale = d3.scale.linear()
 d3.csv('examples/data/cars.csv', function(data) {
   pcz = d3.parcoords()("#example-zscore")
     .data(data)
+    .hideAxis(["name"])
     .render()
     .alpha(0.6)
     .brushMode("1D-axes")  // enable brushing
@@ -437,6 +439,7 @@ d3.csv('examples/data/nutrients.csv', function(data) {
 
   pc_progressive = d3.parcoords()("#example-progressive")
     .data(data)
+    .hideAxis(["name"])
     .color(color)
     .alpha(0.4)
     .margin({ top: 24, left: 150, bottom: 12, right: 0 })
@@ -473,7 +476,7 @@ pc0 = d3.parcoords()("#example0")
 	.smoothness(0)
 	.bundleDimension("cylinders")
 	.showControlPoints(false)
-	.hideAxis(["cylinders"])
+	.hideAxis(["name"])
 	.render()
 	.brushMode("1D-axes")
 	.reorderable()

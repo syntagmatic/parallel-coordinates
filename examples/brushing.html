@@ -42,6 +42,7 @@ var parcoords = d3.parcoords()("#example")
 d3.csv('data/cars.csv', function(data) {
   parcoords
     .data(data)
+    .hideAxis(["name"])
     .render()
     .shadows()
     .reorderable()

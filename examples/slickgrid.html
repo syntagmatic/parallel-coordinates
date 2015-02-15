@@ -66,6 +66,7 @@ d3.csv('data/nutrients.csv', function(data) {
 
   parcoords
     .data(data)
+    .hideAxis(["name"])
     .render()
     .reorderable()
     .brushMode("1D-axes");

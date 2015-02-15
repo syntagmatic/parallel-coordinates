@@ -83,6 +83,8 @@ d3.csv('data/ngl_wyoming.csv', function(data) {
     delete d.v_first_name;
     delete d.v_last_name;
     delete d.v_mid_name;
+    delete d.d_birth_date;
+    delete d.d_death_date;
   });
 
   // slickgrid needs each data element to have an id
@@ -90,6 +92,7 @@ d3.csv('data/ngl_wyoming.csv', function(data) {
 
   parcoords
     .data(data)
+    .hideAxis(["d_first_name", "d_mid_name", "d_last_name", "cem_name"])
     .render()
     .reorderable()
     .brushMode("1D-axes");

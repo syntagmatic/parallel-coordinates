@@ -312,7 +312,7 @@ Custom values must be passed into the original chart config to register events.
 
 ### Axes
 
-The following methods are available from [d3.svg.axis](https://github.com/mbostock/d3/wiki/SVG-Axes): ticks, orient, tickValues, tickSubdivide, tickSize, tickPadding, tickFormat.
+*Todo* Axis configuration
 
 ## Developing
 

@@ -9,8 +9,14 @@ pc.autoscale = function() {
         .range([h()+1, 1]);
     },
     "number": function(k) {
+      var extent = d3.extent(__.data, function(d) { return +d[k]; });
+      if (extent[0] === extent[1]) {
+        return d3.scale.linear()
+          .domain([extent[0] - 1, extent[0], extent[0] + 1])
+          .range([h(), h()/2, 1]);
+      }
       return d3.scale.linear()
-        .domain(d3.extent(__.data, function(d) { return +d[k]; }))
+        .domain(extent)
         .range([h()+1, 1]);
     },
     "string": function(k) {
@@ -44,15 +50,6 @@ pc.autoscale = function() {
   __.hideAxis.forEach(function(k) {
     yscale[k] = defaultScales[__.types[k]](k);
   });
-
-  // hack to remove ordinal dimensions with many values
-  pc.dimensions(pc.dimensions().filter(function(p,i) {
-    var uniques = yscale[p].domain().length;
-    if (__.types[p] == "string" && (uniques > 60 || uniques < 2)) {
-      return false;
-    }
-    return true;
-  }));
 
   // xscale
   xscale.rangePoints([0, w()], 1);

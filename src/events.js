@@ -64,9 +64,6 @@ getset(pc, __, events);
 // expose events
 d3.rebind(pc, events, "on");
 
-// tick formatting
-d3.rebind(pc, axis, "ticks", "orient", "tickValues", "tickSubdivide", "tickSize", "tickPadding", "tickFormat");
-
 // getter/setter with event firing
 function getset(obj,state,events)  {
   d3.keys(state).forEach(function(key) {
