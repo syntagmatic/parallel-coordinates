@@ -2,19 +2,31 @@ pc.autoscale = function() {
   // yscale
   var defaultScales = {
     "date": function(k) {
-      return d3.time.scale()
-        .domain(d3.extent(__.data, function(d) {
-          return d[k] ? d[k].getTime() : null;
-        }))
-        .range([h()+1, 1]);
-    },
-    "number": function(k) {
-      var extent = d3.extent(__.data, function(d) { return +d[k]; });
+      var extent = d3.extent(__.data, function(d) {
+        return d[k] ? d[k].getTime() : null;
+      });
+
+      // special case if single value
       if (extent[0] === extent[1]) {
         return d3.scale.ordinal()
           .domain([extent[0]])
           .rangePoints([h()+1, 1]);
       }
+
+      return d3.time.scale()
+        .domain(extent)
+        .range([h()+1, 1]);
+    },
+    "number": function(k) {
+      var extent = d3.extent(__.data, function(d) { return +d[k]; });
+
+      // special case if single value
+      if (extent[0] === extent[1]) {
+        return d3.scale.ordinal()
+          .domain([extent[0]])
+          .rangePoints([h()+1, 1]);
+      }
+
       return d3.scale.linear()
         .domain(extent)
         .range([h()+1, 1]);
