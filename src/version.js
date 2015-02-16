@@ -1,1 +1,1 @@
-pc.version = "0.5.0";
+pc.version = "0.6.0";
