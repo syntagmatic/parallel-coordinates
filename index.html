@@ -421,18 +421,16 @@ d3.select("#compositing-opacity").on("change", function() {
 <div id="example-progressive" class="parcoords" style="width:1300px;margin-left:-250px;height:270px;"></div>
 <pre><a href="#" class="show-code" data-code="progressive">Show code</a></pre>
 
-<script id="progressive">// linear color scale
-// interact with this variable from a javascript console
-var pc_progressive;
-
-// load csv file and create the chart
+<script id="progressive">// load csv file and create the chart
 d3.csv('examples/data/nutrients.csv', function(data) {
   var colorgen = d3.scale.ordinal()
-    .range(["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf6f","#ff7f00","#cab2d6","#6a3d9a","#ffff99","#b15928"]);
+    .range(["#a6cee3","#1f78b4","#b2df8a","#33a02c",
+            "#fb9a99","#e31a1c","#fdbf6f","#ff7f00",
+            "#cab2d6","#6a3d9a","#ffff99","#b15928"]);
 
   var color = function(d) { return colors(d.group); };
 
-  pc_progressive = d3.parcoords()("#example-progressive")
+  var parcoords = d3.parcoords()("#example-progressive")
     .data(data)
     .hideAxis(["name"])
     .color(color)
@@ -444,7 +442,7 @@ d3.csv('examples/data/nutrients.csv', function(data) {
     .brushMode("1D-axes")  // enable brushing
     .interactive()  // command line mode
 
-  pc_progressive.svg.selectAll("text")
+  parcoords.selectAll("text")
     .style("font", "10px sans-serif");
 });
 </script>
