@@ -510,6 +510,8 @@ pc.clear = function(layer) {
   ctx[layer].clearRect(0,0,w()+2,h()+2);
   return this;
 };
+d3.rebind(pc, axis, "ticks", "orient", "tickValues", "tickSubdivide", "tickSize", "tickPadding", "tickFormat");
+
 function flipAxisAndUpdatePCP(dimension) {
   var g = pc.svg.selectAll(".dimension");
 
@@ -1292,7 +1294,7 @@ function position(d) {
   var v = dragging[d];
   return v == null ? xscale(d) : v;
 }
-pc.version = "0.5.0";
+pc.version = "0.6.0";
   // this descriptive text should live with other introspective methods
   pc.toString = function() { return "Parallel Coordinates: " + __.dimensions.length + " dimensions (" + d3.keys(__.data[0]).length + " total) , " + __.data.length + " rows"; };
 

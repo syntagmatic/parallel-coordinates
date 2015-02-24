@@ -1,3 +1,5 @@
+d3.rebind(pc, axis, "ticks", "orient", "tickValues", "tickSubdivide", "tickSize", "tickPadding", "tickFormat");
+
 function flipAxisAndUpdatePCP(dimension) {
   var g = pc.svg.selectAll(".dimension");
 
