@@ -439,10 +439,9 @@ d3.csv('examples/data/nutrients.csv', function(data) {
     .margin({ top: 24, left: 150, bottom: 12, right: 0 })
     .mode("queue")
     .render()
-    .brushMode("1D-axes")  // enable brushing
-    .interactive()  // command line mode
+    .brushMode("1D-axes");  // enable brushing
 
-  parcoords.selectAll("text")
+  parcoords.svg.selectAll("text")
     .style("font", "10px sans-serif");
 });
 </script>
