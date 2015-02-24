@@ -35,8 +35,7 @@
 </ul>
 
 <h3>Brushing</h3>
-<p>Click an axis label to start an oscillating brush. The brush creates a sliding window, filtering out data outside the range. Multiple brushes can be created at once.</p>
-<p>Stop the brush by clicking the axis label again. You can drag, resize and remove stopped brushes.</p>
+<p>Click and drag along an axis to filter data</p>
 <div id="example1" class="parcoords"></div>
 <pre><a href="#" class="show-code" data-code="brushing">Show code</a></pre>
 
@@ -54,8 +53,9 @@ d3.csv('examples/data/cars.csv', function(data) {
   pc1 = d3.parcoords()("#example1")
     .data(data)
     .hideAxis(["name"])
+    .composite("darker")
     .color(function(d) { return blue_to_brown(d['economy (mpg)']); })  // quantitative color scale
-    .alpha(0.4)
+    .alpha(0.35)
     .render()
     .brushMode("1D-axes")  // enable brushing
     .interactive()  // command line mode
@@ -299,8 +299,9 @@ d3.csv('examples/data/cars.csv', function(data) {
   pcz = d3.parcoords()("#example-zscore")
     .data(data)
     .hideAxis(["name"])
+    .composite("darker")
     .render()
-    .alpha(0.6)
+    .alpha(0.35)
     .brushMode("1D-axes")  // enable brushing
     .interactive()  // command line mode
 
@@ -426,22 +427,17 @@ var pc_progressive;
 
 // load csv file and create the chart
 d3.csv('examples/data/nutrients.csv', function(data) {
-  var colorgen = d3.scale.category20();
-  var colors = {};
-  _(data).chain()
-    .pluck('group')
-    .uniq()
-    .each(function(d,i) {
-      colors[d] = colorgen(i);
-    });
+  var colorgen = d3.scale.ordinal()
+    .range(["#a6cee3","#1f78b4","#b2df8a","#33a02c","#fb9a99","#e31a1c","#fdbf6f","#ff7f00","#cab2d6","#6a3d9a","#ffff99","#b15928"]);
 
-  var color = function(d) { return colors[d.group]; };
+  var color = function(d) { return colors(d.group); };
 
   pc_progressive = d3.parcoords()("#example-progressive")
     .data(data)
     .hideAxis(["name"])
     .color(color)
-    .alpha(0.4)
+    .alpha(0.25)
+    .composite("darker")
     .margin({ top: 24, left: 150, bottom: 12, right: 0 })
     .mode("queue")
     .render()

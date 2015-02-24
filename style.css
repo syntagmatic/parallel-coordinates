@@ -39,6 +39,7 @@ pre {
   padding: 4px 8px;
   background: #f2f2f2;
   border: 1px solid #ccc;
+  word-wrap: auto;
 }
 h1 small {
   font-weight: normal;

@@ -43,6 +43,7 @@ d3.csv('data/cars.csv', function(data) {
   parcoords
     .data(data)
     .hideAxis(["name"])
+    .composite("darker")
     .render()
     .shadows()
     .reorderable()
