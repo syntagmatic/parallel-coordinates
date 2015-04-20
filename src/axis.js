@@ -25,6 +25,10 @@ function rotateLabels() {
   d3.event.preventDefault();
 }
 
+function dimensionLabels(d) {
+  return d in __.dimensionTitles ? __.dimensionTitles[d] : d;  // dimension display names
+}
+
 pc.createAxes = function() {
   if (g) pc.removeAxes();
 
@@ -48,9 +52,7 @@ pc.createAxes = function() {
         "x": 0,
         "class": "label"
       })
-      .text(function(d) {
-        return d in __.dimensionTitles ? __.dimensionTitles[d] : d;  // dimension display names
-      })
+      .text(dimensionLabels)
       .on("dblclick", flipAxisAndUpdatePCP)
       .on("wheel", rotateLabels);
 
@@ -83,7 +85,7 @@ pc.updateAxes = function() {
         "x": 0,
         "class": "label"
       })
-      .text(String)
+      .text(dimensionLabels)
       .on("dblclick", flipAxisAndUpdatePCP)
       .on("wheel", rotateLabels);
 
@@ -98,7 +100,7 @@ pc.updateAxes = function() {
   g_data.select(".label")
     .transition()
       .duration(1100)
-      .text(String)
+      .text(dimensionLabels)
       .attr("transform", "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")");
 
   // Exit
