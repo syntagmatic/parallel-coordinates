@@ -1000,22 +1000,27 @@ pc.brushMode = function(mode) {
     // should be allowed.
     return function() {
       var p = d3.mouse(strumRect[0][0]),
-          dims = dimensionsForPoint(p),
-          strum = {
-            p1: p,
-            dims: dims,
-            minX: xscale(dims.left),
-            maxX: xscale(dims.right),
-            minY: 0,
-            maxY: h()
-          };
+          dims,
+          strum;
+
+      p[0] = p[0] - __.margin.left;
+      p[1] = p[1] - __.margin.top;
+
+      dims = dimensionsForPoint(p),
+      strum = {
+        p1: p,
+        dims: dims,
+        minX: xscale(dims.left),
+        maxX: xscale(dims.right),
+        minY: 0,
+        maxY: h()
+      };
 
       strums[dims.i] = strum;
       strums.active = dims.i;
 
       // Make sure that the point is within the bounds
       strum.p1[0] = Math.min(Math.max(strum.minX, p[0]), strum.maxX);
-      strum.p1[1] = p[1] - __.margin.top;
       strum.p2 = strum.p1.slice();
     };
   }
@@ -1026,7 +1031,7 @@ pc.brushMode = function(mode) {
           strum = strums[strums.active];
 
       // Make sure that the point is within the bounds
-      strum.p2[0] = Math.min(Math.max(strum.minX + 1, ev.x), strum.maxX);
+      strum.p2[0] = Math.min(Math.max(strum.minX + 1, ev.x - __.margin.left), strum.maxX);
       strum.p2[1] = Math.min(Math.max(strum.minY, ev.y - __.margin.top), strum.maxY);
       drawStrum(strum, 1);
     };
