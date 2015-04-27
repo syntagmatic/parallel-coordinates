@@ -17,7 +17,7 @@ d3.parcoords = function(config) {
     alpha: 0.7,
     bundlingStrength: 0.5,
     bundleDimension: null,
-    smoothness: 0.25,
+    smoothness: 0.0,
     showControlPoints: false,
     hideAxis : []
   };

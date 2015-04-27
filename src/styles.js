@@ -39,10 +39,10 @@ function single_curve(d, ctx) {
 function color_path(d, i, ctx) {
 	ctx.strokeStyle = d3.functor(__.color)(d, i);
 	ctx.beginPath();
-	if (__.bundleDimension === null || (__.bundlingStrength === 0 && __.smoothness == 0)) {
-		single_path(d, ctx);
-	} else {
+	if ((__.bundleDimension !== null && __.bundlingStrength > 0) || __.smoothness > 0) {
 		single_curve(d, ctx);
+	} else {
+		single_path(d, ctx);
 	}
 	ctx.stroke();
 };
@@ -52,10 +52,10 @@ function paths(data, ctx) {
 	ctx.clearRect(-1, -1, w() + 2, h() + 2);
 	ctx.beginPath();
 	data.forEach(function(d) {
-		if (__.bundleDimension === null || (__.bundlingStrength === 0 && __.smoothness == 0)) {
-			single_path(d, ctx);
-		} else {
+		if ((__.bundleDimension !== null && __.bundlingStrength > 0) || __.smoothness > 0) {
 			single_curve(d, ctx);
+		} else {
+			single_path(d, ctx);
 		}
 	});
 	ctx.stroke();

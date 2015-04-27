@@ -17,7 +17,7 @@ d3.parcoords = function(config) {
     alpha: 0.7,
     bundlingStrength: 0.5,
     bundleDimension: null,
-    smoothness: 0.25,
+    smoothness: 0.0,
     showControlPoints: false,
     hideAxis : []
   };
@@ -467,10 +467,10 @@ function single_curve(d, ctx) {
 function color_path(d, i, ctx) {
 	ctx.strokeStyle = d3.functor(__.color)(d, i);
 	ctx.beginPath();
-	if (__.bundleDimension === null || (__.bundlingStrength === 0 && __.smoothness == 0)) {
-		single_path(d, ctx);
-	} else {
+	if ((__.bundleDimension !== null && __.bundlingStrength > 0) || __.smoothness > 0) {
 		single_curve(d, ctx);
+	} else {
+		single_path(d, ctx);
 	}
 	ctx.stroke();
 };
