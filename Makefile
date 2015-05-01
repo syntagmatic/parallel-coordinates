@@ -14,6 +14,7 @@ TARGETS= \
 	brushes/brushmode.js \
 	brushes/1D.js \
 	brushes/2D.strums.js \
+	brushes/1D.multi.js \
 	interactive.js \
 	version.js \
 	end.js \
