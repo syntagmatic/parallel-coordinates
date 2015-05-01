@@ -158,6 +158,7 @@ Update SVG axes. Call this after updating the dimension order.
 
 ```
 1D-axes
+1D-axes-multi
 2D-strums
 ```
 
