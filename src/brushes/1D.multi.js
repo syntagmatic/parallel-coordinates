@@ -3,7 +3,6 @@
 
 (function() {
   if (typeof d3.svg.multibrush !== 'function') {
-	  console.log("multibrush requires d3.svg.multibrush");
 	  return;
   }
   var brushes = {};
