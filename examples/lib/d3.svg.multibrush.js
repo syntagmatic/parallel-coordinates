@@ -533,6 +533,9 @@ d3.svg.multibrush = function() {
   };
 
   brush.empty = function(i) {
+	if (this.extent().length === 0) {
+	  return true;
+	}
     if(xExtent.length == 1 && yExtent.length == 1) i = 0;
     if(i !== undefined) {
       return !!x && xExtent[i][0] == xExtent[i][1]

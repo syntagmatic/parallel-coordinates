@@ -81,6 +81,11 @@
         brushUpdated(selected());
       })
       .on("brushend", function() {
+    	// d3.svg.multibrush clears extents just before calling 'brushend'
+    	// so we have to update here again.
+    	// This fixes issue #103 for now, but should be changed in d3.svg.multibrush
+    	// to avoid unnecessary computation.
+    	brushUpdated(selected());
         events.brushend.call(pc, __.brushed);
       })
       .extentAdaption(function(selection) {
