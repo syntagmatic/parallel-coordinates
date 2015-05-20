@@ -694,6 +694,43 @@ pc.reorderable = function() {
   return this;
 };
 
+// Reorder dimensions, such that the highest value (visually) is on the left and
+// the lowest on the right. Visual values are determined by the data values in
+// the given row.
+pc.reorder = function(rowdata) {
+  var dims = __.dimensions.slice(0);
+  __.dimensions.sort(function(a, b) {
+    return yscale[a](rowdata[a]) - yscale[b](rowdata[b]);
+  });
+
+  // NOTE: this is relatively cheap given that:
+  // number of dimensions < number of data items
+  // Thus we check equality of order to prevent rerendering when this is the case.
+  var reordered = false;
+  dims.some(function(val, index) {
+    reordered = val !== __.dimensions[index];
+    return reordered;
+  });
+
+  if (reordered) {
+    xscale.domain(__.dimensions);
+    var highlighted = __.highlighted.slice(0);
+    pc.unhighlight();
+
+    g.transition()
+      .duration(1500)
+      .attr("transform", function(d) {
+        return "translate(" + xscale(d) + ")";
+      });
+    pc.render();
+
+    // pc.highlight() does not check whether highlighted is length zero, so we do that here.
+    if (highlighted.length !== 0) {
+      pc.highlight(highlighted);
+    }
+  }
+}
+
 // pairs of adjacent dimensions
 pc.adjacent_pairs = function(arr) {
   var ret = [];
