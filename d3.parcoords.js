@@ -702,9 +702,17 @@ pc.reorderable = function() {
 pc.reorder = function(rowdata) {
   var dims = __.dimensions.slice(0);
   __.dimensions.sort(function(a, b) {
-    return yscale[a](rowdata[a]) - yscale[b](rowdata[b]);
-  });
+    var pixelDifference = yscale[a](rowdata[a]) - yscale[b](rowdata[b]);
 
+    // Array.sort is not necessarily stable, this means that if pixelDifference is zero
+    // the ordering of dimensions might change unexpectedly. This is solved by sorting on
+    // variable name in that case.
+    if (pixelDifference === 0) {
+      return a.localeCompare(b);
+    } // else
+    return pixelDifference;
+  });
+  
   // NOTE: this is relatively cheap given that:
   // number of dimensions < number of data items
   // Thus we check equality of order to prevent rerendering when this is the case.
