@@ -883,7 +883,7 @@ pc.brushMode = function(mode) {
     var extents = {};
     __.dimensions.forEach(function(d) {
       var brush = brushes[d];
-      if (!brush.empty()) {
+      if (brush !== undefined && !brush.empty()) {
         var extent = brush.extent();
         extent.sort(d3.ascending);
         extents[d] = extent;
@@ -950,7 +950,8 @@ pc.brushMode = function(mode) {
       delete pc.brushExtents;
       delete pc.brushReset;
     },
-    selected: selected
+    selected: selected,
+    brushState: brushExtents
   }
 })();
 // brush mode: 2D-strums
@@ -1269,7 +1270,8 @@ pc.brushMode = function(mode) {
 
       strumRect = undefined;
     },
-    selected: selected
+    selected: selected,
+    brushState: function () { return strums; }
   };
 
 }());
@@ -1339,7 +1341,7 @@ pc.brushMode = function(mode) {
     var extents = {};
     __.dimensions.forEach(function(d) {
       var brush = brushes[d];
-      if (!brush.empty()) {
+      if (brush !== undefined && !brush.empty()) {
         var extent = brush.extent();
         extents[d] = extent;
       }
@@ -1422,7 +1424,8 @@ pc.brushMode = function(mode) {
       delete pc.brushExtents;
       delete pc.brushReset;
     },
-    selected: selected
+    selected: selected,
+    brushState: brushExtents
   }
 })();
 pc.interactive = function() {

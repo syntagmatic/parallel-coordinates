@@ -314,7 +314,8 @@
 
       strumRect = undefined;
     },
-    selected: selected
+    selected: selected,
+    brushState: function () { return strums; }
   };
 
 }());
