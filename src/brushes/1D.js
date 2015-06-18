@@ -54,7 +54,7 @@
     var extents = {};
     __.dimensions.forEach(function(d) {
       var brush = brushes[d];
-      if (!brush.empty()) {
+      if (brush !== undefined && !brush.empty()) {
         var extent = brush.extent();
         extent.sort(d3.ascending);
         extents[d] = extent;
@@ -121,6 +121,7 @@
       delete pc.brushExtents;
       delete pc.brushReset;
     },
-    selected: selected
+    selected: selected,
+    brushState: brushExtents
   }
 })();
