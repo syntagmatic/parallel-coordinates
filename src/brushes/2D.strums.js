@@ -210,7 +210,7 @@
       brushed = selected(strums);
       strums.active = undefined;
       __.brushed = brushed;
-      pc.render();
+      pc.renderBrushed();
       events.brushend.call(pc, __.brushed);
     };
   }

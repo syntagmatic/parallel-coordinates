@@ -78,6 +78,10 @@ pc.autoscale = function() {
   ctx.foreground.lineWidth = 1.4;
   ctx.foreground.globalCompositeOperation = __.composite;
   ctx.foreground.globalAlpha = __.alpha;
+  ctx.brushed.strokeStyle = __.brushedColor;
+  ctx.brushed.lineWidth = 1.4;
+  ctx.brushed.globalCompositeOperation = __.composite;
+  ctx.brushed.globalAlpha = __.alpha;
   ctx.highlight.lineWidth = 3;
   ctx.shadows.strokeStyle = "#dadada";
 

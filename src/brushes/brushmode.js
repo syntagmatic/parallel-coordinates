@@ -2,9 +2,10 @@
 var brush = {
   modes: {
     "None": {
-      install: function(pc) {},           // Nothing to be done.
-      uninstall: function(pc) {},         // Nothing to be done.
-      selected: function() { return []; } // Nothing to return
+      install: function(pc) {},            // Nothing to be done.
+      uninstall: function(pc) {},          // Nothing to be done.
+      selected: function() { return []; }, // Nothing to return
+      brushState: function() { return {}; }
     }
   },
   mode: "None",
@@ -22,7 +23,7 @@ var brush = {
 function brushUpdated(newSelection) {
   __.brushed = newSelection;
   events.brush.call(pc,__.brushed);
-  pc.render();
+  pc.renderBrushed();
 }
 
 function brushPredicate(predicate) {
@@ -35,7 +36,7 @@ function brushPredicate(predicate) {
 
   brush.predicate = predicate;
   __.brushed = brush.currentMode().selected();
-  pc.render();
+  pc.renderBrushed();
   return pc;
 }
 
