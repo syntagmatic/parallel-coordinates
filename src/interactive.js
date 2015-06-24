@@ -43,7 +43,7 @@ pc.highlight = function(data) {
 
   __.highlighted = data;
   pc.clear("highlight");
-  d3.select(canvas.foreground).classed("faded", true);
+  d3.selectAll([canvas.foreground, canvas.brushed]).classed("faded", true);
   data.forEach(path_highlight);
   events.highlight.call(this, data);
   return this;
@@ -53,7 +53,7 @@ pc.highlight = function(data) {
 pc.unhighlight = function() {
   __.highlighted = [];
   pc.clear("highlight");
-  d3.select(canvas.foreground).classed("faded", false);
+  d3.selectAll([canvas.foreground, canvas.brushed]).classed("faded", false);
   return this;
 };
 

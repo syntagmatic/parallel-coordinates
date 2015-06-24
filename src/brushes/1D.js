@@ -89,7 +89,7 @@
             brushes[d].clear()
           );
         });
-      pc.render();
+      pc.renderBrushed();
     }
     return this;
   };
