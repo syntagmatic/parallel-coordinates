@@ -7,6 +7,8 @@ d3.parcoords = function(config) {
     dimensionTitleRotation: 0,
     types: {},
     brushed: false,
+    brushedColor: null,
+    alphaOnBrushed: 0.0,
     mode: "default",
     rate: 20,
     width: 600,
@@ -30,7 +32,7 @@ var pc = function(selection) {
   __.height = selection[0][0].clientHeight;
 
   // canvas data layers
-  ["shadows", "marks", "foreground", "highlight"].forEach(function(layer) {
+  ["shadows", "marks", "foreground", "brushed", "highlight"].forEach(function(layer) {
     canvas[layer] = selection
       .append("canvas")
       .attr("class", layer)[0][0];
@@ -70,12 +72,24 @@ var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush", "
 
 // side effects for setters
 var side_effects = d3.dispatch.apply(this,d3.keys(__))
-  .on("composite", function(d) { ctx.foreground.globalCompositeOperation = d.value; })
-  .on("alpha", function(d) { ctx.foreground.globalAlpha = d.value; })
+  .on("composite", function(d) {
+    ctx.foreground.globalCompositeOperation = d.value;
+    ctx.brushed.globalCompositeOperation = d.value;
+  })
+  .on("alpha", function(d) {
+    ctx.foreground.globalAlpha = d.value;
+    ctx.brushed.globalAlpha = d.value;
+  })
+  .on("brushedColor", function (d) {
+    ctx.brushed.strokeStyle = d.value;
+  })
   .on("width", function(d) { pc.resize(); })
   .on("height", function(d) { pc.resize(); })
   .on("margin", function(d) { pc.resize(); })
-  .on("rate", function(d) { rqueue.rate(d.value); })
+  .on("rate", function(d) {
+    brushedQueue.rate(d.value);
+    foregroundQueue.rate(d.value);
+  })
   .on("data", function(d) {
     if (flags.shadows){paths(__.data, ctx.shadows);}
   })
@@ -219,6 +233,10 @@ pc.autoscale = function() {
   ctx.foreground.lineWidth = 1.4;
   ctx.foreground.globalCompositeOperation = __.composite;
   ctx.foreground.globalAlpha = __.alpha;
+  ctx.brushed.strokeStyle = __.brushedColor;
+  ctx.brushed.lineWidth = 1.4;
+  ctx.brushed.globalCompositeOperation = __.composite;
+  ctx.brushed.globalAlpha = __.alpha;
   ctx.highlight.lineWidth = 3;
   ctx.shadows.strokeStyle = "#dadada";
 
@@ -312,19 +330,40 @@ pc.render = function() {
   return this;
 };
 
-pc.render['default'] = function() {
-  pc.clear('foreground');
-  pc.clear('highlight');
-  if (__.brushed) {
-    __.brushed.forEach(path_foreground);
-    __.highlighted.forEach(path_highlight);
-  } else {
-    __.data.forEach(path_foreground);
-    __.highlighted.forEach(path_highlight);
-  }
+pc.renderBrushed = function() {
+  if (!__.dimensions.length) pc.detectDimensions();
+  if (!(__.dimensions[0] in yscale)) pc.autoscale();
+
+  pc.renderBrushed[__.mode]();
+
+  events.render.call(this);
+  return this;
 };
 
-var rqueue = d3.renderQueue(path_foreground)
+function isBrushed() {
+  if (__.brushed && __.brushed.length !== __.data.length)
+    return true;
+
+  var object = brush.currentMode().brushState();
+
+  for (var key in object) {
+    if (object.hasOwnProperty(key)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+pc.render.default = function() {
+  pc.clear('foreground');
+  pc.clear('highlight');
+
+  pc.renderBrushed.default();
+
+  __.data.forEach(path_foreground);
+};
+
+var foregroundQueue = d3.renderQueue(path_foreground)
   .rate(50)
   .clear(function() {
     pc.clear('foreground');
@@ -332,15 +371,32 @@ var rqueue = d3.renderQueue(path_foreground)
   });
 
 pc.render.queue = function() {
-  if (__.brushed) {
-    rqueue(__.brushed);
-    __.highlighted.forEach(path_highlight);
-  } else {
-    rqueue(__.data);
-    __.highlighted.forEach(path_highlight);
+  pc.renderBrushed.queue();
+
+  foregroundQueue(__.data);
+};
+
+pc.renderBrushed.default = function() {
+  pc.clear('brushed');
+
+  if (isBrushed()) {
+    __.brushed.forEach(path_brushed);
   }
 };
-function compute_cluster_centroids(d) {
+
+var brushedQueue = d3.renderQueue(path_brushed)
+  .rate(50)
+  .clear(function() {
+    pc.clear('brushed');
+  });
+
+pc.renderBrushed.queue = function() {
+  if (isBrushed()) {
+    brushedQueue(__.brushed);
+  } else {
+    brushedQueue([]); // This is needed to clear the currently brushed items
+  }
+};function compute_cluster_centroids(d) {
 
 	var clusterCentroids = d3.map();
 	var clusterCounts = d3.map();
@@ -464,8 +520,7 @@ function single_curve(d, ctx) {
 };
 
 // draw single polyline
-function color_path(d, i, ctx) {
-	ctx.strokeStyle = d3.functor(__.color)(d, i);
+function color_path(d, ctx) {
 	ctx.beginPath();
 	if ((__.bundleDimension !== null && __.bundlingStrength > 0) || __.smoothness > 0) {
 		single_curve(d, ctx);
@@ -499,15 +554,36 @@ function single_path(d, ctx) {
 	});
 }
 
+function path_brushed(d, i) {
+  if (__.brushedColor !== null) {
+    ctx.brushed.strokeStyle = d3.functor(__.brushedColor)(d, i);
+  } else {
+    ctx.brushed.strokeStyle = d3.functor(__.color)(d, i);
+  }
+  return color_path(d, ctx.brushed)
+}
+
 function path_foreground(d, i) {
-	return color_path(d, i, ctx.foreground);
+  ctx.foreground.strokeStyle = d3.functor(__.color)(d, i);
+	return color_path(d, ctx.foreground);
 };
 
 function path_highlight(d, i) {
-	return color_path(d, i, ctx.highlight);
+  ctx.highlight.strokeStyle = d3.functor(__.color)(d, i);
+	return color_path(d, ctx.highlight);
 };
 pc.clear = function(layer) {
-  ctx[layer].clearRect(0,0,w()+2,h()+2);
+  ctx[layer].clearRect(0, 0, w() + 2, h() + 2);
+
+  // This will make sure that the foreground items are transparent
+  // without the need for changing the opacity style of the foreground canvas
+  // as this would stop the css styling from working
+  if(layer === "brushed" && isBrushed()) {
+    ctx.brushed.fillStyle = pc.selection.style("background-color");
+    ctx.brushed.globalAlpha = 1 - __.alphaOnBrushed;
+    ctx.brushed.fillRect(0, 0, w() + 2, h() + 2);
+    ctx.brushed.globalAlpha = __.alpha;
+  }
   return this;
 };
 d3.rebind(pc, axis, "ticks", "orient", "tickValues", "tickSubdivide", "tickSize", "tickPadding", "tickFormat");
@@ -702,9 +778,17 @@ pc.reorderable = function() {
 pc.reorder = function(rowdata) {
   var dims = __.dimensions.slice(0);
   __.dimensions.sort(function(a, b) {
-    return yscale[a](rowdata[a]) - yscale[b](rowdata[b]);
-  });
+    var pixelDifference = yscale[a](rowdata[a]) - yscale[b](rowdata[b]);
 
+    // Array.sort is not necessarily stable, this means that if pixelDifference is zero
+    // the ordering of dimensions might change unexpectedly. This is solved by sorting on
+    // variable name in that case.
+    if (pixelDifference === 0) {
+      return a.localeCompare(b);
+    } // else
+    return pixelDifference;
+  });
+  
   // NOTE: this is relatively cheap given that:
   // number of dimensions < number of data items
   // Thus we check equality of order to prevent rerendering when this is the case.
@@ -745,9 +829,10 @@ pc.adjacent_pairs = function(arr) {
 var brush = {
   modes: {
     "None": {
-      install: function(pc) {},           // Nothing to be done.
-      uninstall: function(pc) {},         // Nothing to be done.
-      selected: function() { return []; } // Nothing to return
+      install: function(pc) {},            // Nothing to be done.
+      uninstall: function(pc) {},          // Nothing to be done.
+      selected: function() { return []; }, // Nothing to return
+      brushState: function() { return {}; }
     }
   },
   mode: "None",
@@ -765,7 +850,7 @@ var brush = {
 function brushUpdated(newSelection) {
   __.brushed = newSelection;
   events.brush.call(pc,__.brushed);
-  pc.render();
+  pc.renderBrushed();
 }
 
 function brushPredicate(predicate) {
@@ -778,7 +863,7 @@ function brushPredicate(predicate) {
 
   brush.predicate = predicate;
   __.brushed = brush.currentMode().selected();
-  pc.render();
+  pc.renderBrushed();
   return pc;
 }
 
@@ -875,7 +960,7 @@ pc.brushMode = function(mode) {
     var extents = {};
     __.dimensions.forEach(function(d) {
       var brush = brushes[d];
-      if (!brush.empty()) {
+      if (brush !== undefined && !brush.empty()) {
         var extent = brush.extent();
         extent.sort(d3.ascending);
         extents[d] = extent;
@@ -910,7 +995,7 @@ pc.brushMode = function(mode) {
             brushes[d].clear()
           );
         });
-      pc.render();
+      pc.renderBrushed();
     }
     return this;
   };
@@ -942,7 +1027,8 @@ pc.brushMode = function(mode) {
       delete pc.brushExtents;
       delete pc.brushReset;
     },
-    selected: selected
+    selected: selected,
+    brushState: brushExtents
   }
 })();
 // brush mode: 2D-strums
@@ -1157,7 +1243,7 @@ pc.brushMode = function(mode) {
       brushed = selected(strums);
       strums.active = undefined;
       __.brushed = brushed;
-      pc.render();
+      pc.renderBrushed();
       events.brushend.call(pc, __.brushed);
     };
   }
@@ -1261,7 +1347,8 @@ pc.brushMode = function(mode) {
 
       strumRect = undefined;
     },
-    selected: selected
+    selected: selected,
+    brushState: function () { return strums; }
   };
 
 }());
@@ -1331,7 +1418,7 @@ pc.brushMode = function(mode) {
     var extents = {};
     __.dimensions.forEach(function(d) {
       var brush = brushes[d];
-      if (!brush.empty()) {
+      if (brush !== undefined && !brush.empty()) {
         var extent = brush.extent();
         extents[d] = extent;
       }
@@ -1382,7 +1469,7 @@ pc.brushMode = function(mode) {
             brushes[d].clear()
           );
         });
-      pc.render();
+      pc.renderBrushed();
     }
     return this;
   };
@@ -1414,7 +1501,8 @@ pc.brushMode = function(mode) {
       delete pc.brushExtents;
       delete pc.brushReset;
     },
-    selected: selected
+    selected: selected,
+    brushState: brushExtents
   }
 })();
 pc.interactive = function() {
@@ -1462,7 +1550,7 @@ pc.highlight = function(data) {
 
   __.highlighted = data;
   pc.clear("highlight");
-  d3.select(canvas.foreground).classed("faded", true);
+  d3.selectAll([canvas.foreground, canvas.brushed]).classed("faded", true);
   data.forEach(path_highlight);
   events.highlight.call(this, data);
   return this;
@@ -1472,7 +1560,7 @@ pc.highlight = function(data) {
 pc.unhighlight = function() {
   __.highlighted = [];
   pc.clear("highlight");
-  d3.select(canvas.foreground).classed("faded", false);
+  d3.selectAll([canvas.foreground, canvas.brushed]).classed("faded", false);
   return this;
 };
 

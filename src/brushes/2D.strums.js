@@ -210,7 +210,7 @@
       brushed = selected(strums);
       strums.active = undefined;
       __.brushed = brushed;
-      pc.render();
+      pc.renderBrushed();
       events.brushend.call(pc, __.brushed);
     };
   }
@@ -314,7 +314,8 @@
 
       strumRect = undefined;
     },
-    selected: selected
+    selected: selected,
+    brushState: function () { return strums; }
   };
 
 }());

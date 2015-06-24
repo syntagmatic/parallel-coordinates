@@ -7,6 +7,8 @@ d3.parcoords = function(config) {
     dimensionTitleRotation: 0,
     types: {},
     brushed: false,
+    brushedColor: null,
+    alphaOnBrushed: 0.0,
     mode: "default",
     rate: 20,
     width: 600,
