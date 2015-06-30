@@ -170,6 +170,39 @@ For <a href="#parcoords_brushMode">brushable</a> plots, returns the selected dat
 
 Reset all brushes.
 
+<a name="parcoords_brushedColor" href="#parcoords_brushedColor">#</a> parcoords <b>brushedColor</b>()
+
+Change coloring of brushed items.
+The default behavior is that brushed items get the original coloring.
+The example below will make all brushed items black.
+
+```javascript
+parcoords.brushedColor("#000");
+```
+
+<a name="parcoords_brushedColor" href="#parcoords_brushedColor">#</a> parcoords <b>alphaOnBrushed</b>()
+
+Change the alpha of the layer between the foreground and brushed items.
+This value defaults to 0, making the foreground invisible when items are brushed.
+Increasing the alpha value will result in a shadows effect, where the foreground
+items are increasingly more visible when alpha increases.
+Combined with <a href="#parcoords_brushedColor">brushedColor</a> various highlight effects can be achieved on brushing.
+
+```javascript
+// default behavior: brushed items are colored the same as foreground items,
+// forground items are invisible.
+
+// Add shadows: Brushed items are colored the same as foreground items, forground
+// items are vaguely visible. Same effect is achieved by parcoords.shadows()
+parcoords.alphaOnBrushed(0.1);
+
+// Highlight brushed items with a different color. Foreground items are fully
+// visibible, except those who are covered by brushed items.
+parcoords
+  .alphaOnBrushed(1)
+  .brushedColor("#000");
+```
+
 <a name="parcoords_reorderable" href="#parcoords_reorderable">#</a> parcoords.<b>reorderable</b>()
 
 Enable reordering of axes. Automatically creates axes if they don't exist.
@@ -182,7 +215,7 @@ Mark the points where polylines meet an axis with dots.
 
 <a name="parcoords_shadows" href="#parcoords_shadows">#</a> parcoords.<b>shadows</b>()
 
-Active greyed-out background shadows.
+Active greyed-out background shadows. See <a href="#parcoords_brushedColor">brushedColor</a> and <a href="#parcoords_alphaOnBrushed">alphaOnBrushed</a>
 
 <a name="parcoords_width" href="#parcoords_width">#</a> parcoords.<b>width</b>()
 
