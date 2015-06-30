@@ -27,7 +27,6 @@ pc.resize = function() {
 
   // axes, destroys old brushes.
   if (g) pc.createAxes();
-  if (flags.shadows) paths(__.data, ctx.shadows);
   if (flags.brushable) pc.brushable();
   if (flags.reorderable) pc.reorderable();
 

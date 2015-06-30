@@ -83,7 +83,6 @@ pc.autoscale = function() {
   ctx.brushed.globalCompositeOperation = __.composite;
   ctx.brushed.globalAlpha = __.alpha;
   ctx.highlight.lineWidth = 3;
-  ctx.shadows.strokeStyle = "#dadada";
 
   return this;
 };

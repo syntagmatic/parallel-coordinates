@@ -6,7 +6,6 @@ var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush", "
       reorderable: false,
       axes: false,
       interactive: false,
-      shadows: false,
       debug: false
     },
     xscale = d3.scale.ordinal(),
@@ -38,9 +37,6 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
   .on("rate", function(d) {
     brushedQueue.rate(d.value);
     foregroundQueue.rate(d.value);
-  })
-  .on("data", function(d) {
-    if (flags.shadows){paths(__.data, ctx.shadows);}
   })
   .on("dimensions", function(d) {
     xscale.domain(__.dimensions);

@@ -11,7 +11,6 @@ function flipAxisAndUpdatePCP(dimension) {
       .call(axis.scale(yscale[dimension]));
 
   pc.render();
-  if (flags.shadows) paths(__.data, ctx.shadows);
 }
 
 function rotateLabels() {
@@ -116,7 +115,6 @@ pc.updateAxes = function() {
       .duration(1100)
       .each(function(d) { d3.select(this).call(axis.scale(yscale[d])); });
 
-  if (flags.shadows) paths(__.data, ctx.shadows);
   if (flags.brushable) pc.brushable();
   if (flags.reorderable) pc.reorderable();
   if (pc.brushMode() !== "None") {
@@ -178,7 +176,6 @@ pc.reorderable = function() {
         delete dragging[d];
         d3.select(this).transition().attr("transform", "translate(" + xscale(d) + ")");
         pc.render();
-        if (flags.shadows) paths(__.data, ctx.shadows);
       }));
   flags.reorderable = true;
   return this;
@@ -200,7 +197,7 @@ pc.reorder = function(rowdata) {
     } // else
     return pixelDifference;
   });
-  
+
   // NOTE: this is relatively cheap given that:
   // number of dimensions < number of data items
   // Thus we check equality of order to prevent rerendering when this is the case.

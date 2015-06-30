@@ -1,8 +1,7 @@
 pc.shadows = function() {
 	flags.shadows = true;
-	if (__.data.length > 0) {
-		paths(__.data, ctx.shadows);
-	}
+	pc.alphaOnBrushed(0.1);
+	pc.render();
 	return this;
 };
 

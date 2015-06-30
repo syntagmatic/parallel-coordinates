@@ -32,7 +32,7 @@ var pc = function(selection) {
   __.height = selection[0][0].clientHeight;
 
   // canvas data layers
-  ["shadows", "marks", "foreground", "brushed", "highlight"].forEach(function(layer) {
+  ["marks", "foreground", "brushed", "highlight"].forEach(function(layer) {
     canvas[layer] = selection
       .append("canvas")
       .attr("class", layer)[0][0];
@@ -57,7 +57,6 @@ var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush", "
       reorderable: false,
       axes: false,
       interactive: false,
-      shadows: false,
       debug: false
     },
     xscale = d3.scale.ordinal(),
@@ -89,9 +88,6 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
   .on("rate", function(d) {
     brushedQueue.rate(d.value);
     foregroundQueue.rate(d.value);
-  })
-  .on("data", function(d) {
-    if (flags.shadows){paths(__.data, ctx.shadows);}
   })
   .on("dimensions", function(d) {
     xscale.domain(__.dimensions);
@@ -238,7 +234,6 @@ pc.autoscale = function() {
   ctx.brushed.globalCompositeOperation = __.composite;
   ctx.brushed.globalAlpha = __.alpha;
   ctx.highlight.lineWidth = 3;
-  ctx.shadows.strokeStyle = "#dadada";
 
   return this;
 };
@@ -484,9 +479,8 @@ function compute_control_points(centroids) {
 
 };pc.shadows = function() {
 	flags.shadows = true;
-	if (__.data.length > 0) {
-		paths(__.data, ctx.shadows);
-	}
+	pc.alphaOnBrushed(0.1);
+	pc.render();
 	return this;
 };
 
@@ -599,7 +593,6 @@ function flipAxisAndUpdatePCP(dimension) {
       .call(axis.scale(yscale[dimension]));
 
   pc.render();
-  if (flags.shadows) paths(__.data, ctx.shadows);
 }
 
 function rotateLabels() {
@@ -704,7 +697,6 @@ pc.updateAxes = function() {
       .duration(1100)
       .each(function(d) { d3.select(this).call(axis.scale(yscale[d])); });
 
-  if (flags.shadows) paths(__.data, ctx.shadows);
   if (flags.brushable) pc.brushable();
   if (flags.reorderable) pc.reorderable();
   if (pc.brushMode() !== "None") {
@@ -766,7 +758,6 @@ pc.reorderable = function() {
         delete dragging[d];
         d3.select(this).transition().attr("transform", "translate(" + xscale(d) + ")");
         pc.render();
-        if (flags.shadows) paths(__.data, ctx.shadows);
       }));
   flags.reorderable = true;
   return this;
@@ -788,7 +779,7 @@ pc.reorder = function(rowdata) {
     } // else
     return pixelDifference;
   });
-  
+
   // NOTE: this is relatively cheap given that:
   // number of dimensions < number of data items
   // Thus we check equality of order to prevent rerendering when this is the case.
@@ -1534,7 +1525,6 @@ pc.resize = function() {
 
   // axes, destroys old brushes.
   if (g) pc.createAxes();
-  if (flags.shadows) paths(__.data, ctx.shadows);
   if (flags.brushable) pc.brushable();
   if (flags.reorderable) pc.reorderable();
 
