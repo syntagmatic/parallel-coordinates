@@ -5,13 +5,19 @@ pc.shadows = function() {
 	return this;
 };
 
-// draw little dots on the axis line where data intersects
-pc.axisDots = function() {
+// draw dots with radius r on the axis line where data intersects
+pc.axisDots = function(r) {
+	var r = r || 0.1;
 	var ctx = pc.ctx.marks;
+	var startAngle = 0;
+	var endAngle = 2 * Math.PI;
 	ctx.globalAlpha = d3.min([ 1 / Math.pow(__.data.length, 1 / 2), 1 ]);
 	__.data.forEach(function(d) {
 		__.dimensions.map(function(p, i) {
-			ctx.fillRect(position(p) - 0.75, yscale[p](d[p]) - 0.75, 1.5, 1.5);
+			ctx.beginPath();
+			ctx.arc(position(p), yscale[p](d[p]), r, startAngle, endAngle);
+			ctx.stroke();
+			ctx.fill();
 		});
 	});
 	return this;
