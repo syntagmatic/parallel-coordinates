@@ -209,9 +209,9 @@ Enable reordering of axes. Automatically creates axes if they don't exist.
 
 The behavior is identical to that of the [original reorderable d3.js parallel coordinates](http://bl.ocks.org/1341281).
 
-<a name="parcoords_axisDots" href="#parcoords_axisDots">#</a> parcoords.<b>axisDots</b>()
+<a name="parcoords_axisDots" href="#parcoords_axisDots">#</a> parcoords.<b>axisDots</b>(<i>size = 0.1</i>)
 
-Mark the points where polylines meet an axis with dots.
+Mark the points where polylines meet an axis with dots of radius *size*.
 
 <a name="parcoords_shadows" href="#parcoords_shadows">#</a> parcoords.<b>shadows</b>()
 
