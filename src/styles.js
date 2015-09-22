@@ -65,12 +65,24 @@ function paths(data, ctx) {
 	ctx.stroke();
 };
 
+// returns the y-position just beyond the separating null value line
+function getNullPosition() {
+	if (__.nullValueSeparator=="bottom") {
+		return h()+1;
+	} else if (__.nullValueSeparator=="top") {
+		return 1;
+	} else {
+		console.log("A value is NULL, but nullValueSeparator is not set; set it to 'bottom' or 'top'.");
+	}
+	return h()+1;
+};
+
 function single_path(d, ctx) {
 	__.dimensions.map(function(p, i) {
 		if (i == 0) {
-			ctx.moveTo(position(p), yscale[p](d[p]));
+			ctx.moveTo(position(p), typeof d[p] =='undefined' ? getNullPosition() : yscale[p](d[p]));
 		} else {
-			ctx.lineTo(position(p), yscale[p](d[p]));
+			ctx.lineTo(position(p), typeof d[p] =='undefined' ? getNullPosition() : yscale[p](d[p]));
 		}
 	});
 }

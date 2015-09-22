@@ -14,6 +14,8 @@ d3.parcoords = function(config) {
     width: 600,
     height: 300,
     margin: { top: 24, right: 0, bottom: 12, left: 0 },
+    nullValueSeparator: "undefined", // set to "top" or "bottom"
+    nullValueSeparatorPadding: { top: 8, right: 0, bottom: 8, left: 0 },
     color: "#069",
     composite: "source-over",
     alpha: 0.7,
@@ -149,6 +151,16 @@ function extend(target, source) {
 function without(arr, item) {
   return arr.filter(function(elem) { return item.indexOf(elem) === -1; })
 };
+/** adjusts an axis' default range [h()+1, 1] if a NullValueSeparator is set */
+function getRange() {
+	if (__.nullValueSeparator=="bottom") {
+		return [h()+1-__.nullValueSeparatorPadding.bottom-__.nullValueSeparatorPadding.top, 1];
+	} else if (__.nullValueSeparator=="top") {
+		return [h()+1, 1+__.nullValueSeparatorPadding.bottom+__.nullValueSeparatorPadding.top];
+	}
+	return [h()+1, 1];
+};
+
 pc.autoscale = function() {
   // yscale
   var defaultScales = {
@@ -161,12 +173,12 @@ pc.autoscale = function() {
       if (extent[0] === extent[1]) {
         return d3.scale.ordinal()
           .domain([extent[0]])
-          .rangePoints([h()+1, 1]);
+          .rangePoints(getRange());
       }
 
       return d3.time.scale()
         .domain(extent)
-        .range([h()+1, 1]);
+        .range(getRange());
     },
     "number": function(k) {
       var extent = d3.extent(__.data, function(d) { return +d[k]; });
@@ -175,12 +187,12 @@ pc.autoscale = function() {
       if (extent[0] === extent[1]) {
         return d3.scale.ordinal()
           .domain([extent[0]])
-          .rangePoints([h()+1, 1]);
+          .rangePoints(getRange());
       }
 
       return d3.scale.linear()
         .domain(extent)
-        .range([h()+1, 1]);
+        .range(getRange());
     },
     "string": function(k) {
       var counts = {},
@@ -202,7 +214,7 @@ pc.autoscale = function() {
 
       return d3.scale.ordinal()
         .domain(domain)
-        .rangePoints([h()+1, 1]);
+        .rangePoints(getRange());
     }
   };
 
@@ -544,12 +556,24 @@ function paths(data, ctx) {
 	ctx.stroke();
 };
 
+// returns the y-position just beyond the separating null value line
+function getNullPosition() {
+	if (__.nullValueSeparator=="bottom") {
+		return h()+1;
+	} else if (__.nullValueSeparator=="top") {
+		return 1;
+	} else {
+		console.log("A value is NULL, but nullValueSeparator is not set; set it to 'bottom' or 'top'.");
+	}
+	return h()+1;
+};
+
 function single_path(d, ctx) {
 	__.dimensions.map(function(p, i) {
 		if (i == 0) {
-			ctx.moveTo(position(p), yscale[p](d[p]));
+			ctx.moveTo(position(p), typeof d[p] =='undefined' ? getNullPosition() : yscale[p](d[p]));
 		} else {
-			ctx.lineTo(position(p), yscale[p](d[p]));
+			ctx.lineTo(position(p), typeof d[p] =='undefined' ? getNullPosition() : yscale[p](d[p]));
 		}
 	});
 }
@@ -642,7 +666,29 @@ pc.createAxes = function() {
       .text(dimensionLabels)
       .on("dblclick", flipAxisAndUpdatePCP)
       .on("wheel", rotateLabels);
-
+  
+  if (__.nullValueSeparator=="top") {
+    pc.svg.append("line")
+      .attr("x1", 0)
+      .attr("y1", 1+__.nullValueSeparatorPadding.top)
+      .attr("x2", w())
+      .attr("y2", 1+__.nullValueSeparatorPadding.top)
+      .attr("stroke-width", 1)
+      .attr("stroke", "#777")
+      .attr("fill", "none")
+      .attr("shape-rendering", "crispEdges");
+  } else if (__.nullValueSeparator=="bottom") {
+    pc.svg.append("line")
+      .attr("x1", 0)
+      .attr("y1", h()+1-__.nullValueSeparatorPadding.bottom)
+      .attr("x2", w())
+      .attr("y2", h()+1-__.nullValueSeparatorPadding.bottom)
+      .attr("stroke-width", 1)
+      .attr("stroke", "#777")
+      .attr("fill", "none")
+      .attr("shape-rendering", "crispEdges");
+  }
+  
   flags.axes= true;
   return this;
 };
@@ -1502,6 +1548,7 @@ pc.brushMode = function(mode) {
   }
 })();
 // brush mode: angular
+// code based on 2D.strums.js
 
 (function() {
   var arcs = {},
@@ -1669,6 +1716,7 @@ pc.brushMode = function(mode) {
     };
   }
   
+  // some helper functions
   function hypothenuse(a, b) {
 	  return Math.sqrt(a*a + b*b);
   }
@@ -1687,6 +1735,7 @@ pc.brushMode = function(mode) {
 	  }; 
   })();
   
+  // [0, 2*PI] -> [-PI/2, PI/2]
   var signedAngle = function(angle) {
 	  var ret = angle;
 	  if (angle > Math.PI) {
@@ -1699,6 +1748,12 @@ pc.brushMode = function(mode) {
 	  return -ret;
   }
   
+  /**
+   * angles are stored in radians from in [0, 2*PI], where 0 in 12 o'clock.
+   * However, one can only select lines from 0 to PI, so we compute the
+   * 'signed' angle, where 0 is the horizontal line (3 o'clock), and +/- PI/2
+   * are 12 and 6 o'clock respectively.
+   */
   function containmentTest(arc) {
     var startAngle = signedAngle(arc.startAngle);
     var endAngle = signedAngle(arc.endAngle);
@@ -1739,7 +1794,7 @@ pc.brushMode = function(mode) {
           a = arcs.width(id),
           b = y1(d[d1]) - y2(d[d2]),
           c = hypothenuse(a, b),
-          angle = Math.asin(b/c);
+          angle = Math.asin(b/c);	// rad in [-PI/2, PI/2]
       return test(angle);
     }
 

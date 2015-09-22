@@ -1,3 +1,13 @@
+/** adjusts an axis' default range [h()+1, 1] if a NullValueSeparator is set */
+function getRange() {
+	if (__.nullValueSeparator=="bottom") {
+		return [h()+1-__.nullValueSeparatorPadding.bottom-__.nullValueSeparatorPadding.top, 1];
+	} else if (__.nullValueSeparator=="top") {
+		return [h()+1, 1+__.nullValueSeparatorPadding.bottom+__.nullValueSeparatorPadding.top];
+	}
+	return [h()+1, 1];
+};
+
 pc.autoscale = function() {
   // yscale
   var defaultScales = {
@@ -10,12 +20,12 @@ pc.autoscale = function() {
       if (extent[0] === extent[1]) {
         return d3.scale.ordinal()
           .domain([extent[0]])
-          .rangePoints([h()+1, 1]);
+          .rangePoints(getRange());
       }
 
       return d3.time.scale()
         .domain(extent)
-        .range([h()+1, 1]);
+        .range(getRange());
     },
     "number": function(k) {
       var extent = d3.extent(__.data, function(d) { return +d[k]; });
@@ -24,12 +34,12 @@ pc.autoscale = function() {
       if (extent[0] === extent[1]) {
         return d3.scale.ordinal()
           .domain([extent[0]])
-          .rangePoints([h()+1, 1]);
+          .rangePoints(getRange());
       }
 
       return d3.scale.linear()
         .domain(extent)
-        .range([h()+1, 1]);
+        .range(getRange());
     },
     "string": function(k) {
       var counts = {},
@@ -51,7 +61,7 @@ pc.autoscale = function() {
 
       return d3.scale.ordinal()
         .domain(domain)
-        .rangePoints([h()+1, 1]);
+        .rangePoints(getRange());
     }
   };
 
