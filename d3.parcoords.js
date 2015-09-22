@@ -1010,14 +1010,42 @@ pc.brushMode = function(mode) {
       }
     });
     return extents;
-  }
+  };
 
+  /** A setter for 1D-axes brushes, accessible from outside of parcoords. */
+  function setBrushExtents(initialExtents) {
+	  
+    for (var key in initialExtents) {
+	  brushes[key].extent(initialExtents[key])
+    }
+    if (g) {
+      g.selectAll('.brush').each(function(d) {
+	    if (!(brushes[d].empty())){
+		  d3.select(this) // draws the brush initially
+		    .call(brushes[d]);
+		
+		  d3.select(this) // re-draw brushes with set extent, then start brush event
+		    .transition()
+		    .duration(50)
+		    .call(brushes[d].extent(initialExtents[d]))
+		    .call(brushes[d].event);
+		
+	    } else {
+		  d3.select(this).call(brushes[d].clear());
+	    }
+	  });
+    }
+    return pc;
+  };
+  
   function brushFor(axis) {
     var brush = d3.svg.brush();
 
     brush
       .y(yscale[axis])
-      .on("brushstart", function() { d3.event.sourceEvent.stopPropagation() })
+      .on("brushstart", function() {
+        d3.event.sourceEvent ? d3.event.sourceEvent.stopPropagation() : 0;
+      })
       .on("brush", function() {
         brushUpdated(selected());
       })
@@ -1027,7 +1055,7 @@ pc.brushMode = function(mode) {
 
     brushes[axis] = brush;
     return brush;
-  }
+  };
 
   function brushReset(dimension) {
     __.brushed = false;
@@ -1058,9 +1086,10 @@ pc.brushMode = function(mode) {
         .attr("width", 30);
 
     pc.brushExtents = brushExtents;
+    pc.setBrushExtents = setBrushExtents;
     pc.brushReset = brushReset;
     return pc;
-  }
+  };
 
   brush.modes["1D-axes"] = {
     install: install,
@@ -1068,6 +1097,7 @@ pc.brushMode = function(mode) {
       g.selectAll(".brush").remove();
       brushes = {};
       delete pc.brushExtents;
+	  delete pc.setBrushExtents;
       delete pc.brushReset;
     },
     selected: selected,
