@@ -201,6 +201,9 @@ pc.autoscale = function() {
       // Let's get the count for each value so that we can sort the domain based
       // on the number of items for each value.
       __.data.map(function(p) {
+        if (p[k] === undefined && __.nullValueSeparator!== "undefined"){
+          return; // null values will be drawn beyond the horizontal null value separator!
+        }
         if (counts[p[k]] === undefined) {
           counts[p[k]] = 1;
         } else {
@@ -359,7 +362,7 @@ function isBrushed() {
     }
   }
   return false;
-}
+};
 
 pc.render.default = function() {
   pc.clear('foreground');
@@ -576,7 +579,7 @@ function single_path(d, ctx) {
 			ctx.lineTo(position(p), typeof d[p] =='undefined' ? getNullPosition() : yscale[p](d[p]));
 		}
 	});
-}
+};
 
 function path_brushed(d, i) {
   if (__.brushedColor !== null) {
@@ -585,7 +588,7 @@ function path_brushed(d, i) {
     ctx.brushed.strokeStyle = d3.functor(__.color)(d, i);
   }
   return color_path(d, ctx.brushed)
-}
+};
 
 function path_foreground(d, i) {
   ctx.foreground.strokeStyle = d3.functor(__.color)(d, i);

@@ -85,7 +85,7 @@ function single_path(d, ctx) {
 			ctx.lineTo(position(p), typeof d[p] =='undefined' ? getNullPosition() : yscale[p](d[p]));
 		}
 	});
-}
+};
 
 function path_brushed(d, i) {
   if (__.brushedColor !== null) {
@@ -94,7 +94,7 @@ function path_brushed(d, i) {
     ctx.brushed.strokeStyle = d3.functor(__.color)(d, i);
   }
   return color_path(d, ctx.brushed)
-}
+};
 
 function path_foreground(d, i) {
   ctx.foreground.strokeStyle = d3.functor(__.color)(d, i);

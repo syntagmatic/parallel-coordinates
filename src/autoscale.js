@@ -48,6 +48,9 @@ pc.autoscale = function() {
       // Let's get the count for each value so that we can sort the domain based
       // on the number of items for each value.
       __.data.map(function(p) {
+        if (p[k] === undefined && __.nullValueSeparator!== "undefined"){
+          return; // null values will be drawn beyond the horizontal null value separator!
+        }
         if (counts[p[k]] === undefined) {
           counts[p[k]] = 1;
         } else {

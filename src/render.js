@@ -31,7 +31,7 @@ function isBrushed() {
     }
   }
   return false;
-}
+};
 
 pc.render.default = function() {
   pc.clear('foreground');
