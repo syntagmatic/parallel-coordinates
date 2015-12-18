@@ -1,0 +1,15 @@
+{
+  "name": "d3.parcoords.js",
+  "main": "d3.parcoords.js",
+  "ignore": [
+    ".git",
+    ".gitignore",
+    "Makefile",
+    "index.html",
+    "package.json",
+    "forkme.png",
+    "src",
+    "examples",
+    "test"
+  ]
+}
