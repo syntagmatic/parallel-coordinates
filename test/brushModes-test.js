@@ -16,8 +16,8 @@ suite.addBatch({
   'd3.parcoords': {
     'has by default': {
        topic: d3Parcoords(),
-       'three brush modes': function(pc) {
-         assert.strictEqual(pc.brushModes().length, 3);
+       'four brush modes': function(pc) {
+         assert.strictEqual(pc.brushModes().length, 4);
        },
        'the brush mode "None"': function(pc) {
          assert.notStrictEqual(pc.brushModes().indexOf("None"), -1);
@@ -27,6 +27,9 @@ suite.addBatch({
        },
        'the brush mode "2D-strums"': function(pc) {
          assert.notStrictEqual(pc.brushModes().indexOf("2D-strums"), -1);
+       },
+       'the brush mode "angular"': function(pc) {
+         assert.notStrictEqual(pc.brushModes().indexOf("angular"), -1);
        }
     },
   }
