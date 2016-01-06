@@ -25,7 +25,7 @@ function rotateLabels() {
 }
 
 function dimensionLabels(d) {
-  return d in __.dimensionTitles ? __.dimensionTitles[d] : d;  // dimension display names
+  return __.dimensions[d].title ? __.dimensions[d].title : d;  // dimension display names
 }
 
 pc.createAxes = function() {

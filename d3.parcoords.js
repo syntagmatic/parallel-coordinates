@@ -3,7 +3,6 @@ d3.parcoords = function(config) {
     data: [],
     highlighted: [],
     dimensions: {},
-    dimensionTitles: {},
     dimensionTitleRotation: 0,
     types: {},
     brushed: false,
@@ -25,7 +24,19 @@ d3.parcoords = function(config) {
   };
 
   extend(__, config);
-var pc = function(selection) {
+
+  if (config && config.dimensionTitles) {
+    console.warn("dimensionTitles passed in config is deprecated. Add title to dimension object.");
+    d3.entries(config.dimensionTitles).forEach(function(d) {
+      if (__.dimensions[d.key]) {
+        __.dimensions[d.key].title = __.dimensions[d.key].title ? __.dimensions[d.key].title : d.value;
+      } else {
+        __.dimensions[d.key] = {
+          title: d.value
+        };
+      }
+    });
+  }var pc = function(selection) {
   selection = pc.selection = d3.select(selection);
 
   __.width = selection[0][0].clientWidth;
@@ -338,6 +349,9 @@ pc.render = function() {
     pc.detectDimensions()
   } else {
     //Apply defaults if dimensions was passed
+    if (Object.keys(__.types).length === 0) {
+      pc.detectDimensions();
+    }
     pc.dimensions(pc.applyDimensionDefaults(d3.keys(__.dimensions)));
   }
   pc.autoscale();
@@ -635,7 +649,7 @@ function rotateLabels() {
 }
 
 function dimensionLabels(d) {
-  return d in __.dimensionTitles ? __.dimensionTitles[d] : d;  // dimension display names
+  return __.dimensions[d].title ? __.dimensions[d].title : d;  // dimension display names
 }
 
 pc.createAxes = function() {

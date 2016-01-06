@@ -3,7 +3,6 @@ d3.parcoords = function(config) {
     data: [],
     highlighted: [],
     dimensions: {},
-    dimensionTitles: {},
     dimensionTitleRotation: 0,
     types: {},
     brushed: false,
@@ -25,3 +24,16 @@ d3.parcoords = function(config) {
   };
 
   extend(__, config);
+
+  if (config && config.dimensionTitles) {
+    console.warn("dimensionTitles passed in config is deprecated. Add title to dimension object.");
+    d3.entries(config.dimensionTitles).forEach(function(d) {
+      if (__.dimensions[d.key]) {
+        __.dimensions[d.key].title = __.dimensions[d.key].title ? __.dimensions[d.key].title : d.value;
+      } else {
+        __.dimensions[d.key] = {
+          title: d.value
+        };
+      }
+    });
+  }
