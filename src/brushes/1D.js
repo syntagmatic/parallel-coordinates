@@ -9,7 +9,7 @@
 
   // data within extents
   function selected() {
-    var actives = __.dimensions.filter(is_brushed),
+    var actives = d3.keys(__.dimensions).filter(is_brushed),
         extents = actives.map(function(p) { return brushes[p].extent(); });
 
     // We don't want to return the full data set when there are no axes brushed.
@@ -29,7 +29,7 @@
         return extents[dimension][0] <= d[p] && d[p] <= extents[dimension][1]
       },
       "string": function(d,p,dimension) {
-        return extents[dimension][0] <= yscale[p](d[p]) && yscale[p](d[p]) <= extents[dimension][1]
+        return extents[dimension][0] <= __.dimensions[p].yscale(d[p]) && __.dimensions[p].yscale(d[p]) <= extents[dimension][1]
       }
     };
 
@@ -54,7 +54,7 @@
     if(typeof(extents) === 'undefined')
   {
     var extents = {};
-    __.dimensions.forEach(function(d) {
+    d3.keys(__.dimensions).forEach(function(d) {
       var brush = brushes[d];
       if (brush !== undefined && !brush.empty()) {
         var extent = brush.extent();
@@ -75,7 +75,7 @@
     });   
     
     // loop over each dimension and update appropriately (if it was passed in through extents)
-    __.dimensions.forEach(function(d) {
+    d3.keys(__.dimensions).forEach(function(d) {
       if (extents[d] === undefined){
         return;
       }
@@ -102,7 +102,7 @@
     var brush = d3.svg.brush();
 
     brush
-      .y(yscale[axis])
+      .y(__.dimensions[axis].yscale)
       .on("brushstart", function() { 
       if(d3.event.sourceEvent !== null) {
         d3.event.sourceEvent.stopPropagation();

@@ -1,7 +1,12 @@
 pc.render = function() {
   // try to autodetect dimensions and create scales
-  if (!__.dimensions.length) pc.detectDimensions();
-  if (!(__.dimensions[0] in yscale)) pc.autoscale();
+  if (!d3.keys(__.dimensions).length) {
+    pc.detectDimensions()
+  } else {
+    //Apply defaults if dimensions was passed
+    pc.applyDimensionDefaults(d3.keys(__.dimensions));
+  }
+  pc.autoscale();
 
   pc.render[__.mode]();
 
@@ -10,8 +15,7 @@ pc.render = function() {
 };
 
 pc.renderBrushed = function() {
-  if (!__.dimensions.length) pc.detectDimensions();
-  if (!(__.dimensions[0] in yscale)) pc.autoscale();
+  if (!d3.keys(__.dimensions).length) pc.detectDimensions();
 
   pc.renderBrushed[__.mode]();
 

@@ -5,7 +5,6 @@ pc.interactive = function() {
 
 // expose a few objects
 pc.xscale = xscale;
-pc.yscale = yscale;
 pc.ctx = ctx;
 pc.canvas = canvas;
 pc.g = function() { return g; };

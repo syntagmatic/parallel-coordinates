@@ -9,7 +9,6 @@ var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush", "
       debug: false
     },
     xscale = d3.scale.ordinal(),
-    yscale = {},
     dragging = {},
     line = d3.svg.line(),
     axis = d3.svg.axis().orient("left").ticks(5),
@@ -39,7 +38,7 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
     foregroundQueue.rate(d.value);
   })
   .on("dimensions", function(d) {
-    xscale.domain(__.dimensions);
+    xscale.domain(d3.keys(__.dimensions));
     if (flags.interactive){pc.render().updateAxes();}
   })
   .on("bundleDimension", function(d) {
@@ -75,16 +74,21 @@ d3.rebind(pc, events, "on");
 // getter/setter with event firing
 function getset(obj,state,events)  {
   d3.keys(state).forEach(function(key) {
-    obj[key] = function(x) {
-      if (!arguments.length) {
-		return state[key];
-	}
-      var old = state[key];
-      state[key] = x;
-      side_effects[key].call(pc,{"value": x, "previous": old});
-      events[key].call(pc,{"value": x, "previous": old});
-      return obj;
-    };
+      obj[key] = function(x) {
+        if (!arguments.length) {
+          return state[key];
+        }
+        if (key === 'dimensions' && Object.prototype.toString.call(x) === '[object Array]') {
+          console.log("pc.dimensions([]) is deprecated, use pc.dimensions({})");
+          pc.applyDimensionDefaults(x);
+          x = __.dimensions;
+        }
+        var old = state[key];
+        state[key] = x;
+        side_effects[key].call(pc,{"value": x, "previous": old});
+        events[key].call(pc,{"value": x, "previous": old});
+        return obj;
+      };
   });
 };
 
@@ -95,6 +99,9 @@ function extend(target, source) {
   return target;
 };
 
-function without(arr, item) {
-  return arr.filter(function(elem) { return item.indexOf(elem) === -1; })
+function without(arr, items) {
+  items.forEach(function (el) {
+    delete arr[el];
+  });
+  return arr;
 };

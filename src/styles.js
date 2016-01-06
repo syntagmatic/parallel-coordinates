@@ -66,11 +66,11 @@ function paths(data, ctx) {
 };
 
 function single_path(d, ctx) {
-	__.dimensions.map(function(p, i) {
+	d3.entries(__.dimensions).forEach(function(p, i) {  //p isn't really p
 		if (i == 0) {
-			ctx.moveTo(position(p), yscale[p](d[p]));
+			ctx.moveTo(position(p.key), __.dimensions[p.key].yscale(d[p.key]));
 		} else {
-			ctx.lineTo(position(p), yscale[p](d[p]));
+			ctx.lineTo(position(p.key), __.dimensions[p.key].yscale(d[p.key]));
 		}
 	});
 }
