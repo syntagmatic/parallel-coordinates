@@ -79,9 +79,8 @@ function getset(obj,state,events)  {
           return state[key];
         }
         if (key === 'dimensions' && Object.prototype.toString.call(x) === '[object Array]') {
-          console.log("pc.dimensions([]) is deprecated, use pc.dimensions({})");
-          pc.applyDimensionDefaults(x);
-          x = __.dimensions;
+          console.warn("pc.dimensions([]) is deprecated, use pc.dimensions({})");
+          x = pc.applyDimensionDefaults(x);
         }
         var old = state[key];
         state[key] = x;

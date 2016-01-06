@@ -1,21 +1,21 @@
 pc.detectDimensions = function() {
   pc.types(pc.detectDimensionTypes(__.data));
-  pc.applyDimensionDefaults(d3.keys(pc.types()));
-  pc.dimensions(__.dimensions);
+  pc.dimensions(pc.applyDimensionDefaults(d3.keys(pc.types())));
   return this;
 };
 
 pc.applyDimensionDefaults = function(dims) {
+  var newDims = {};
   dims.forEach(function(k) {
-    var dim = __.dimensions[k] ? __.dimensions[k] : __.dimensions[k] = {};
+    newDims[k] = __.dimensions[k] ? __.dimensions[k] : {};
     //Set up defaults
-    dim.orient= dim.orient ? dim.orient : 'left',
-    dim.ticks= dim.ticks ? dim.ticks : 5,
-    dim.innerTickSize= dim.innerTickSize ? dim.innerTickSize : 6,
-    dim.outerTickSize= dim.outerTickSize ? dim.outerTickSize : 0,
-    dim.tickPadding= dim.tickPadding ? dim.tickPadding : 3
-
+    newDims[k].orient= newDims[k].orient ? newDims[k].orient : 'left',
+    newDims[k].ticks= newDims[k].ticks ? newDims[k].ticks : 5,
+    newDims[k].innerTickSize= newDims[k].innerTickSize ? newDims[k].innerTickSize : 6,
+    newDims[k].outerTickSize= newDims[k].outerTickSize ? newDims[k].outerTickSize : 0,
+    newDims[k].tickPadding= newDims[k].tickPadding ? newDims[k].tickPadding : 3
   });
+  return newDims;
 };
 
 // a better "typeof" from this post: http://stackoverflow.com/questions/7390426/better-way-to-get-type-of-a-javascript-variable

@@ -4,7 +4,7 @@ pc.render = function() {
     pc.detectDimensions()
   } else {
     //Apply defaults if dimensions was passed
-    pc.applyDimensionDefaults(d3.keys(__.dimensions));
+    pc.dimensions(pc.applyDimensionDefaults(d3.keys(__.dimensions)));
   }
   pc.autoscale();
 

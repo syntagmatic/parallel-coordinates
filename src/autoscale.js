@@ -61,10 +61,6 @@ pc.autoscale = function() {
     }
   });
 
-  __.hideAxis.forEach(function(k) {
-    //yscale[k] = defaultScales[__.types[k]](k);
-  });
-
   // xscale
   xscale.rangePoints([0, w()], 1);
 
