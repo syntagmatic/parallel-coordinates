@@ -61,6 +61,7 @@ pc.createAxes = function() {
 
 pc.removeAxes = function() {
   g.remove();
+  g = undefined;
   return this;
 };
 
