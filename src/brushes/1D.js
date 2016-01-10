@@ -58,7 +58,9 @@
       });
   };
 
-  function brushExtents() {
+  function brushExtents(extents) {
+    if(typeof(extents) === 'undefined')
+  {
     var extents = {};
     __.dimensions.forEach(function(d) {
       var brush = brushes[d];
@@ -70,13 +72,50 @@
     });
     return extents;
   }
+  else 
+  {
+    //first get all the brush selections
+    var brushSelections = {};
+    g.selectAll('.brush')
+      .each(function(d) {
+        brushSelections[d] = d3.select(this);
+
+    });   
+    
+    // loop over each dimension and update appropriately (if it was passed in through extents)
+    __.dimensions.forEach(function(d) {
+      if (extents[d] === undefined){
+        return;
+      }
+      
+      var brush = brushes[d];
+      if (brush !== undefined) {
+        //update the extent
+        brush.extent(extents[d]);
+        
+        //redraw the brush
+        brush(brushSelections[d]);
+        
+        //fire some events
+        brush.event(brushSelections[d]);
+      }
+    });
+    
+    //redraw the chart
+    pc.renderBrushed();
+  }
+  }
 
   function brushFor(axis) {
     var brush = d3.svg.brush();
 
     brush
       .y(yscale[axis])
-      .on("brushstart", function() { d3.event.sourceEvent.stopPropagation() })
+      .on("brushstart", function() { 
+      if(d3.event.sourceEvent !== null) {
+        d3.event.sourceEvent.stopPropagation();
+    }
+    })
       .on("brush", function() {
         brushUpdated(selected());
       })
@@ -87,7 +126,6 @@
     brushes[axis] = brush;
     return brush;
   }
-
   function brushReset(dimension) {
     __.brushed = false;
     if (g) {

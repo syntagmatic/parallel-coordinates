@@ -10,22 +10,58 @@ d3.svg.multibrush = function() {
   }
 
   // From d3
+    var d3_document = this.document;
+    function d3_documentElement(node) {
+      return node && (node.ownerDocument || node.document || node).documentElement;
+    }
+    function d3_window(node) {
+      return node && (node.ownerDocument && node.ownerDocument.defaultView || node.document && node || node.defaultView);
+    }
+    if (d3_document) {
+      try {
+        d3_array(d3_document.documentElement.childNodes)[0].nodeType;
+      } catch (e) {
+        d3_array = function(list) {
+          var i = list.length, array = new Array(i);
+          while (i--) array[i] = list[i];
+          return array;
+        };
+      }
+    }
+
+    function d3_eventPreventDefault() {
+      d3.event.preventDefault();
+    }
+
+    function d3_vendorSymbol(object, name) {
+      if (name in object) return name;
+      name = name.charAt(0).toUpperCase() + name.slice(1);
+      for (var i = 0, n = d3_vendorPrefixes.length; i < n; ++i) {
+        var prefixName = d3_vendorPrefixes[i] + name;
+        if (prefixName in object) return prefixName;
+      }
+    }
+    var d3_vendorPrefixes = [ "webkit", "ms", "moz", "Moz", "o", "O" ];
+
   var d3_event_dragSelect = "onselectstart" in document ? null : d3_vendorSymbol(document.documentElement.style, "userSelect"), d3_event_dragId = 0;
-  function d3_event_dragSuppress() {
-    var name = ".dragsuppress-" + ++d3_event_dragId, click = "click" + name, w = d3.select(window).on("touchmove" + name, d3.event.preventDefault()).on("dragstart" + name, d3.event.preventDefault()).on("selectstart" + name, d3.event.preventDefault());
+    function d3_event_dragSuppress(node) {
+      var name = ".dragsuppress-" + ++d3_event_dragId, click = "click" + name, w = d3.select(d3_window(node)).on("touchmove" + name, d3_eventPreventDefault).on("dragstart" + name, d3_eventPreventDefault).on("selectstart" + name, d3_eventPreventDefault);
+      if (d3_event_dragSelect == null) {
+        d3_event_dragSelect = "onselectstart" in node ? false : d3_vendorSymbol(node.style, "userSelect");
+      }
     if (d3_event_dragSelect) {
-      var style = d3_documentElement.style, select = style[d3_event_dragSelect];
+        var style = d3_documentElement(node).style, select = style[d3_event_dragSelect];
       style[d3_event_dragSelect] = "none";
     }
     return function(suppressClick) {
       w.on(name, null);
       if (d3_event_dragSelect) style[d3_event_dragSelect] = select;
       if (suppressClick) {
-        function off() {
+          var off = function() {
           w.on(click, null);
-        }
+          };
         w.on(click, function() {
-          d3.event.preventDefault();
+            d3_eventPreventDefault();
           off();
         }, true);
         setTimeout(off, 0);
@@ -134,7 +170,7 @@ d3.svg.multibrush = function() {
     var newResize = resize.enter().append("g")
         .attr("class", function(d) { return "resize " + d[0]; })
         .style("cursor", function(d) { return d3_svg_brushCursor[d[0]]; });
-    
+
     newResize.append("rect")
         .attr("x", function(d) { return /[ew]$/.test(d[0]) ? -3 : null; })
         .attr("y", function(d) { return /^[ns]/.test(d[0]) ? -3 : null; })
@@ -196,12 +232,12 @@ d3.svg.multibrush = function() {
 
   function redrawX(g) {
     g.selectAll(".extent").attr("x", function (d) { return xExtent[d][0]; });
-    g.selectAll(".extent,.n>rect,.s>rect").attr("width", function(d) { return xExtent[d][1] - xExtent[d][0]; });
+      g.selectAll(".extent").attr("width", function(d) { return xExtent[d][1] - xExtent[d][0]; });
   }
 
   function redrawY(g) {
     g.selectAll(".extent").attr("y", function (d) { return yExtent[d][0]; });
-    g.selectAll(".extent,.e>rect,.w>rect").attr("height", function (d) { return yExtent[d][1] - yExtent[d][0]; });
+      g.selectAll(".extent").attr("height", function (d) { return yExtent[d][1] - yExtent[d][0]; });
   }
 
   function brushstart() {
@@ -213,7 +249,7 @@ d3.svg.multibrush = function() {
         resizingX = !/^(n|s)$/.test(resizing) && x,
         resizingY = !/^(e|w)$/.test(resizing) && y,
         dragging = eventTarget.classed("extent"),
-        dragRestore = d3_event_dragSuppress(),
+          dragRestore = d3_event_dragSuppress(target),
         center,
         origin = d3.mouse(target),
         offset,
@@ -432,7 +468,7 @@ d3.svg.multibrush = function() {
     if (!arguments.length) return extentAdaption;
     extentAdaption = z;
     return brush;
-  }  
+  }
 
   brush.clamp = function(z) {
     if (!arguments.length) return x && y ? [xClamp, yClamp] : x ? xClamp : y ? yClamp : null;
