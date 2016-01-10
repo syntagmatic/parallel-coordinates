@@ -6,8 +6,8 @@ pc.render = function() {
     //Apply defaults if dimensions was passed
     if (Object.keys(__.types).length === 0) {
       pc.detectDimensions();
+      pc.dimensions(pc.applyDimensionDefaults(d3.keys(__.dimensions)));
     }
-    pc.dimensions(pc.applyDimensionDefaults(d3.keys(__.dimensions)));
   }
   pc.autoscale();
 
