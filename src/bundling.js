@@ -13,7 +13,7 @@ function compute_cluster_centroids(d) {
 	});
 
 	__.data.forEach(function(row) {
-		d3.entries(__.dimensions).forEach(function(p, i) {
+		d3.keys(__.dimensions).map(function(p, i) {
 			var scaled = __.dimensions[d].yscale(row[d]);
 			if (!clusterCentroids.has(scaled)) {
 				var map = d3.map();
@@ -35,7 +35,7 @@ function compute_cluster_centroids(d) {
 function compute_centroids(row) {
 	var centroids = [];
 
-	var p = __.dimensions;
+	var p = d3.keys(__.dimensions);
 	var cols = p.length;
 	var a = 0.5;			// center between axes
 	for (var i = 0; i < cols; ++i) {

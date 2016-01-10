@@ -104,10 +104,10 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
     if (flags.interactive){pc.render().updateAxes();}
   })
   .on("bundleDimension", function(d) {
-	  if (!__.dimensions.length) pc.detectDimensions();
-	  if (!(__.dimensions[0] in yscale)) pc.autoscale();
+	  if (!d3.keys(__.dimensions).length) pc.detectDimensions();
+	  pc.autoscale();
 	  if (typeof d.value === "number") {
-		  if (d.value < __.dimensions.length) {
+		  if (d.value < d3.keys(__.dimensions).length) {
 			  __.bundleDimension = __.dimensions[d.value];
 		  } else if (d.value < __.hideAxis.length) {
 			  __.bundleDimension = __.hideAxis[d.value];
@@ -117,9 +117,10 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
 	  }
 
 	  __.clusterCentroids = compute_cluster_centroids(__.bundleDimension);
+    if (flags.interactive){pc.render();}
   })
   .on("hideAxis", function(d) {
-	  if (!__.dimensions.length) pc.detectDimensions();
+	  if (!d3.keys(__.dimensions).length || !__.types.length) pc.detectDimensions();
 	  pc.dimensions(without(__.dimensions, d.value));
   });
 
@@ -351,8 +352,8 @@ pc.render = function() {
     //Apply defaults if dimensions was passed
     if (Object.keys(__.types).length === 0) {
       pc.detectDimensions();
+      pc.dimensions(pc.applyDimensionDefaults(d3.keys(__.dimensions)));
     }
-    pc.dimensions(pc.applyDimensionDefaults(d3.keys(__.dimensions)));
   }
   pc.autoscale();
 
@@ -442,7 +443,7 @@ pc.renderBrushed.queue = function() {
 	});
 
 	__.data.forEach(function(row) {
-		d3.entries(__.dimensions).forEach(function(p, i) {
+		d3.keys(__.dimensions).map(function(p, i) {
 			var scaled = __.dimensions[d].yscale(row[d]);
 			if (!clusterCentroids.has(scaled)) {
 				var map = d3.map();
@@ -464,7 +465,7 @@ pc.renderBrushed.queue = function() {
 function compute_centroids(row) {
 	var centroids = [];
 
-	var p = __.dimensions;
+	var p = d3.keys(__.dimensions);
 	var cols = p.length;
 	var a = 0.5;			// center between axes
 	for (var i = 0; i < cols; ++i) {
@@ -2146,7 +2147,7 @@ function position(d) {
 }
 pc.version = "0.7.0";
   // this descriptive text should live with other introspective methods
-  pc.toString = function() { return "Parallel Coordinates: " + __.dimensions.length + " dimensions (" + d3.keys(__.data[0]).length + " total) , " + __.data.length + " rows"; };
+  pc.toString = function() { return "Parallel Coordinates: " + d3.keys(__.dimensions).length + " dimensions (" + d3.keys(__.data[0]).length + " total) , " + __.data.length + " rows"; };
 
   return pc;
 };

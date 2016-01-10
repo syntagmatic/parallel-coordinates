@@ -1,0 +1,80 @@
+<!doctype html>
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+</head>
+<title>Bundling Example</title>
+<link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<script src="lib/d3.js"></script>
+<script src="lib/d3.svg.multibrush.js"></script>
+<script src="../d3.parcoords.js"></script>
+
+
+<script src="lib/sylvester.js"></script>
+<script src="lib/underscore.js"></script>
+<script src="lib/slickgrid/jquery-1.7.min.js"></script>
+<script src="lib/underscore.js"></script>
+<script src="lib/underscore.math.js"></script>
+
+<div id="example" class="parcoords" style="width:960px;height:200px;"></div>
+<p>Loads an external <a href="data/cars.csv">csv file</a>, creates a custom <a href="https://github.com/mbostock/d3/wiki/Quantitative-Scales#wiki-quantitative">quantitative color scale</a> using <a href="http://bl.ocks.org/3014589">L*a*b interpolation</a>, and enables brushing.
+
+<p>
+<p>Use this slider to change the bundling strength. The current value is <strong id="strength">0.5</strong><br>
+    <input type="range" min="0" max="1" value=".5" step="0.05" id="bundling">
+</p>
+<div id="bundleDimension">Bundle using clusters determined by: </div>
+</p>
+
+<script>
+
+
+
+    //interact with this variable from a javascript console
+    var pc0;
+
+    d3.csv('data/cars.csv', function(data) {
+    pc0 = d3.parcoords()("#example")
+    .data(data)
+    .bundlingStrength(.5) // set bundling strength
+    .smoothness(0)
+    .bundleDimension("economy (mpg)")
+    .showControlPoints(false)
+    .hideAxis(["name"])
+    .render()
+    .brushMode("1D-axes")
+    .reorderable()
+    .interactive();
+
+    // smoothness
+    d3.select("#smoothness").on("change", function() {
+    d3.select("#smooth").text(this.value);
+    pc0.smoothness(this.value).render();
+    });
+
+    // bundling strength slider
+    d3.select("#bundling").on("change", function() {
+    d3.select("#strength").text(this.value);
+    pc0.bundlingStrength(this.value).render();
+    });
+
+    var select = d3.select("#bundleDimension").append("select").on("change", changeBundle);
+
+    var options = select.selectAll('option')
+    .data(d3.keys(pc0.dimensions()));
+
+    options
+    .enter()
+    .append("option")
+    .attr("value", function(d) {return d;})
+    .text(function(d) {return d;});
+
+    function changeBundle() {
+    pc0.bundleDimension(this.value);
+    }
+
+});
+</script>
+
+

@@ -42,10 +42,10 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
     if (flags.interactive){pc.render().updateAxes();}
   })
   .on("bundleDimension", function(d) {
-	  if (!__.dimensions.length) pc.detectDimensions();
-	  if (!(__.dimensions[0] in yscale)) pc.autoscale();
+	  if (!d3.keys(__.dimensions).length) pc.detectDimensions();
+	  pc.autoscale();
 	  if (typeof d.value === "number") {
-		  if (d.value < __.dimensions.length) {
+		  if (d.value < d3.keys(__.dimensions).length) {
 			  __.bundleDimension = __.dimensions[d.value];
 		  } else if (d.value < __.hideAxis.length) {
 			  __.bundleDimension = __.hideAxis[d.value];
@@ -55,9 +55,10 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
 	  }
 
 	  __.clusterCentroids = compute_cluster_centroids(__.bundleDimension);
+    if (flags.interactive){pc.render();}
   })
   .on("hideAxis", function(d) {
-	  if (!__.dimensions.length) pc.detectDimensions();
+	  if (!d3.keys(__.dimensions).length || !__.types.length) pc.detectDimensions();
 	  pc.dimensions(without(__.dimensions, d.value));
   });
 
