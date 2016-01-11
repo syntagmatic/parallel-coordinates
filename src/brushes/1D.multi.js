@@ -27,10 +27,18 @@
     // test if within range
     var within = {
       "date": function(d,p,dimension,b) {
-        return b[0] <= d[p] && d[p] <= b[1]
+        if (typeof __.dimensions[p].yscale.rangePoints === "function") { // if it is ordinal
+          return b[0] <= __.dimensions[p].yscale(d[p]) && __.dimensions[p].yscale(d[p]) <= b[1]
+        } else {
+            return b[0] <= d[p] && d[p] <= b[1]
+        }
       },
       "number": function(d,p,dimension,b) {
-        return b[0] <= d[p] && d[p] <= b[1]
+        if (typeof __.dimensions[p].yscale.rangePoints === "function") { // if it is ordinal
+          return b[0] <= __.dimensions[p].yscale(d[p]) && __.dimensions[p].yscale(d[p]) <= b[1]
+        } else {
+            return b[0] <= d[p] && d[p] <= b[1]
+        }
       },
       "string": function(d,p,dimension,b) {
         return b[0] <= __.dimensions[p].yscale(d[p]) && __.dimensions[p].yscale(d[p]) <= b[1]
