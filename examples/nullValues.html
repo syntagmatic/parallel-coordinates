@@ -1,0 +1,22 @@
+<!doctype html>
+<title>Null Value Parallel Coordinates Example</title>
+<link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<script src="lib/d3.min.js"></script>
+<script src="../d3.parcoords.js"></script>
+<body>
+<div id="example" class="parcoords" style="width:500px;height:150px"></div>
+<p>Demonstrates a parallel coordinates plot with null values at some axes. The design was copied from Templ et at. 2012, "Exploring incomplete data using visualization techniques"</p>
+</body>
+<script>
+var parcoords = d3.parcoords({nullValueSeparator: "bottom"})("#example")
+  .data([
+    [0,-0,0,0,0,1],
+    [1,-1,1,2,1,1],
+    [2,,4,4,0.5,1],
+    [3,,9,6,,],
+    [4,-4,16,8,0.25,1]
+  ])
+  .render()
+  .createAxes();
+</script>
