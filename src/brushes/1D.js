@@ -24,14 +24,14 @@
     var within = {
       "date": function(d,p,dimension) {
 	if (typeof yscale[p].rangePoints === "function") { // if it is ordinal
-          return extents[dimension][0] <= yscale[p](d[p]) && yscale[p](d[p]) <= extents[dimension][1] 
+          return extents[dimension][0] <= yscale[p](d[p]) && yscale[p](d[p]) <= extents[dimension][1]
         } else {
           return extents[dimension][0] <= d[p] && d[p] <= extents[dimension][1]
         }
       },
       "number": function(d,p,dimension) {
         if (typeof yscale[p].rangePoints === "function") { // if it is ordinal
-          return extents[dimension][0] <= yscale[p](d[p]) && yscale[p](d[p]) <= extents[dimension][1] 
+          return extents[dimension][0] <= yscale[p](d[p]) && yscale[p](d[p]) <= extents[dimension][1]
         } else {
           return extents[dimension][0] <= d[p] && d[p] <= extents[dimension][1]
         }
@@ -60,58 +60,84 @@
 
   function brushExtents(extents) {
     if(typeof(extents) === 'undefined')
-  {
-    var extents = {};
-    __.dimensions.forEach(function(d) {
-      var brush = brushes[d];
-      if (brush !== undefined && !brush.empty()) {
-        var extent = brush.extent();
-        extent.sort(d3.ascending);
-        extents[d] = extent;
-      }
-    });
-    return extents;
-  }
-  else 
-  {
-    //first get all the brush selections
-    var brushSelections = {};
-    g.selectAll('.brush')
-      .each(function(d) {
-        brushSelections[d] = d3.select(this);
+    {
+      var extents = {};
+      __.dimensions.forEach(function(d) {
+        var brush = brushes[d];
+        if (brush !== undefined && !brush.empty()) {
+          var extent = brush.extent();
+          extent.sort(d3.ascending);
+          extents[d] = extent;
+        }
+      });
+      return extents;
+    }
+    else
+    {
+      //first get all the brush selections
+      var brushSelections = {};
+      g.selectAll('.brush')
+        .each(function(d) {
+          brushSelections[d] = d3.select(this);
 
-    });   
-    
-    // loop over each dimension and update appropriately (if it was passed in through extents)
-    __.dimensions.forEach(function(d) {
-      if (extents[d] === undefined){
-        return;
-      }
-      
-      var brush = brushes[d];
-      if (brush !== undefined) {
-        //update the extent
-        brush.extent(extents[d]);
-        
-        //redraw the brush
-        brush(brushSelections[d]);
-        
-        //fire some events
-        brush.event(brushSelections[d]);
-      }
-    });
-    
-    //redraw the chart
-    pc.renderBrushed();
+      });
+
+      // loop over each dimension and update appropriately (if it was passed in through extents)
+      __.dimensions.forEach(function(d) {
+        if (extents[d] === undefined){
+          return;
+        }
+
+        var brush = brushes[d];
+        if (brush !== undefined) {
+          //update the extent
+          brush.extent(extents[d]);
+
+          //redraw the brush
+          brush(brushSelections[d]);
+
+          //fire some events
+          brush.event(brushSelections[d]);
+        }
+      });
+
+      //redraw the chart
+      pc.renderBrushed();
+    }
   }
-  }
+
+  /** A setter for 1D-axes brushes, accessible from outside of parcoords. */
+  function setBrushExtents(initialExtents) {
+
+    for (var key in initialExtents) {
+	  brushes[key].extent(initialExtents[key])
+    }
+    if (g) {
+      g.selectAll('.brush').each(function(d) {
+	    if (!(brushes[d].empty())){
+		  d3.select(this) // draws the brush initially
+		    .call(brushes[d]);
+
+		  d3.select(this) // re-draw brushes with set extent, then start brush event
+		    .transition()
+		    .duration(50)
+		    .call(brushes[d].extent(initialExtents[d]))
+		    .call(brushes[d].event);
+
+	    } else {
+		  d3.select(this).call(brushes[d].clear());
+	    }
+	  });
+    }
+    return pc;
+  };
 
   function brushFor(axis) {
     var brush = d3.svg.brush();
 
     brush
       .y(yscale[axis])
-      .on("brushstart", function() { 
+      .on("brushstart", function() {
       if(d3.event.sourceEvent !== null) {
         d3.event.sourceEvent.stopPropagation();
     }
@@ -125,7 +151,7 @@
 
     brushes[axis] = brush;
     return brush;
-  }
+  };
   function brushReset(dimension) {
     __.brushed = false;
     if (g) {
@@ -155,9 +181,10 @@
         .attr("width", 30);
 
     pc.brushExtents = brushExtents;
+    pc.setBrushExtents = setBrushExtents;
     pc.brushReset = brushReset;
     return pc;
-  }
+  };
 
   brush.modes["1D-axes"] = {
     install: install,
@@ -165,6 +192,7 @@
       g.selectAll(".brush").remove();
       brushes = {};
       delete pc.brushExtents;
+	  delete pc.setBrushExtents;
       delete pc.brushReset;
     },
     selected: selected,

@@ -65,15 +65,27 @@ function paths(data, ctx) {
 	ctx.stroke();
 };
 
+// returns the y-position just beyond the separating null value line
+function getNullPosition() {
+	if (__.nullValueSeparator=="bottom") {
+		return h()+1;
+	} else if (__.nullValueSeparator=="top") {
+		return 1;
+	} else {
+		console.log("A value is NULL, but nullValueSeparator is not set; set it to 'bottom' or 'top'.");
+	}
+	return h()+1;
+};
+
 function single_path(d, ctx) {
 	__.dimensions.map(function(p, i) {
 		if (i == 0) {
-			ctx.moveTo(position(p), yscale[p](d[p]));
+			ctx.moveTo(position(p), typeof d[p] =='undefined' ? getNullPosition() : yscale[p](d[p]));
 		} else {
-			ctx.lineTo(position(p), yscale[p](d[p]));
+			ctx.lineTo(position(p), typeof d[p] =='undefined' ? getNullPosition() : yscale[p](d[p]));
 		}
 	});
-}
+};
 
 function path_brushed(d, i) {
   if (__.brushedColor !== null) {
@@ -82,7 +94,7 @@ function path_brushed(d, i) {
     ctx.brushed.strokeStyle = d3.functor(__.color)(d, i);
   }
   return color_path(d, ctx.brushed)
-}
+};
 
 function path_foreground(d, i) {
   ctx.foreground.strokeStyle = d3.functor(__.color)(d, i);
