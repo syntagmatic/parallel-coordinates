@@ -83,7 +83,11 @@
 
     brush
       .y(yscale[axis])
-      .on("brushstart", function() { d3.event.sourceEvent.stopPropagation() })
+      .on("brushstart", function() {
+				if(d3.event.sourceEvent !== null) {
+					d3.event.sourceEvent.stopPropagation();
+				}
+      })
       .on("brush", function() {
         brushUpdated(selected());
       })
