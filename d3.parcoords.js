@@ -13,6 +13,8 @@ d3.parcoords = function(config) {
     width: 600,
     height: 300,
     margin: { top: 24, right: 0, bottom: 12, left: 0 },
+    nullValueSeparator: "undefined", // set to "top" or "bottom"
+    nullValueSeparatorPadding: { top: 8, right: 0, bottom: 8, left: 0 },
     color: "#069",
     composite: "source-over",
     alpha: 0.7,
@@ -36,7 +38,8 @@ d3.parcoords = function(config) {
         };
       }
     });
-  }var pc = function(selection) {
+  }
+var pc = function(selection) {
   selection = pc.selection = d3.select(selection);
 
   __.width = selection[0][0].clientWidth;
@@ -167,6 +170,16 @@ function without(arr, items) {
   });
   return arr;
 };
+/** adjusts an axis' default range [h()+1, 1] if a NullValueSeparator is set */
+function getRange() {
+	if (__.nullValueSeparator=="bottom") {
+		return [h()+1-__.nullValueSeparatorPadding.bottom-__.nullValueSeparatorPadding.top, 1];
+	} else if (__.nullValueSeparator=="top") {
+		return [h()+1, 1+__.nullValueSeparatorPadding.bottom+__.nullValueSeparatorPadding.top];
+	}
+	return [h()+1, 1];
+};
+
 pc.autoscale = function() {
   // yscale
   var defaultScales = {
@@ -179,12 +192,12 @@ pc.autoscale = function() {
       if (extent[0] === extent[1]) {
         return d3.scale.ordinal()
           .domain([extent[0]])
-          .rangePoints([h()+1, 1]);
+          .rangePoints(getRange());
       }
 
       return d3.time.scale()
         .domain(extent)
-        .range([h()+1, 1]);
+        .range(getRange());
     },
     "number": function(k) {
       var extent = d3.extent(__.data, function(d) { return +d[k]; });
@@ -193,12 +206,12 @@ pc.autoscale = function() {
       if (extent[0] === extent[1]) {
         return d3.scale.ordinal()
           .domain([extent[0]])
-          .rangePoints([h()+1, 1]);
+          .rangePoints(getRange());
       }
 
       return d3.scale.linear()
         .domain(extent)
-        .range([h()+1, 1]);
+        .range(getRange());
     },
     "string": function(k) {
       var counts = {},
@@ -207,6 +220,9 @@ pc.autoscale = function() {
       // Let's get the count for each value so that we can sort the domain based
       // on the number of items for each value.
       __.data.map(function(p) {
+        if (p[k] === undefined && __.nullValueSeparator!== "undefined"){
+          return; // null values will be drawn beyond the horizontal null value separator!
+        }
         if (counts[p[k]] === undefined) {
           counts[p[k]] = 1;
         } else {
@@ -220,7 +236,7 @@ pc.autoscale = function() {
 
       return d3.scale.ordinal()
         .domain(domain)
-        .rangePoints([h()+1, 1]);
+        .rangePoints(getRange());
     }
   };
 
@@ -384,7 +400,7 @@ function isBrushed() {
     }
   }
   return false;
-}
+};
 
 pc.render.default = function() {
   pc.clear('foreground');
@@ -581,15 +597,27 @@ function paths(data, ctx) {
 	ctx.stroke();
 };
 
+// returns the y-position just beyond the separating null value line
+function getNullPosition() {
+	if (__.nullValueSeparator=="bottom") {
+		return h()+1;
+	} else if (__.nullValueSeparator=="top") {
+		return 1;
+	} else {
+		console.log("A value is NULL, but nullValueSeparator is not set; set it to 'bottom' or 'top'.");
+	}
+	return h()+1;
+};
+
 function single_path(d, ctx) {
 	d3.entries(__.dimensions).forEach(function(p, i) {  //p isn't really p
 		if (i == 0) {
-			ctx.moveTo(position(p.key), __.dimensions[p.key].yscale(d[p.key]));
+			ctx.moveTo(position(p.key), typeof d[p.key] =='undefined' ? getNullPosition() : __.dimensions[p.key].yscale(d[p.key]));
 		} else {
-			ctx.lineTo(position(p.key), __.dimensions[p.key].yscale(d[p.key]));
+			ctx.lineTo(position(p.key), typeof d[p.key] =='undefined' ? getNullPosition() : __.dimensions[p.key].yscale(d[p.key]));
 		}
 	});
-}
+};
 
 function path_brushed(d, i) {
   if (__.brushedColor !== null) {
@@ -598,7 +626,7 @@ function path_brushed(d, i) {
     ctx.brushed.strokeStyle = d3.functor(__.color)(d, i);
   }
   return color_path(d, ctx.brushed)
-}
+};
 
 function path_foreground(d, i) {
   ctx.foreground.strokeStyle = d3.functor(__.color)(d, i);
@@ -684,7 +712,29 @@ pc.createAxes = function() {
       .text(dimensionLabels)
       .on("dblclick", flipAxisAndUpdatePCP)
       .on("wheel", rotateLabels);
-
+  
+  if (__.nullValueSeparator=="top") {
+    pc.svg.append("line")
+      .attr("x1", 0)
+      .attr("y1", 1+__.nullValueSeparatorPadding.top)
+      .attr("x2", w())
+      .attr("y2", 1+__.nullValueSeparatorPadding.top)
+      .attr("stroke-width", 1)
+      .attr("stroke", "#777")
+      .attr("fill", "none")
+      .attr("shape-rendering", "crispEdges");
+  } else if (__.nullValueSeparator=="bottom") {
+    pc.svg.append("line")
+      .attr("x1", 0)
+      .attr("y1", h()+1-__.nullValueSeparatorPadding.bottom)
+      .attr("x2", w())
+      .attr("y2", h()+1-__.nullValueSeparatorPadding.bottom)
+      .attr("stroke-width", 1)
+      .attr("stroke", "#777")
+      .attr("fill", "none")
+      .attr("shape-rendering", "crispEdges");
+  }
+  
   flags.axes= true;
   return this;
 };
@@ -1028,50 +1078,50 @@ pc.brushMode = function(mode) {
 
   function brushExtents(extents) {
     if(typeof(extents) === 'undefined')
-  {
-    var extents = {};
-    d3.keys(__.dimensions).forEach(function(d) {
-      var brush = brushes[d];
-      if (brush !== undefined && !brush.empty()) {
-        var extent = brush.extent();
-        extent.sort(d3.ascending);
-        extents[d] = extent;
-      }
-    });
-    return extents;
-  }
-  else 
-  {
-    //first get all the brush selections
-    var brushSelections = {};
-    g.selectAll('.brush')
-      .each(function(d) {
-        brushSelections[d] = d3.select(this);
+		{
+			var extents = {};
+			d3.keys(__.dimensions).forEach(function(d) {
+				var brush = brushes[d];
+				if (brush !== undefined && !brush.empty()) {
+					var extent = brush.extent();
+					extent.sort(d3.ascending);
+					extents[d] = extent;
+				}
+			});
+			return extents;
+		}
+		else
+		{
+			//first get all the brush selections
+			var brushSelections = {};
+			g.selectAll('.brush')
+				.each(function(d) {
+					brushSelections[d] = d3.select(this);
 
-    });   
-    
-    // loop over each dimension and update appropriately (if it was passed in through extents)
-    d3.keys(__.dimensions).forEach(function(d) {
-      if (extents[d] === undefined){
-        return;
-      }
-      
-      var brush = brushes[d];
-      if (brush !== undefined) {
-        //update the extent
-        brush.extent(extents[d]);
-        
-        //redraw the brush
-        brush(brushSelections[d]);
-        
-        //fire some events
-        brush.event(brushSelections[d]);
-      }
-    });
-    
-    //redraw the chart
-    pc.renderBrushed();
-  }
+			});
+
+			// loop over each dimension and update appropriately (if it was passed in through extents)
+			d3.keys(__.dimensions).forEach(function(d) {
+				if (extents[d] === undefined){
+					return;
+				}
+
+				var brush = brushes[d];
+				if (brush !== undefined) {
+					//update the extent
+					brush.extent(extents[d]);
+
+					//redraw the brush
+					brush(brushSelections[d]);
+
+					//fire some events
+					brush.event(brushSelections[d]);
+				}
+			});
+
+			//redraw the chart
+			pc.renderBrushed();
+		}
   }
 
   function brushFor(axis) {
@@ -1080,10 +1130,10 @@ pc.brushMode = function(mode) {
     brush
       .y(__.dimensions[axis].yscale)
       .on("brushstart", function() { 
-      if(d3.event.sourceEvent !== null) {
-        d3.event.sourceEvent.stopPropagation();
-    }
-    })
+				if(d3.event.sourceEvent !== null) {
+					d3.event.sourceEvent.stopPropagation();
+			}
+			})
       .on("brush", function() {
         brushUpdated(selected());
       })
@@ -1093,7 +1143,7 @@ pc.brushMode = function(mode) {
 
     brushes[axis] = brush;
     return brush;
-  }
+  };
   function brushReset(dimension) {
     __.brushed = false;
     if (g) {
@@ -1125,7 +1175,7 @@ pc.brushMode = function(mode) {
     pc.brushExtents = brushExtents;
     pc.brushReset = brushReset;
     return pc;
-  }
+  };
 
   brush.modes["1D-axes"] = {
     install: install,

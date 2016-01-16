@@ -2,6 +2,10 @@
 
 An implementation of parallel coordinates in d3 as a [reusable chart](http://bost.ocks.org/mike/chart/)
 
+## Contributing
+
+In order to obtain a linear history, please adhere to the [workflow](https://github.com/bbroeksema/writing/blob/master/parcoords-git-workflow.md) outlined by @bbroeksema.
+
 ## Resources 
 
 ### Tutorials

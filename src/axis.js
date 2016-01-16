@@ -59,7 +59,29 @@ pc.createAxes = function() {
       .text(dimensionLabels)
       .on("dblclick", flipAxisAndUpdatePCP)
       .on("wheel", rotateLabels);
-
+  
+  if (__.nullValueSeparator=="top") {
+    pc.svg.append("line")
+      .attr("x1", 0)
+      .attr("y1", 1+__.nullValueSeparatorPadding.top)
+      .attr("x2", w())
+      .attr("y2", 1+__.nullValueSeparatorPadding.top)
+      .attr("stroke-width", 1)
+      .attr("stroke", "#777")
+      .attr("fill", "none")
+      .attr("shape-rendering", "crispEdges");
+  } else if (__.nullValueSeparator=="bottom") {
+    pc.svg.append("line")
+      .attr("x1", 0)
+      .attr("y1", h()+1-__.nullValueSeparatorPadding.bottom)
+      .attr("x2", w())
+      .attr("y2", h()+1-__.nullValueSeparatorPadding.bottom)
+      .attr("stroke-width", 1)
+      .attr("stroke", "#777")
+      .attr("fill", "none")
+      .attr("shape-rendering", "crispEdges");
+  }
+  
   flags.axes= true;
   return this;
 };
