@@ -105,43 +105,16 @@
       pc.renderBrushed();
     }
   }
-
-  /** A setter for 1D-axes brushes, accessible from outside of parcoords. */
-  function setBrushExtents(initialExtents) {
-
-    for (var key in initialExtents) {
-	  brushes[key].extent(initialExtents[key])
-    }
-    if (g) {
-      g.selectAll('.brush').each(function(d) {
-	    if (!(brushes[d].empty())){
-		  d3.select(this) // draws the brush initially
-		    .call(brushes[d]);
-
-		  d3.select(this) // re-draw brushes with set extent, then start brush event
-		    .transition()
-		    .duration(50)
-		    .call(brushes[d].extent(initialExtents[d]))
-		    .call(brushes[d].event);
-
-	    } else {
-		  d3.select(this).call(brushes[d].clear());
-	    }
-	  });
-    }
-    return pc;
-  };
-
   function brushFor(axis) {
     var brush = d3.svg.brush();
 
     brush
       .y(yscale[axis])
       .on("brushstart", function() {
-      if(d3.event.sourceEvent !== null) {
-        d3.event.sourceEvent.stopPropagation();
-    }
-    })
+				if(d3.event.sourceEvent !== null) {
+					d3.event.sourceEvent.stopPropagation();
+				}
+			})
       .on("brush", function() {
         brushUpdated(selected());
       })
@@ -181,7 +154,6 @@
         .attr("width", 30);
 
     pc.brushExtents = brushExtents;
-    pc.setBrushExtents = setBrushExtents;
     pc.brushReset = brushReset;
     return pc;
   };
@@ -192,7 +164,6 @@
       g.selectAll(".brush").remove();
       brushes = {};
       delete pc.brushExtents;
-	  delete pc.setBrushExtents;
       delete pc.brushReset;
     },
     selected: selected,
