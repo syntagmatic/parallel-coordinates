@@ -351,7 +351,12 @@ pc.renderBrushed = function() {
 };
 
 function isBrushed() {
-  if (__.brushed && __.brushed.length !== __.data.length)
+  if (__.brushed) {
+    return true;
+  }
+  return false;
+  // TODO: debug: whats going on here??
+  /*if (__.brushed && __.brushed.length !== __.data.length)
     return true;
 
   var object = brush.currentMode().brushState();
@@ -361,7 +366,7 @@ function isBrushed() {
       return true;
     }
   }
-  return false;
+  return false;*/
 };
 
 pc.render.default = function() {
@@ -406,7 +411,8 @@ pc.renderBrushed.queue = function() {
   } else {
     brushedQueue([]); // This is needed to clear the currently brushed items
   }
-};function compute_cluster_centroids(d) {
+};
+function compute_cluster_centroids(d) {
 
 	var clusterCentroids = d3.map();
 	var clusterCounts = d3.map();
@@ -1022,7 +1028,6 @@ pc.brushMode = function(mode) {
           extents[d] = extent;
         }
       });
-      return extents;
     }
     else
     {
@@ -1037,7 +1042,7 @@ pc.brushMode = function(mode) {
       // loop over each dimension and update appropriately (if it was passed in through extents)
       __.dimensions.forEach(function(d) {
         if (extents[d] === undefined){
-          return;
+          return pc;
         }
 
         var brush = brushes[d];
@@ -1056,31 +1061,59 @@ pc.brushMode = function(mode) {
       //redraw the chart
       pc.renderBrushed();
     }
+    return pc;
   }
 
   /** A setter for 1D-axes brushes, accessible from outside of parcoords. */
-  function setBrushExtents(initialExtents) {
-
+  function updateBrush(dimension, extent, duration) {
+    var brush = brushes[dimension];
+    // set brush extent
+    brush.extent(extent);
+    /*
+    // set brush extents for all dimensions
     for (var key in initialExtents) {
-	  brushes[key].extent(initialExtents[key])
+      brushes[key].extent(initialExtents[key])
+    }*/
+    if (g) {
+      //first get all the brush selections
+      var brushSelections = {};
+      g.selectAll('.brush')
+        .each(function(d) {
+          brushSelections[d] = d3.select(this);
+        });
+
+      //redraw the brush
+      brushSelections[dimension]
+        .transition()
+        .duration(duration)
+        .call(brush)
+      //brush(brushSelections[d]);
+
+      //fire some events
+      brush.event(brushSelections[dimension]);
+
     }
+
+/*
+    // update all brush extents
     if (g) {
       g.selectAll('.brush').each(function(d) {
-	    if (!(brushes[d].empty())){
-		  d3.select(this) // draws the brush initially
-		    .call(brushes[d]);
+  	    if (!(brushes[d].empty())){
+  		  d3.select(this) // draws the brush initially
+  		    .call(brushes[d]);
 
-		  d3.select(this) // re-draw brushes with set extent, then start brush event
-		    .transition()
-		    .duration(50)
-		    .call(brushes[d].extent(initialExtents[d]))
-		    .call(brushes[d].event);
+  		  d3.select(this) // re-draw brushes with set extent, then start brush event
+  		    .transition()
+  		    .duration(duration)
+  		    .call(brushes[d].extent(initialExtents[d]))
+  		    .call(brushes[d].event);
 
-	    } else {
-		  d3.select(this).call(brushes[d].clear());
-	    }
-	  });
-    }
+  	    } else {
+  		    d3.select(this).call(brushes[d].clear());
+  	    }
+      });
+    }*/
+
     return pc;
   };
 
@@ -1104,16 +1137,33 @@ pc.brushMode = function(mode) {
     brushes[axis] = brush;
     return brush;
   };
-  function brushReset(dimension) {
-    __.brushed = false;
-    if (g) {
-      g.selectAll('.brush')
-        .each(function(d) {
-          d3.select(this).call(
-            brushes[d].clear()
-          );
-        });
-      pc.renderBrushed();
+  function resetBrushes(dimension) {
+    if (dimension===undefined) {
+      __.brushed = false;
+      if (g) {
+        g.selectAll('.brush')
+          .each(function(d) {
+            d3.select(this)
+              .transition()
+              .duration(0)
+              .call(brushes[d].clear());
+          });
+        pc.renderBrushed();
+      }
+    }
+    else {
+      if (g) {
+        g.selectAll('.brush')
+          .each(function(d) {
+            if (d!=dimension) return;
+            d3.select(this)
+              .transition()
+              .duration(0)
+              .call(brushes[d].clear());
+            brushes[d].event(d3.select(this));
+          });
+        pc.renderBrushed();
+      }
     }
     return this;
   };
@@ -1133,8 +1183,8 @@ pc.brushMode = function(mode) {
         .attr("width", 30);
 
     pc.brushExtents = brushExtents;
-    pc.setBrushExtents = setBrushExtents;
-    pc.brushReset = brushReset;
+    pc.updateBrush = updateBrush;
+    pc.resetBrushes = resetBrushes;
     return pc;
   };
 
@@ -1144,11 +1194,11 @@ pc.brushMode = function(mode) {
       g.selectAll(".brush").remove();
       brushes = {};
       delete pc.brushExtents;
-	  delete pc.setBrushExtents;
-      delete pc.brushReset;
+	    delete pc.updateBrush;
+      delete pc.resetBrushes;
     },
     selected: selected,
-    brushState: brushExtents
+    //brushState: brushExtents
   }
 })();
 // brush mode: 2D-strums

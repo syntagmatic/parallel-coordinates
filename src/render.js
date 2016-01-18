@@ -20,7 +20,12 @@ pc.renderBrushed = function() {
 };
 
 function isBrushed() {
-  if (__.brushed && __.brushed.length !== __.data.length)
+  if (__.brushed) {
+    return true;
+  }
+  return false;
+  // TODO: debug: whats going on here??
+  /*if (__.brushed && __.brushed.length !== __.data.length)
     return true;
 
   var object = brush.currentMode().brushState();
@@ -30,7 +35,7 @@ function isBrushed() {
       return true;
     }
   }
-  return false;
+  return false;*/
 };
 
 pc.render.default = function() {
