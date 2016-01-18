@@ -165,10 +165,10 @@
     brush
       .y(yscale[axis])
       .on("brushstart", function() {
-      if(d3.event.sourceEvent !== null) {
-        d3.event.sourceEvent.stopPropagation();
-    }
-    })
+				if(d3.event.sourceEvent !== null) {
+					d3.event.sourceEvent.stopPropagation();
+				}
+			})
       .on("brush", function() {
         brushUpdated(selected());
       })
@@ -179,6 +179,7 @@
     brushes[axis] = brush;
     return brush;
   };
+
   function resetBrushes(dimension) {
     if (dimension===undefined) {
       __.brushed = false;
