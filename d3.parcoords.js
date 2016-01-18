@@ -1123,10 +1123,10 @@ pc.brushMode = function(mode) {
     brush
       .y(yscale[axis])
       .on("brushstart", function() {
-      if(d3.event.sourceEvent !== null) {
-        d3.event.sourceEvent.stopPropagation();
-    }
-    })
+				if(d3.event.sourceEvent !== null) {
+					d3.event.sourceEvent.stopPropagation();
+				}
+			})
       .on("brush", function() {
         brushUpdated(selected());
       })
@@ -1137,6 +1137,7 @@ pc.brushMode = function(mode) {
     brushes[axis] = brush;
     return brush;
   };
+
   function resetBrushes(dimension) {
     if (dimension===undefined) {
       __.brushed = false;
@@ -1608,7 +1609,11 @@ pc.brushMode = function(mode) {
 
     brush
       .y(yscale[axis])
-      .on("brushstart", function() { d3.event.sourceEvent.stopPropagation() })
+      .on("brushstart", function() {
+				if(d3.event.sourceEvent !== null) {
+					d3.event.sourceEvent.stopPropagation();
+				}
+      })
       .on("brush", function() {
         brushUpdated(selected());
       })
