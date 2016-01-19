@@ -51,13 +51,13 @@
       case "AND":
         return actives.every(function(p, dimension) {
           return extents[dimension].some(function(b) {
-          	return within[__.types[p]](d,p,dimension,b);
+          	return within[__.dimensions[p].type](d,p,dimension,b);
           });
         });
       case "OR":
         return actives.some(function(p, dimension) {
       	  return extents[dimension].some(function(b) {
-            	return within[__.types[p]](d,p,dimension,b);
+            	return within[__.dimensions[p].type](d,p,dimension,b);
             });
         });
       default:
@@ -83,7 +83,11 @@
 
     brush
       .y(__.dimensions[axis].yscale)
-      .on("brushstart", function() { d3.event.sourceEvent.stopPropagation() })
+      .on("brushstart", function() {
+				if(d3.event.sourceEvent !== null) {
+					d3.event.sourceEvent.stopPropagation();
+				}
+      })
       .on("brush", function() {
         brushUpdated(selected());
       })

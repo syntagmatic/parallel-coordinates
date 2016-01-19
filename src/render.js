@@ -2,12 +2,6 @@ pc.render = function() {
   // try to autodetect dimensions and create scales
   if (!d3.keys(__.dimensions).length) {
     pc.detectDimensions()
-  } else {
-    //Apply defaults if dimensions was passed
-    if (Object.keys(__.types).length === 0) {
-      pc.detectDimensions();
-      pc.dimensions(pc.applyDimensionDefaults(d3.keys(__.dimensions)));
-    }
   }
   pc.autoscale();
 

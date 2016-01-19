@@ -92,7 +92,7 @@
     var dims = { i: -1, left: undefined, right: undefined };
     d3.keys(__.dimensions).some(function(dim, i) {
       if (xscale(dim) < p[0]) {
-        var next = d3.keys(__.dimensions)[d3.keys(__.dimensions).indexOf(dim)+1];
+        var next = d3.keys(__.dimensions)[pc.getOrderedDimensionKeys().indexOf(dim)+1];
         dims.i = i;
         dims.left = dim;
         dims.right = next;
@@ -104,13 +104,13 @@
     if (dims.left === undefined) {
       // Event on the left side of the first axis.
       dims.i = 0;
-      dims.left = d3.keys(__.dimensions)[0];
-      dims.right = d3.keys(__.dimensions)[1];
+      dims.left = pc.getOrderedDimensionKeys()[0];
+      dims.right = pc.getOrderedDimensionKeys()[1];
     } else if (dims.right === undefined) {
       // Event on the right side of the last axis
       dims.i = d3.keys(__.dimensions).length - 1;
       dims.right = dims.left;
-      dims.left = d3.keys(__.dimensions)[d3.keys(__.dimensions).length - 2];
+      dims.left = pc.getOrderedDimensionKeys()[d3.keys(__.dimensions).length - 2];
     }
 
     return dims;

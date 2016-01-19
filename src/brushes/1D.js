@@ -46,11 +46,11 @@
         switch(brush.predicate) {
         case "AND":
           return actives.every(function(p, dimension) {
-            return within[__.types[p]](d,p,dimension);
+            return within[__.dimensions[p].type](d,p,dimension);
           });
         case "OR":
           return actives.some(function(p, dimension) {
-            return within[__.types[p]](d,p,dimension);
+            return within[__.dimensions[p].type](d,p,dimension);
           });
         default:
           throw "Unknown brush predicate " + __.brushPredicate;
@@ -111,10 +111,10 @@
 
     brush
       .y(__.dimensions[axis].yscale)
-      .on("brushstart", function() { 
+      .on("brushstart", function() {
 				if(d3.event.sourceEvent !== null) {
 					d3.event.sourceEvent.stopPropagation();
-			}
+				}
 			})
       .on("brush", function() {
         brushUpdated(selected());

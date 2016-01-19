@@ -33,7 +33,7 @@ pc.createAxes = function() {
 
   // Add a group element for each dimension.
   g = pc.svg.selectAll(".dimension")
-      .data(d3.keys(__.dimensions), function(d) {
+      .data(pc.getOrderedDimensionKeys(), function(d) {
         return d;
       })
     .enter().append("svg:g")
@@ -176,7 +176,7 @@ pc.reorderable = function() {
       .on("drag", function(d) {
         dragging[d] = Math.min(w(), Math.max(0, this.__origin__ += d3.event.dx));
         pc.sortDimensions();
-        xscale.domain(d3.keys(__.dimensions));
+        xscale.domain(pc.getOrderedDimensionKeys());
         pc.render();
         g.attr("transform", function(d) {
           return "translate(" + position(d) + ")";
@@ -185,13 +185,13 @@ pc.reorderable = function() {
       .on("dragend", function(d) {
         // Let's see if the order has changed and send out an event if so.
         var i = 0,
-            j = d3.keys(__.dimensions).indexOf(d),
+            j = __.dimensions[d].index,
             elem = this,
             parent = this.parentElement;
 
         while((elem = elem.previousElementSibling) != null) ++i;
         if (i !== j) {
-          events.axesreorder.call(pc, d3.keys(__.dimensions));
+          events.axesreorder.call(pc, pc.getOrderedDimensionKeys());
           // We now also want to reorder the actual dom elements that represent
           // the axes. That is, the g.dimension elements. If we don't do this,
           // we get a weird and confusing transition when updateAxes is called.
@@ -249,7 +249,7 @@ pc.reorder = function(rowdata) {
   });
 
   if (reordered) {
-    xscale.domain(d3.keys(__.dimensions));
+    xscale.domain(pc.getOrderedDimensionKeys());
     var highlighted = __.highlighted.slice(0);
     pc.unhighlight();
 
@@ -269,10 +269,13 @@ pc.reorder = function(rowdata) {
 
 pc.sortDimensions = function() {
   var copy = __.dimensions;
-  var sortedKeys = d3.keys(__.dimensions).sort(function(a, b) { return position(a) - position(b); });
+  var positionSortedKeys = d3.keys(__.dimensions).sort(function(a, b) {
+  	return position(a) - position(b);
+	});
   __.dimensions = {};
-  sortedKeys.forEach(function(p){
+  positionSortedKeys.forEach(function(p, i){
     __.dimensions[p] = copy[p];
+    __.dimensions[p].index = i;
   })
 };
 

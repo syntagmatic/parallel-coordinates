@@ -38,7 +38,7 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
     foregroundQueue.rate(d.value);
   })
   .on("dimensions", function(d) {
-    xscale.domain(d3.keys(__.dimensions));
+    xscale.domain(pc.getOrderedDimensionKeys());
     if (flags.interactive){pc.render().updateAxes();}
   })
   .on("bundleDimension", function(d) {
@@ -58,7 +58,7 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
     if (flags.interactive){pc.render();}
   })
   .on("hideAxis", function(d) {
-	  if (!d3.keys(__.dimensions).length || !__.types.length) pc.detectDimensions();
+  	pc.dimensions(pc.applyDimensionDefaults());
 	  pc.dimensions(without(__.dimensions, d.value));
   });
 

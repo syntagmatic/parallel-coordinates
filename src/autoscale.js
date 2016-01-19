@@ -70,7 +70,7 @@ pc.autoscale = function() {
 
   d3.keys(__.dimensions).forEach(function(k) {
     if (!__.dimensions[k].yscale){
-      __.dimensions[k].yscale = defaultScales[__.types[k]](k);
+      __.dimensions[k].yscale = defaultScales[__.dimensions[k].type](k);
     }
   });
 
@@ -119,7 +119,7 @@ pc.commonScale = function(global, type) {
 
 	// scales of the same type
 	var scales = __.dimensions.concat(__.hideAxis).filter(function(p) {
-		return __.types[p] == t;
+		return __.dimensions[p].type == t;
 	});
 
 	if (global) {
