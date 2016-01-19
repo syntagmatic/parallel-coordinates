@@ -89,7 +89,7 @@ function getset(obj,state,events)  {
 };
 
 function extend(target, source) {
-  for (key in source) {
+  for (var key in source) {
     target[key] = source[key];
   }
   return target;
