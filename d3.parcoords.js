@@ -4,7 +4,6 @@ d3.parcoords = function(config) {
     highlighted: [],
     dimensions: {},
     dimensionTitleRotation: 0,
-    types: {},
     brushed: false,
     brushedColor: null,
     alphaOnBrushed: 0.0,
@@ -103,7 +102,7 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
     foregroundQueue.rate(d.value);
   })
   .on("dimensions", function(d) {
-    xscale.domain(d3.keys(__.dimensions));
+    xscale.domain(pc.getOrderedDimensionKeys());
     if (flags.interactive){pc.render().updateAxes();}
   })
   .on("bundleDimension", function(d) {
@@ -123,7 +122,7 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
     if (flags.interactive){pc.render();}
   })
   .on("hideAxis", function(d) {
-	  if (!d3.keys(__.dimensions).length || !__.types.length) pc.detectDimensions();
+  	pc.dimensions(pc.applyDimensionDefaults());
 	  pc.dimensions(without(__.dimensions, d.value));
   });
 
@@ -242,7 +241,7 @@ pc.autoscale = function() {
 
   d3.keys(__.dimensions).forEach(function(k) {
     if (!__.dimensions[k].yscale){
-      __.dimensions[k].yscale = defaultScales[__.types[k]](k);
+      __.dimensions[k].yscale = defaultScales[__.dimensions[k].type](k);
     }
   });
 
@@ -291,7 +290,7 @@ pc.commonScale = function(global, type) {
 
 	// scales of the same type
 	var scales = __.dimensions.concat(__.hideAxis).filter(function(p) {
-		return __.types[p] == t;
+		return __.dimensions[p].type == t;
 	});
 
 	if (global) {
@@ -319,23 +318,35 @@ pc.commonScale = function(global, type) {
 	return this;
 };
 pc.detectDimensions = function() {
-  pc.types(pc.detectDimensionTypes(__.data));
-  pc.dimensions(pc.applyDimensionDefaults(d3.keys(pc.types())));
+  pc.dimensions(pc.applyDimensionDefaults());
   return this;
 };
 
 pc.applyDimensionDefaults = function(dims) {
+	var types = pc.detectDimensionTypes(__.data);
+	dims = dims ? dims : d3.keys(types);
   var newDims = {};
+  var currIndex = 0;
   dims.forEach(function(k) {
     newDims[k] = __.dimensions[k] ? __.dimensions[k] : {};
     //Set up defaults
-    newDims[k].orient= newDims[k].orient ? newDims[k].orient : 'left',
-    newDims[k].ticks= newDims[k].ticks ? newDims[k].ticks : 5,
-    newDims[k].innerTickSize= newDims[k].innerTickSize ? newDims[k].innerTickSize : 6,
-    newDims[k].outerTickSize= newDims[k].outerTickSize ? newDims[k].outerTickSize : 0,
-    newDims[k].tickPadding= newDims[k].tickPadding ? newDims[k].tickPadding : 3
+    newDims[k].orient= newDims[k].orient ? newDims[k].orient : 'left';
+    newDims[k].ticks= newDims[k].ticks ? newDims[k].ticks : 5;
+    newDims[k].innerTickSize= newDims[k].innerTickSize ? newDims[k].innerTickSize : 6;
+    newDims[k].outerTickSize= newDims[k].outerTickSize ? newDims[k].outerTickSize : 0;
+    newDims[k].tickPadding= newDims[k].tickPadding ? newDims[k].tickPadding : 3;
+    newDims[k].type= newDims[k].type ? newDims[k].type : types[k];
+
+    newDims[k].index = newDims[k].index ? newDims[k].index : currIndex;
+    currIndex++;
   });
   return newDims;
+};
+
+pc.getOrderedDimensionKeys = function(){
+	return d3.keys(__.dimensions).sort(function(x, y){
+		return d3.ascending(__.dimensions[x].index, __.dimensions[y].index);
+	});
 };
 
 // a better "typeof" from this post: http://stackoverflow.com/questions/7390426/better-way-to-get-type-of-a-javascript-variable
@@ -364,12 +375,6 @@ pc.render = function() {
   // try to autodetect dimensions and create scales
   if (!d3.keys(__.dimensions).length) {
     pc.detectDimensions()
-  } else {
-    //Apply defaults if dimensions was passed
-    if (Object.keys(__.types).length === 0) {
-      pc.detectDimensions();
-      pc.dimensions(pc.applyDimensionDefaults(d3.keys(__.dimensions)));
-    }
   }
   pc.autoscale();
 
@@ -686,7 +691,7 @@ pc.createAxes = function() {
 
   // Add a group element for each dimension.
   g = pc.svg.selectAll(".dimension")
-      .data(d3.keys(__.dimensions), function(d) {
+      .data(pc.getOrderedDimensionKeys(), function(d) {
         return d;
       })
     .enter().append("svg:g")
@@ -829,7 +834,7 @@ pc.reorderable = function() {
       .on("drag", function(d) {
         dragging[d] = Math.min(w(), Math.max(0, this.__origin__ += d3.event.dx));
         pc.sortDimensions();
-        xscale.domain(d3.keys(__.dimensions));
+        xscale.domain(pc.getOrderedDimensionKeys());
         pc.render();
         g.attr("transform", function(d) {
           return "translate(" + position(d) + ")";
@@ -838,13 +843,13 @@ pc.reorderable = function() {
       .on("dragend", function(d) {
         // Let's see if the order has changed and send out an event if so.
         var i = 0,
-            j = d3.keys(__.dimensions).indexOf(d),
+            j = __.dimensions[d].index,
             elem = this,
             parent = this.parentElement;
 
         while((elem = elem.previousElementSibling) != null) ++i;
         if (i !== j) {
-          events.axesreorder.call(pc, d3.keys(__.dimensions));
+          events.axesreorder.call(pc, pc.getOrderedDimensionKeys());
           // We now also want to reorder the actual dom elements that represent
           // the axes. That is, the g.dimension elements. If we don't do this,
           // we get a weird and confusing transition when updateAxes is called.
@@ -902,7 +907,7 @@ pc.reorder = function(rowdata) {
   });
 
   if (reordered) {
-    xscale.domain(d3.keys(__.dimensions));
+    xscale.domain(pc.getOrderedDimensionKeys());
     var highlighted = __.highlighted.slice(0);
     pc.unhighlight();
 
@@ -922,10 +927,13 @@ pc.reorder = function(rowdata) {
 
 pc.sortDimensions = function() {
   var copy = __.dimensions;
-  var sortedKeys = d3.keys(__.dimensions).sort(function(a, b) { return position(a) - position(b); });
+  var positionSortedKeys = d3.keys(__.dimensions).sort(function(a, b) {
+  	return position(a) - position(b);
+	});
   __.dimensions = {};
-  sortedKeys.forEach(function(p){
+  positionSortedKeys.forEach(function(p, i){
     __.dimensions[p] = copy[p];
+    __.dimensions[p].index = i;
   })
 };
 
@@ -1064,11 +1072,11 @@ pc.brushMode = function(mode) {
         switch(brush.predicate) {
         case "AND":
           return actives.every(function(p, dimension) {
-            return within[__.types[p]](d,p,dimension);
+            return within[__.dimensions[p].type](d,p,dimension);
           });
         case "OR":
           return actives.some(function(p, dimension) {
-            return within[__.types[p]](d,p,dimension);
+            return within[__.dimensions[p].type](d,p,dimension);
           });
         default:
           throw "Unknown brush predicate " + __.brushPredicate;
@@ -1129,10 +1137,10 @@ pc.brushMode = function(mode) {
 
     brush
       .y(__.dimensions[axis].yscale)
-      .on("brushstart", function() { 
+      .on("brushstart", function() {
 				if(d3.event.sourceEvent !== null) {
 					d3.event.sourceEvent.stopPropagation();
-			}
+				}
 			})
       .on("brush", function() {
         brushUpdated(selected());
@@ -1256,7 +1264,7 @@ pc.brushMode = function(mode) {
     var dims = { i: -1, left: undefined, right: undefined };
     d3.keys(__.dimensions).some(function(dim, i) {
       if (xscale(dim) < p[0]) {
-        var next = d3.keys(__.dimensions)[d3.keys(__.dimensions).indexOf(dim)+1];
+        var next = d3.keys(__.dimensions)[pc.getOrderedDimensionKeys().indexOf(dim)+1];
         dims.i = i;
         dims.left = dim;
         dims.right = next;
@@ -1268,13 +1276,13 @@ pc.brushMode = function(mode) {
     if (dims.left === undefined) {
       // Event on the left side of the first axis.
       dims.i = 0;
-      dims.left = d3.keys(__.dimensions)[0];
-      dims.right = d3.keys(__.dimensions)[1];
+      dims.left = pc.getOrderedDimensionKeys()[0];
+      dims.right = pc.getOrderedDimensionKeys()[1];
     } else if (dims.right === undefined) {
       // Event on the right side of the last axis
       dims.i = d3.keys(__.dimensions).length - 1;
       dims.right = dims.left;
-      dims.left = d3.keys(__.dimensions)[d3.keys(__.dimensions).length - 2];
+      dims.left = pc.getOrderedDimensionKeys()[d3.keys(__.dimensions).length - 2];
     }
 
     return dims;
@@ -1568,13 +1576,13 @@ pc.brushMode = function(mode) {
       case "AND":
         return actives.every(function(p, dimension) {
           return extents[dimension].some(function(b) {
-          	return within[__.types[p]](d,p,dimension,b);
+          	return within[__.dimensions[p].type](d,p,dimension,b);
           });
         });
       case "OR":
         return actives.some(function(p, dimension) {
       	  return extents[dimension].some(function(b) {
-            	return within[__.types[p]](d,p,dimension,b);
+            	return within[__.dimensions[p].type](d,p,dimension,b);
             });
         });
       default:
@@ -1600,7 +1608,11 @@ pc.brushMode = function(mode) {
 
     brush
       .y(__.dimensions[axis].yscale)
-      .on("brushstart", function() { d3.event.sourceEvent.stopPropagation() })
+      .on("brushstart", function() {
+				if(d3.event.sourceEvent !== null) {
+					d3.event.sourceEvent.stopPropagation();
+				}
+      })
       .on("brush", function() {
         brushUpdated(selected());
       })
@@ -1768,7 +1780,7 @@ pc.brushMode = function(mode) {
     var dims = { i: -1, left: undefined, right: undefined };
     d3.keys(__.dimensions).some(function(dim, i) {
       if (xscale(dim) < p[0]) {
-        var next = d3.keys(__.dimensions)[d3.keys(__.dimensions).indexOf(dim)+1];
+        var next = d3.keys(__.dimensions)[pc.getOrderedDimensionKeys().indexOf(dim)+1];
         dims.i = i;
         dims.left = dim;
         dims.right = next;
@@ -1780,13 +1792,13 @@ pc.brushMode = function(mode) {
     if (dims.left === undefined) {
       // Event on the left side of the first axis.
       dims.i = 0;
-      dims.left = d3.keys(__.dimensions)[0];
-      dims.right = d3.keys(__.dimensions)[1];
+      dims.left = pc.getOrderedDimensionKeys()[0];
+      dims.right = pc.getOrderedDimensionKeys()[1];
     } else if (dims.right === undefined) {
       // Event on the right side of the last axis
       dims.i = d3.keys(__.dimensions).length - 1;
       dims.right = dims.left;
-      dims.left = d3.keys(__.dimensions)[d3.keys(__.dimensions).length - 2];
+      dims.left = pc.getOrderedDimensionKeys()[d3.keys(__.dimensions).length - 2];
     }
 
     return dims;
