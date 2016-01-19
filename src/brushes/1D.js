@@ -85,7 +85,7 @@
 			// loop over each dimension and update appropriately (if it was passed in through extents)
 			__.dimensions.forEach(function(d) {
 				if (extents[d] === undefined){
-					continue;
+					return; // continue
 				}
 
 				var brush = brushes[d];
