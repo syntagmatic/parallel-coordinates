@@ -242,6 +242,6 @@
 			delete pc.brushReset;
 		},
 		selected: selected,
-		//brushState: brushExtents
+		brushState: brushExtents
 	}
 })();

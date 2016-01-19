@@ -1195,7 +1195,7 @@ pc.brushMode = function(mode) {
 			delete pc.brushReset;
 		},
 		selected: selected,
-		//brushState: brushExtents
+		brushState: brushExtents
 	}
 })();
 // brush mode: 2D-strums
