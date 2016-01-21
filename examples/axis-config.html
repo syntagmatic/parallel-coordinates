@@ -1,5 +1,5 @@
 <!doctype html>
-<title>Brushing Example</title>
+<title>Axis-Config Example</title>
 <link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
 <link rel="stylesheet" type="text/css" href="style.css">
 <script src="lib/d3.min.js"></script>
@@ -56,11 +56,15 @@
                     }
                 },
                 'power (hp)': {
-                    title: "MMhhm Power"
+                    title: "MMhhm Power",
+                    innerTickSize: 10,
+                    outerTickSize: 20
                 },
                 'year': {
                     orient: 'right',
-                    type: 'string'
+                    type: 'string',
+                    tickPadding: 0,
+                    innerTickSize: 8
                 }
             };
 
@@ -74,6 +78,7 @@
                     .render()
                     .shadows()
                     .reorderable()
+                    .interactive()date 
                     .brushMode("1D-axes");  // enable brushing
         });
 
