@@ -114,12 +114,13 @@ var dimensions = {
 If no *dimensions* are specified, then it returns the currently set dimensions.
 
 Dimension attributes include:
-"type": Possible values include: String, Date and number. Detected types are automatically populated by <a href="#parcoords_detectDimensions">detectDimensions</a> using d3.parcoords.<strong>detectDimensionTypes</strong>.
-"ticks": Number of horizontal ticks to include on y axis
-"innerTickSize": Length of the horizontal ticks in between the top and bottom
-"outerTickSize": Length of the horizontal ticks at the top and bottom
-"tickPadding": Pixels to pad the tick title from the innerTickSize
-"index": Integer position for ordering dimensions on the x axis
+
+"type": Possible values include: String, Date and number. Detected types are automatically populated by <a href="#parcoords_detectDimensions">detectDimensions</a> using d3.parcoords.<strong>detectDimensionTypes</strong>.  
+"ticks": Number of horizontal ticks to include on y axis  
+"innerTickSize": Length of the horizontal ticks in between the top and bottom  
+"outerTickSize": Length of the horizontal ticks at the top and bottom  
+"tickPadding": Pixels to pad the tick title from the innerTickSize  
+"index": Integer position for ordering dimensions on the x axis  
 
 
 <a name="parcoords_color" href="#parcoords_color">#</a> parcoords.<b>color</b>(*color*)
