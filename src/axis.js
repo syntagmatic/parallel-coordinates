@@ -92,7 +92,7 @@ pc.removeAxes = function() {
 };
 
 pc.updateAxes = function() {
-  var g_data = pc.svg.selectAll(".dimension").data(__.dimensions);
+  var g_data = pc.svg.selectAll(".dimension").data(pc.getOrderedDimensionKeys());
 
   // Enter
   g_data.enter().append("svg:g")

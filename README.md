@@ -94,31 +94,33 @@ If no dimensions have been specified, it will attempt to <a href="#parcoords_det
 
 <a name="parcoords_dimensions" href="#parcoords_dimensions">#</a> parcoords.<b>dimensions</b>(*dimensions*)
 
-If *dimensions* is specified, sets the quantitative dimensions to be visualized. The format is an array of dimension names. This will update the xscale domain, but will not trigger re-rendering of lines or axes.
+If *dimensions* is specified, sets the quantitative dimensions to be visualized and custom formatting. The format is an object of dimension objects. This will update the xscale domain, but will not trigger re-rendering of lines or axes.
 
 ```javascript
-var dimensions = ['protein', 'calcium', 'sodium'];
+var dimensions = {
+	{"name": 
+		{	
+			orient: 'right',
+			type: 'string',
+			tickPadding: 0,
+			innerTickSize: 8,
+			type: "string"
+		}
+	},
+	{"protein": {type:"number"}},
+	{"calcium": {type:"number"}};
 ```
 
 If no *dimensions* are specified, then it returns the currently set dimensions.
 
-<a name="parcoords_types" href="#parcoords_types">#</a> parcoords.<b>types</b>(*object*)
+Dimension attributes include:
+"type": Possible values include: String, Date and number. Detected types are automatically populated by <a href="#parcoords_detectDimensions">detectDimensions</a> using d3.parcoords.<strong>detectDimensionTypes</strong>.
+"ticks": Number of horizontal ticks to include on y axis
+"innerTickSize": Length of the horizontal ticks in between the top and bottom
+"outerTickSize": Length of the horizontal ticks at the top and bottom
+"tickPadding": Pixels to pad the tick title from the innerTickSize
+"index": Integer position for ordering dimensions on the x axis
 
-If *types* is specified, sets the data types for the dimensions. The format is an object where the keys are dimension names and the values are type strings.
-
-For example:
-
-```javascript
-var types = {
-  "name": "string",
-  "protein": "number",
-  "calcium": "number"
-}
-```
-
-If no *types* are specified, then it returns the currently set types.
-
-Detected types are automatically populated by <a href="#parcoords_detectDimensions">detectDimensions</a> using d3.parcoords.<strong>detectDimensionTypes</strong>.
 
 <a name="parcoords_color" href="#parcoords_color">#</a> parcoords.<b>color</b>(*color*)
 
@@ -164,6 +166,7 @@ Update SVG axes. Call this after updating the dimension order.
 1D-axes
 1D-axes-multi
 2D-strums
+angular
 ```
 
 <a name="parcoords_brushed" href="#parcoords_brushed">#</a> parcoords.<b>brushed</b>()
