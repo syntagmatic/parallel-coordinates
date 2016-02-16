@@ -13,9 +13,9 @@ pc.axisDots = function(r) {
 	var endAngle = 2 * Math.PI;
 	ctx.globalAlpha = d3.min([ 1 / Math.pow(__.data.length, 1 / 2), 1 ]);
 	__.data.forEach(function(d) {
-		__.dimensions.map(function(p, i) {
+		d3.entries(__.dimensions).forEach(function(p, i) {
 			ctx.beginPath();
-			ctx.arc(position(p), yscale[p](d[p]), r, startAngle, endAngle);
+			ctx.arc(position(p), __.dimensions[p.key].yscale(d[p]), r, startAngle, endAngle);
 			ctx.stroke();
 			ctx.fill();
 		});
