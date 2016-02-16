@@ -290,8 +290,14 @@ pc.commonScale = function(global, type) {
 		global = true;
 	}
 
+  // try to autodetect dimensions and create scales
+  if (!d3.keys(__.dimensions).length) {
+    pc.detectDimensions()
+  }
+  pc.autoscale();
+
 	// scales of the same type
-	var scales = __.dimensions.concat(__.hideAxis).filter(function(p) {
+	var scales = d3.keys(__.dimensions).filter(function(p) {
 		return __.dimensions[p].type == t;
 	});
 
