@@ -226,27 +226,14 @@ pc.reorderable = function() {
 // the lowest on the right. Visual values are determined by the data values in
 // the given row.
 pc.reorder = function(rowdata) {
-  var dims = __.dimensions.slice(0);
-  __.dimensions.sort(function(a, b) {
-    var pixelDifference = __.dimensions[a].yscale(rowdata[a]) - __.dimensions[b].yscale(rowdata[b]);
+  var firstDim = pc.getOrderedDimensionKeys()[0];
 
-    // Array.sort is not necessarily stable, this means that if pixelDifference is zero
-    // the ordering of dimensions might change unexpectedly. This is solved by sorting on
-    // variable name in that case.
-    if (pixelDifference === 0) {
-      return a.localeCompare(b);
-    } // else
-    return pixelDifference;
-  });
-
+	pc.sortDimensionsByRowData(rowdata);
   // NOTE: this is relatively cheap given that:
   // number of dimensions < number of data items
   // Thus we check equality of order to prevent rerendering when this is the case.
   var reordered = false;
-  dims.some(function(val, index) {
-    reordered = val !== __.dimensions[index];
-    return reordered;
-  });
+  reordered = firstDim !== pc.getOrderedDimensionKeys()[0];
 
   if (reordered) {
     xscale.domain(pc.getOrderedDimensionKeys());
@@ -265,6 +252,26 @@ pc.reorder = function(rowdata) {
       pc.highlight(highlighted);
     }
   }
+}
+
+pc.sortDimensionsByRowData = function(rowdata) {
+  var copy = __.dimensions;
+	var positionSortedKeys = d3.keys(__.dimensions).sort(function(a, b) {
+    var pixelDifference = __.dimensions[a].yscale(rowdata[a]) - __.dimensions[b].yscale(rowdata[b]);
+
+    // Array.sort is not necessarily stable, this means that if pixelDifference is zero
+    // the ordering of dimensions might change unexpectedly. This is solved by sorting on
+    // variable name in that case.
+    if (pixelDifference === 0) {
+      return a.localeCompare(b);
+    } // else
+    return pixelDifference;
+  });
+  __.dimensions = {};
+	positionSortedKeys.forEach(function(p, i){
+		__.dimensions[p] = copy[p];
+		__.dimensions[p].index = i;
+	});
 }
 
 pc.sortDimensions = function() {
