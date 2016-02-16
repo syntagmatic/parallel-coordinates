@@ -156,7 +156,7 @@ Drag the axes titles around to reorder the dimensions.
 d3.select("#reorder-dance").on("click", function() {
   event.preventDefault();
   function dance() {
-    pc2.dimensions( _.shuffle(pc2.dimensions()) )
+    pc2.dimensions( _.shuffle(d3.keys(pc2.dimensions())) )
     .render()
     .updateAxes();
   };
@@ -487,7 +487,7 @@ pc0 = d3.parcoords()("#example0")
 	var select = d3.select("#bundleDimension").append("select").on("change", changeBundle);
 	
 	var options = select.selectAll('option')
-		.data(pc0.dimensions().concat(pc0.hideAxis()));
+		.data(d3.keys(pc0.dimensions()));
 	
 	options
 		.enter()
