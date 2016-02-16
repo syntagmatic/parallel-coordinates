@@ -103,6 +103,7 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
   })
   .on("dimensions", function(d) {
     xscale.domain(pc.getOrderedDimensionKeys());
+    pc.sortDimensions();
     if (flags.interactive){pc.render().updateAxes();}
   })
   .on("bundleDimension", function(d) {
@@ -2220,6 +2221,9 @@ pc.intersection =  function(a, b, c, d) {
 };
 
 function position(d) {
+  if (xscale.range().length === 0) {
+    xscale.rangePoints([0, w()], 1);
+  }
   var v = dragging[d];
   return v == null ? xscale(d) : v;
 }
