@@ -52,7 +52,7 @@ d3.csv('examples/data/cars.csv', function(data) {
   pc1 = d3.parcoords()("#example1")
     .data(data)
     .hideAxis(["name"])
-    .composite("darker")
+    .composite("darken")
     .color(function(d) { return blue_to_brown(d['economy (mpg)']); })  // quantitative color scale
     .alpha(0.35)
     .render()
@@ -296,7 +296,7 @@ d3.csv('examples/data/cars.csv', function(data) {
   pcz = d3.parcoords()("#example-zscore")
     .data(data)
     .hideAxis(["name"])
-    .composite("darker")
+    .composite("darken")
     .render()
     .alpha(0.35)
     .brushMode("1D-axes")  // enable brushing
@@ -368,7 +368,7 @@ Four useful settings are:
   "source-over",
   "lighter",
   "destination-over",
-  "darker"
+  "darken"
 ];
 
 var color = d3.scale.linear()
@@ -432,7 +432,7 @@ d3.csv('examples/data/nutrients.csv', function(data) {
     .hideAxis(["name"])
     .color(color)
     .alpha(0.25)
-    .composite("darker")
+    .composite("darken")
     .margin({ top: 24, left: 150, bottom: 12, right: 0 })
     .mode("queue")
     .render()
