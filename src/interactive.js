@@ -65,6 +65,9 @@ pc.intersection =  function(a, b, c, d) {
 };
 
 function position(d) {
+  if (xscale.range().length === 0) {
+    xscale.rangePoints([0, w()], 1);
+  }
   var v = dragging[d];
   return v == null ? xscale(d) : v;
 }
