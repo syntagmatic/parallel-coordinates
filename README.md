@@ -251,7 +251,7 @@ parcoords.margin({
 
 <a name="parcoords_composite" href="#parcoords_composite">#</a> parcoords.<b>composite</b>()
 
-Change foreground context's [globalCompositeOperation](https://developer.mozilla.org/en-US/docs/Canvas_tutorial/Compositing)
+Change foreground context's [globalCompositeOperation](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation)
 
 * source-over
 * source-in
