@@ -118,9 +118,12 @@ Dimension attributes include:
 "title": String label for dimension  
 "type": Possible values include: String, Date and number. Detected types are automatically populated by <a href="#parcoords_detectDimensions">detectDimensions</a> using d3.parcoords.<strong>detectDimensionTypes</strong>.  
 "ticks": Number of horizontal ticks to include on y axis  
+"tickValues": Array of values to display for tick labels  
+"orient": Orientation of ticks and tickValues(left or right of axis)  
 "innerTickSize": Length of the horizontal ticks in between the top and bottom  
 "outerTickSize": Length of the horizontal ticks at the top and bottom  
 "tickPadding": Pixels to pad the tick title from the innerTickSize  
+"yscale": Type of scale to use for the axis(log, linear, ordinal) 
 "index": Integer position for ordering dimensions on the x axis  
 
 
