@@ -126,10 +126,20 @@ d3.csv('data/nutrients.csv', function(data) {
 
   // highlight row in chart
   grid.onMouseEnter.subscribe(function(e,args) {
-    var i = grid.getCellFromEvent(e).row;
+    // Get row number from grid
+    var grid_row = grid.getCellFromEvent(e).row;
+
+    // Get the id of the item referenced in grid_row
+    var item_id = grid.getDataItem(grid_row).id;
     var d = parcoords.brushed() || data;
-    parcoords.highlight([d[i]]);
+
+    // Get the element position of the id in the data object
+    elementPos = d.map(function(x) {return x.id; }).indexOf(item_id);
+
+    // Highlight that element in the parallel coordinates graph
+    parcoords.highlight([d[elementPos]]);
   });
+
   grid.onMouseLeave.subscribe(function(e,args) {
     parcoords.unhighlight();
   });
