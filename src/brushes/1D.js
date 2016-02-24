@@ -1,28 +1,28 @@
 // brush mode: 1D-Axes
 
 (function() {
-  var brushes = {};
+	var brushes = {};
 
-  function is_brushed(p) {
-    return !brushes[p].empty();
-  }
+	function is_brushed(p) {
+		return !brushes[p].empty();
+	}
 
   // data within extents
   function selected() {
     var actives = d3.keys(__.dimensions).filter(is_brushed),
         extents = actives.map(function(p) { return brushes[p].extent(); });
 
-    // We don't want to return the full data set when there are no axes brushed.
-    // Actually, when there are no axes brushed, by definition, no items are
-    // selected. So, let's avoid the filtering and just return false.
-    //if (actives.length === 0) return false;
+		// We don't want to return the full data set when there are no axes brushed.
+		// Actually, when there are no axes brushed, by definition, no items are
+		// selected. So, let's avoid the filtering and just return false.
+		//if (actives.length === 0) return false;
 
-    // Resolves broken examples for now. They expect to get the full dataset back from empty brushes
-    if (actives.length === 0) return __.data;
+		// Resolves broken examples for now. They expect to get the full dataset back from empty brushes
+		if (actives.length === 0) return __.data;
 
-    // test if within range
-    var within = {
-      "date": function(d,p,dimension) {
+		// test if within range
+		var within = {
+			"date": function(d,p,dimension) {
 	if (typeof __.dimensions[p].yscale.rangePoints === "function") { // if it is ordinal
           return extents[dimension][0] <= __.dimensions[p].yscale(d[p]) && __.dimensions[p].yscale(d[p]) <= extents[dimension][1]
         } else {
@@ -94,7 +94,10 @@
 					brush.extent(extents[d]);
 
 					//redraw the brush
-					brush(brushSelections[d]);
+					brushSelections[d]
+						.transition()
+						.duration(0)
+						.call(brush);
 
 					//fire some events
 					brush.event(brushSelections[d]);
@@ -103,6 +106,8 @@
 
 			//redraw the chart
 			pc.renderBrushed();
+
+			return pc;
 		}
   }
 
@@ -116,58 +121,76 @@
 					d3.event.sourceEvent.stopPropagation();
 				}
 			})
-      .on("brush", function() {
-        brushUpdated(selected());
-      })
-      .on("brushend", function() {
-        events.brushend.call(pc, __.brushed);
-      });
+			.on("brush", function() {
+				brushUpdated(selected());
+			})
+			.on("brushend", function() {
+				events.brushend.call(pc, __.brushed);
+			});
 
-    brushes[axis] = brush;
-    return brush;
-  };
-  function brushReset(dimension) {
-    __.brushed = false;
-    if (g) {
-      g.selectAll('.brush')
-        .each(function(d) {
-          d3.select(this).call(
-            brushes[d].clear()
-          );
-        });
-      pc.renderBrushed();
-    }
-    return this;
-  };
+		brushes[axis] = brush;
+		return brush;
+	};
 
-  function install() {
-    if (!g) pc.createAxes();
+	function brushReset(dimension) {
+		if (dimension===undefined) {
+			__.brushed = false;
+			if (g) {
+				g.selectAll('.brush')
+					.each(function(d) {
+						d3.select(this)
+							.transition()
+							.duration(0)
+							.call(brushes[d].clear());
+					});
+				pc.renderBrushed();
+			}
+		}
+		else {
+			if (g) {
+				g.selectAll('.brush')
+					.each(function(d) {
+						if (d!=dimension) return;
+						d3.select(this)
+							.transition()
+							.duration(0)
+							.call(brushes[d].clear());
+						brushes[d].event(d3.select(this));
+					});
+				pc.renderBrushed();
+			}
+		}
+		return this;
+	};
 
-    // Add and store a brush for each axis.
-    g.append("svg:g")
-      .attr("class", "brush")
-      .each(function(d) {
-        d3.select(this).call(brushFor(d));
-      })
-      .selectAll("rect")
-        .style("visibility", null)
-        .attr("x", -15)
-        .attr("width", 30);
+	function install() {
+		if (!g) pc.createAxes();
 
-    pc.brushExtents = brushExtents;
-    pc.brushReset = brushReset;
-    return pc;
-  };
+		// Add and store a brush for each axis.
+		g.append("svg:g")
+			.attr("class", "brush")
+			.each(function(d) {
+				d3.select(this).call(brushFor(d));
+			})
+			.selectAll("rect")
+				.style("visibility", null)
+				.attr("x", -15)
+				.attr("width", 30);
 
-  brush.modes["1D-axes"] = {
-    install: install,
-    uninstall: function() {
-      g.selectAll(".brush").remove();
-      brushes = {};
-      delete pc.brushExtents;
-      delete pc.brushReset;
-    },
-    selected: selected,
-    brushState: brushExtents
-  }
+		pc.brushExtents = brushExtents;
+		pc.brushReset = brushReset;
+		return pc;
+	};
+
+	brush.modes["1D-axes"] = {
+		install: install,
+		uninstall: function() {
+			g.selectAll(".brush").remove();
+			brushes = {};
+			delete pc.brushExtents;
+			delete pc.brushReset;
+		},
+		selected: selected,
+		brushState: brushExtents
+	}
 })();
