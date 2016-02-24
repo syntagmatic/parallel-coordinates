@@ -4,7 +4,7 @@ function compute_cluster_centroids(d) {
 	var clusterCounts = d3.map();
 	// determine clusterCounts
 	__.data.forEach(function(row) {
-		var scaled = yscale[d](row[d]);
+		var scaled = __.dimensions[d].yscale(row[d]);
 		if (!clusterCounts.has(scaled)) {
 			clusterCounts.set(scaled, 0);
 		}
@@ -13,8 +13,8 @@ function compute_cluster_centroids(d) {
 	});
 
 	__.data.forEach(function(row) {
-		__.dimensions.map(function(p, i) {
-			var scaled = yscale[d](row[d]);
+		d3.keys(__.dimensions).map(function(p, i) {
+			var scaled = __.dimensions[d].yscale(row[d]);
 			if (!clusterCentroids.has(scaled)) {
 				var map = d3.map();
 				clusterCentroids.set(scaled, map);
@@ -23,7 +23,7 @@ function compute_cluster_centroids(d) {
 				clusterCentroids.get(scaled).set(p, 0);
 			}
 			var value = clusterCentroids.get(scaled).get(p);
-			value += yscale[p](row[p]) / clusterCounts.get(scaled);
+			value += __.dimensions[p].yscale(row[p]) / clusterCounts.get(scaled);
 			clusterCentroids.get(scaled).set(p, value);
 		});
 	});
@@ -35,22 +35,22 @@ function compute_cluster_centroids(d) {
 function compute_centroids(row) {
 	var centroids = [];
 
-	var p = __.dimensions;
+	var p = d3.keys(__.dimensions);
 	var cols = p.length;
 	var a = 0.5;			// center between axes
 	for (var i = 0; i < cols; ++i) {
 		// centroids on 'real' axes
 		var x = position(p[i]);
-		var y = yscale[p[i]](row[p[i]]);
+		var y = __.dimensions[p[i]].yscale(row[p[i]]);
 		centroids.push($V([x, y]));
 
 		// centroids on 'virtual' axes
 		if (i < cols - 1) {
 			var cx = x + a * (position(p[i+1]) - x);
-			var cy = y + a * (yscale[p[i+1]](row[p[i+1]]) - y);
+			var cy = y + a * (__.dimensions[p[i+1]].yscale(row[p[i+1]]) - y);
 			if (__.bundleDimension !== null) {
-				var leftCentroid = __.clusterCentroids.get(yscale[__.bundleDimension](row[__.bundleDimension])).get(p[i]);
-				var rightCentroid = __.clusterCentroids.get(yscale[__.bundleDimension](row[__.bundleDimension])).get(p[i+1]);
+				var leftCentroid = __.clusterCentroids.get(__.dimensions[__.bundleDimension].yscale(row[__.bundleDimension])).get(p[i]);
+				var rightCentroid = __.clusterCentroids.get(__.dimensions[__.bundleDimension].yscale(row[__.bundleDimension])).get(p[i+1]);
 				var centroid = 0.5 * (leftCentroid + rightCentroid);
 				cy = centroid + (1 - __.bundlingStrength) * (cy - centroid);
 			}

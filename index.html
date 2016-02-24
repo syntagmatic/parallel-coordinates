@@ -3,7 +3,6 @@
 <link rel="stylesheet" type="text/css" href="d3.parcoords.css">
 <script src="examples/lib/d3.min.js"></script>
 <script src="examples/lib/sylvester.js"></script>
-<script src="examples/lib/underscore.js"></script>
 <script src="examples/lib/slickgrid/jquery-1.7.min.js"></script>
 <script src="examples/lib/underscore.js"></script>
 <script src="examples/lib/underscore.math.js"></script>
@@ -53,7 +52,7 @@ d3.csv('examples/data/cars.csv', function(data) {
   pc1 = d3.parcoords()("#example1")
     .data(data)
     .hideAxis(["name"])
-    .composite("darker")
+    .composite("darken")
     .color(function(d) { return blue_to_brown(d['economy (mpg)']); })  // quantitative color scale
     .alpha(0.35)
     .render()
@@ -119,7 +118,6 @@ var data = [
 var pc = d3.parcoords()("#<strong>example</strong>")
   .data(<strong>data</strong>)
   .render()
-  .ticks(3)
   .createAxes();
 &lt;/script&gt;
 </pre>
@@ -135,7 +133,6 @@ var data = [
 var pc = d3.parcoords()("#example")
   .data(data)
   .render()
-  .ticks(3)
   .createAxes();
 </script>
 
@@ -159,7 +156,7 @@ Drag the axes titles around to reorder the dimensions.
 d3.select("#reorder-dance").on("click", function() {
   event.preventDefault();
   function dance() {
-    pc2.dimensions( _.shuffle(pc2.dimensions()) )
+    pc2.dimensions( _.shuffle(d3.keys(pc2.dimensions())) )
     .render()
     .updateAxes();
   };
@@ -299,7 +296,7 @@ d3.csv('examples/data/cars.csv', function(data) {
   pcz = d3.parcoords()("#example-zscore")
     .data(data)
     .hideAxis(["name"])
-    .composite("darker")
+    .composite("darken")
     .render()
     .alpha(0.35)
     .brushMode("1D-axes")  // enable brushing
@@ -371,7 +368,7 @@ Four useful settings are:
   "source-over",
   "lighter",
   "destination-over",
-  "darker"
+  "darken"
 ];
 
 var color = d3.scale.linear()
@@ -435,7 +432,7 @@ d3.csv('examples/data/nutrients.csv', function(data) {
     .hideAxis(["name"])
     .color(color)
     .alpha(0.25)
-    .composite("darker")
+    .composite("darken")
     .margin({ top: 24, left: 150, bottom: 12, right: 0 })
     .mode("queue")
     .render()
@@ -490,7 +487,7 @@ pc0 = d3.parcoords()("#example0")
 	var select = d3.select("#bundleDimension").append("select").on("change", changeBundle);
 	
 	var options = select.selectAll('option')
-		.data(pc0.dimensions().concat(pc0.hideAxis()));
+		.data(d3.keys(pc0.dimensions()));
 	
 	options
 		.enter()
@@ -526,6 +523,7 @@ For past versions of parallel coordinates that demonstrate various features and 
   <li><a href="http://charts.graphicbaseball.com/">Baseball Batting/Pitching</a></li>
   <li><a href="http://bl.ocks.org/tmcw/raw/11385055/">Running Boston Marathon</a></li>
   <li><a href="http://lmnts.lmnarchitects.com/interaction/interacting-with-climate-data/">Interacting with Climate Data</a></li>
+  <li><a href="https://realimpactanalytics.github.io/d4g-hackathon-malaria-viz/">Malaria Data Exploration</a></li>
 </ul>
 
 <h3>Talk</h3>

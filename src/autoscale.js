@@ -68,12 +68,10 @@ pc.autoscale = function() {
     }
   };
 
-  __.dimensions.forEach(function(k) {
-    yscale[k] = defaultScales[__.types[k]](k);
-  });
-
-  __.hideAxis.forEach(function(k) {
-    yscale[k] = defaultScales[__.types[k]](k);
+  d3.keys(__.dimensions).forEach(function(k) {
+    if (!__.dimensions[k].yscale){
+      __.dimensions[k].yscale = defaultScales[__.dimensions[k].type](k);
+    }
   });
 
   // xscale
@@ -101,14 +99,14 @@ pc.autoscale = function() {
 };
 
 pc.scale = function(d, domain) {
-	yscale[d].domain(domain);
+  __.dimensions[d].yscale.domain(domain);
 
 	return this;
 };
 
 pc.flip = function(d) {
-	//yscale[d].domain().reverse();					// does not work
-	yscale[d].domain(yscale[d].domain().reverse()); // works
+	//__.dimensions[d].yscale.domain().reverse();					// does not work
+  __.dimensions[d].yscale.domain(__.dimensions[d].yscale.domain().reverse()); // works
 
 	return this;
 };
@@ -119,25 +117,31 @@ pc.commonScale = function(global, type) {
 		global = true;
 	}
 
+  // try to autodetect dimensions and create scales
+  if (!d3.keys(__.dimensions).length) {
+    pc.detectDimensions()
+  }
+  pc.autoscale();
+
 	// scales of the same type
-	var scales = __.dimensions.concat(__.hideAxis).filter(function(p) {
-		return __.types[p] == t;
+	var scales = d3.keys(__.dimensions).filter(function(p) {
+		return __.dimensions[p].type == t;
 	});
 
 	if (global) {
-		var extent = d3.extent(scales.map(function(p,i) {
-				return yscale[p].domain();
+		var extent = d3.extent(scales.map(function(d,i) {
+				return __.dimensions[d].yscale.domain();
 			}).reduce(function(a,b) {
 				return a.concat(b);
 			}));
 
 		scales.forEach(function(d) {
-			yscale[d].domain(extent);
+      __.dimensions[d].yscale.domain(extent);
 		});
 
 	} else {
-		scales.forEach(function(k) {
-			yscale[k].domain(d3.extent(__.data, function(d) { return +d[k]; }));
+		scales.forEach(function(d) {
+      __.dimensions[d].yscale.domain(d3.extent(__.data, function(d) { return +d[k]; }));
 		});
 	}
 

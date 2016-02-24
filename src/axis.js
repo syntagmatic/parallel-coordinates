@@ -8,7 +8,7 @@ function flipAxisAndUpdatePCP(dimension) {
   d3.select(this.parentElement)
     .transition()
       .duration(1100)
-      .call(axis.scale(yscale[dimension]));
+      .call(axis.scale(__.dimensions[dimension].yscale));
 
   pc.render();
 }
@@ -25,7 +25,7 @@ function rotateLabels() {
 }
 
 function dimensionLabels(d) {
-  return d in __.dimensionTitles ? __.dimensionTitles[d] : d;  // dimension display names
+  return __.dimensions[d].title ? __.dimensions[d].title : d;  // dimension display names
 }
 
 pc.createAxes = function() {
@@ -33,16 +33,21 @@ pc.createAxes = function() {
 
   // Add a group element for each dimension.
   g = pc.svg.selectAll(".dimension")
-      .data(__.dimensions, function(d) { return d; })
+      .data(pc.getOrderedDimensionKeys(), function(d) {
+        return d;
+      })
     .enter().append("svg:g")
       .attr("class", "dimension")
-      .attr("transform", function(d) { return "translate(" + xscale(d) + ")"; });
+      .attr("transform", function(d) {
+        return "translate(" + xscale(d) + ")";
+      });
 
   // Add an axis and title.
   g.append("svg:g")
       .attr("class", "axis")
       .attr("transform", "translate(0,0)")
-      .each(function(d) { d3.select(this).call(axis.scale(yscale[d])); })
+      .each(function(d) { d3.select(this).call( pc.applyAxisConfig(axis, __.dimensions[d]) )
+      })
     .append("svg:text")
       .attr({
         "text-anchor": "middle",
@@ -87,7 +92,7 @@ pc.removeAxes = function() {
 };
 
 pc.updateAxes = function() {
-  var g_data = pc.svg.selectAll(".dimension").data(__.dimensions);
+  var g_data = pc.svg.selectAll(".dimension").data(pc.getOrderedDimensionKeys());
 
   // Enter
   g_data.enter().append("svg:g")
@@ -97,7 +102,8 @@ pc.updateAxes = function() {
     .append("svg:g")
       .attr("class", "axis")
       .attr("transform", "translate(0,0)")
-      .each(function(d) { d3.select(this).call(axis.scale(yscale[d])); })
+      .each(function(d) { d3.select(this).call( pc.applyAxisConfig(axis, __.dimensions[d]) )
+      })
     .append("svg:text")
       .attr({
         "text-anchor": "middle",
@@ -115,8 +121,7 @@ pc.updateAxes = function() {
   g_data.select(".axis")
     .transition()
       .duration(1100)
-      .each(function(d) {
-        d3.select(this).call(axis.scale(yscale[d]));
+      .each(function(d) { d3.select(this).call( pc.applyAxisConfig(axis, __.dimensions[d]) )
       });
   g_data.select(".label")
     .transition()
@@ -135,7 +140,8 @@ pc.updateAxes = function() {
   pc.svg.selectAll(".axis")
     .transition()
       .duration(1100)
-      .each(function(d) { d3.select(this).call(axis.scale(yscale[d])); });
+      .each(function(d) { d3.select(this).call( pc.applyAxisConfig(axis, __.dimensions[d]) );
+      });
 
   if (flags.brushable) pc.brushable();
   if (flags.reorderable) pc.reorderable();
@@ -145,6 +151,17 @@ pc.updateAxes = function() {
     pc.brushMode(mode);
   }
   return this;
+};
+
+pc.applyAxisConfig = function(axis, dimension) {
+  return axis.scale(dimension.yscale)
+    .orient(dimension.orient)
+    .ticks(dimension.ticks)
+    .tickValues(dimension.tickValues)
+    .innerTickSize(dimension.innerTickSize)
+    .outerTickSize(dimension.outerTickSize)
+    .tickPadding(dimension.tickPadding)
+    .tickFormat(dimension.tickFormat)
 };
 
 // Jason Davies, http://bl.ocks.org/1341281
@@ -158,21 +175,23 @@ pc.reorderable = function() {
       })
       .on("drag", function(d) {
         dragging[d] = Math.min(w(), Math.max(0, this.__origin__ += d3.event.dx));
-        __.dimensions.sort(function(a, b) { return position(a) - position(b); });
-        xscale.domain(__.dimensions);
+        pc.sortDimensions();
+        xscale.domain(pc.getOrderedDimensionKeys());
         pc.render();
-        g.attr("transform", function(d) { return "translate(" + position(d) + ")"; });
+        g.attr("transform", function(d) {
+          return "translate(" + position(d) + ")";
+        });
       })
       .on("dragend", function(d) {
         // Let's see if the order has changed and send out an event if so.
         var i = 0,
-            j = __.dimensions.indexOf(d),
+            j = __.dimensions[d].index,
             elem = this,
             parent = this.parentElement;
 
         while((elem = elem.previousElementSibling) != null) ++i;
         if (i !== j) {
-          events.axesreorder.call(pc, __.dimensions);
+          events.axesreorder.call(pc, pc.getOrderedDimensionKeys());
           // We now also want to reorder the actual dom elements that represent
           // the axes. That is, the g.dimension elements. If we don't do this,
           // we get a weird and confusing transition when updateAxes is called.
@@ -207,30 +226,17 @@ pc.reorderable = function() {
 // the lowest on the right. Visual values are determined by the data values in
 // the given row.
 pc.reorder = function(rowdata) {
-  var dims = __.dimensions.slice(0);
-  __.dimensions.sort(function(a, b) {
-    var pixelDifference = yscale[a](rowdata[a]) - yscale[b](rowdata[b]);
+  var firstDim = pc.getOrderedDimensionKeys()[0];
 
-    // Array.sort is not necessarily stable, this means that if pixelDifference is zero
-    // the ordering of dimensions might change unexpectedly. This is solved by sorting on
-    // variable name in that case.
-    if (pixelDifference === 0) {
-      return a.localeCompare(b);
-    } // else
-    return pixelDifference;
-  });
-
+	pc.sortDimensionsByRowData(rowdata);
   // NOTE: this is relatively cheap given that:
   // number of dimensions < number of data items
   // Thus we check equality of order to prevent rerendering when this is the case.
   var reordered = false;
-  dims.some(function(val, index) {
-    reordered = val !== __.dimensions[index];
-    return reordered;
-  });
+  reordered = firstDim !== pc.getOrderedDimensionKeys()[0];
 
   if (reordered) {
-    xscale.domain(__.dimensions);
+    xscale.domain(pc.getOrderedDimensionKeys());
     var highlighted = __.highlighted.slice(0);
     pc.unhighlight();
 
@@ -247,6 +253,38 @@ pc.reorder = function(rowdata) {
     }
   }
 }
+
+pc.sortDimensionsByRowData = function(rowdata) {
+  var copy = __.dimensions;
+	var positionSortedKeys = d3.keys(__.dimensions).sort(function(a, b) {
+    var pixelDifference = __.dimensions[a].yscale(rowdata[a]) - __.dimensions[b].yscale(rowdata[b]);
+
+    // Array.sort is not necessarily stable, this means that if pixelDifference is zero
+    // the ordering of dimensions might change unexpectedly. This is solved by sorting on
+    // variable name in that case.
+    if (pixelDifference === 0) {
+      return a.localeCompare(b);
+    } // else
+    return pixelDifference;
+  });
+  __.dimensions = {};
+	positionSortedKeys.forEach(function(p, i){
+		__.dimensions[p] = copy[p];
+		__.dimensions[p].index = i;
+	});
+}
+
+pc.sortDimensions = function() {
+  var copy = __.dimensions;
+  var positionSortedKeys = d3.keys(__.dimensions).sort(function(a, b) {
+  	return position(a) - position(b);
+	});
+  __.dimensions = {};
+  positionSortedKeys.forEach(function(p, i){
+    __.dimensions[p] = copy[p];
+    __.dimensions[p].index = i;
+  })
+};
 
 // pairs of adjacent dimensions
 pc.adjacent_pairs = function(arr) {
