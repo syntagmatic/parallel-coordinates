@@ -23,14 +23,12 @@ var pc = d3.parcoords({nullValueSeparator: "bottom"})("#example")
   .reorderable()
   .brushMode("1D-axes")
   .brushExtents({"2": [3,4]});
-  //.brushExtents([,,[3,4],,,]);
 
-pc.updateBrush(2, [3,12], 500);
-//pc.brushReset();
-pc.updateBrush(3, [3,6], 500);
-//pc.brushReset();
+pc.brushReset();
+pc.brushExtents({"3": [3,6]});
+
+pc.brushExtents({"2": [3,12]});
 
 
-//pc.brushExtents([,,[3,12],,,]);
 
 </script>

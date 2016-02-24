@@ -13,7 +13,7 @@
 
   // data within extents
   function selected() {
-    var actives = __.dimensions.filter(is_brushed),
+    var actives = d3.keys(__.dimensions).filter(is_brushed),
         extents = actives.map(function(p) { return brushes[p].extent(); });
 
     // We don't want to return the full data set when there are no axes brushed.
@@ -27,21 +27,21 @@
     // test if within range
     var within = {
       "date": function(d,p,dimension,b) {
-        if (typeof yscale[p].rangePoints === "function") { // if it is ordinal
-          return b[0] <= yscale[p](d[p]) && yscale[p](d[p]) <= b[1]
+        if (typeof __.dimensions[p].yscale.rangePoints === "function") { // if it is ordinal
+          return b[0] <= __.dimensions[p].yscale(d[p]) && __.dimensions[p].yscale(d[p]) <= b[1]
         } else {
             return b[0] <= d[p] && d[p] <= b[1]
         }
       },
       "number": function(d,p,dimension,b) {
-        if (typeof yscale[p].rangePoints === "function") { // if it is ordinal
-          return b[0] <= yscale[p](d[p]) && yscale[p](d[p]) <= b[1]
+        if (typeof __.dimensions[p].yscale.rangePoints === "function") { // if it is ordinal
+          return b[0] <= __.dimensions[p].yscale(d[p]) && __.dimensions[p].yscale(d[p]) <= b[1]
         } else {
             return b[0] <= d[p] && d[p] <= b[1]
         }
       },
       "string": function(d,p,dimension,b) {
-        return b[0] <= yscale[p](d[p]) && yscale[p](d[p]) <= b[1]
+        return b[0] <= __.dimensions[p].yscale(d[p]) && __.dimensions[p].yscale(d[p]) <= b[1]
       }
     };
 
@@ -51,13 +51,13 @@
       case "AND":
         return actives.every(function(p, dimension) {
           return extents[dimension].some(function(b) {
-          	return within[__.types[p]](d,p,dimension,b);
+          	return within[__.dimensions[p].type](d,p,dimension,b);
           });
         });
       case "OR":
         return actives.some(function(p, dimension) {
       	  return extents[dimension].some(function(b) {
-            	return within[__.types[p]](d,p,dimension,b);
+            	return within[__.dimensions[p].type](d,p,dimension,b);
             });
         });
       default:
@@ -68,7 +68,7 @@
 
   function brushExtents() {
     var extents = {};
-    __.dimensions.forEach(function(d) {
+    d3.keys(__.dimensions).forEach(function(d) {
       var brush = brushes[d];
       if (brush !== undefined && !brush.empty()) {
         var extent = brush.extent();
@@ -82,7 +82,7 @@
     var brush = d3.svg.multibrush();
 
     brush
-      .y(yscale[axis])
+      .y(__.dimensions[axis].yscale)
       .on("brushstart", function() {
 				if(d3.event.sourceEvent !== null) {
 					d3.event.sourceEvent.stopPropagation();

@@ -19,10 +19,14 @@
       .attr("class", "strum");
 
     line
-      .attr("x1", function(d) { return d.p1[0]; })
-      .attr("y1", function(d) { return d.p1[1]; })
-      .attr("x2", function(d) { return d.p2[0]; })
-      .attr("y2", function(d) { return d.p2[1]; })
+      .attr("x1", function(d) {
+        return d.p1[0]; })
+      .attr("y1", function(d) {
+        return d.p1[1]; })
+      .attr("x2", function(d) {
+        return d.p2[0]; })
+      .attr("y2", function(d) {
+        return d.p2[1]; })
       .attr("stroke", "black")
       .attr("stroke-width", 2);
 
@@ -59,9 +63,9 @@
 
   function dimensionsForPoint(p) {
     var dims = { i: -1, left: undefined, right: undefined };
-    __.dimensions.some(function(dim, i) {
+    d3.keys(__.dimensions).some(function(dim, i) {
       if (xscale(dim) < p[0]) {
-        var next = __.dimensions[i + 1];
+        var next = d3.keys(__.dimensions)[pc.getOrderedDimensionKeys().indexOf(dim)+1];
         dims.i = i;
         dims.left = dim;
         dims.right = next;
@@ -73,13 +77,13 @@
     if (dims.left === undefined) {
       // Event on the left side of the first axis.
       dims.i = 0;
-      dims.left = __.dimensions[0];
-      dims.right = __.dimensions[1];
+      dims.left = pc.getOrderedDimensionKeys()[0];
+      dims.right = pc.getOrderedDimensionKeys()[1];
     } else if (dims.right === undefined) {
       // Event on the right side of the last axis
-      dims.i = __.dimensions.length - 1;
+      dims.i = d3.keys(__.dimensions).length - 1;
       dims.right = dims.left;
-      dims.left = __.dimensions[__.dimensions.length - 2];
+      dims.left = pc.getOrderedDimensionKeys()[d3.keys(__.dimensions).length - 2];
     }
 
     return dims;
@@ -166,8 +170,8 @@
           test = containmentTest(strum, strums.width(id)),
           d1 = strum.dims.left,
           d2 = strum.dims.right,
-          y1 = yscale[d1],
-          y2 = yscale[d2],
+          y1 = __.dimensions[d1].yscale,
+          y2 = __.dimensions[d2].yscale,
           point = [y1(d[d1]) - strum.minX, y2(d[d2]) - strum.minX];
       return test(point);
     }
@@ -256,8 +260,8 @@
 
       // Checks if the first dimension is directly left of the second dimension.
       function consecutive(first, second) {
-        var length = __.dimensions.length;
-        return __.dimensions.some(function(d, i) {
+        var length = d3.keys(__.dimensions).length;
+        return d3.keys(__.dimensions).some(function(d, i) {
           return (d === first)
             ? i + i < length && __.dimensions[i + 1] === second
             : false;

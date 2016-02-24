@@ -1,0 +1,123 @@
+<!doctype html>
+<title>Axis-Config Example</title>
+<link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<script src="lib/d3.min.js"></script>
+<script src="lib/d3.svg.multibrush.js"></script>
+<script src="../d3.parcoords.js"></script>
+<div id="example" class="parcoords" style="width:960px;height:200px;"></div>
+<p>This example demonstrates dimension configuration. The displacement axis is scaled logarithmically with a custom tickformat, the Power axis has a custom title, and the tick labels for year are on the right
+
+<p>
+    <label for="sltBrushMode">Brush mode:</label>
+    <select id="sltBrushMode">
+    </select>
+    <label id="lblPredicate" for="sltPredicate">Predicate:</label>
+    <select id="sltPredicate">
+        <option>AND</option>
+        <option>OR</option>
+    </select>
+    <button id="btnReset">Reset Brushes</button>
+</p>
+
+
+
+
+    <script>
+        // quantitative color scale
+        var blue_to_brown = d3.scale.linear()
+                .domain([9, 50])
+                .range(["steelblue", "brown"])
+                .interpolate(d3.interpolateLab);
+
+        var color = function(d) { return blue_to_brown(d['economy (mpg)']); };
+
+        var parcoords = d3.parcoords()("#example")
+                .color(color)
+                .alpha(0.4);
+
+        // load csv file and create the chart
+        d3.csv('data/cars.csv', function(data) {
+            var range = parcoords.height() - parcoords.margin().top - parcoords.margin().bottom;
+            var min = d3.min(data, function(d) {
+                return parseInt(d['displacement (cc)']);
+            });
+            var max = d3.max(data, function(d) {
+                return parseInt(d['displacement (cc)']);
+            });
+            var log = d3.scale.log().domain([min, max]).range([range, 1]);
+
+            var dimensions = {
+                'displacement (cc)': {
+                    title: "Displacement (cc)",
+                    yscale: log,
+                    tickFormat: function(d){
+                        return log.tickFormat(4,d3.format(",d"))(d);
+                    }
+                },
+                'power (hp)': {
+                    title: "MMhhm Power",
+                    innerTickSize: 10,
+                    outerTickSize: 20
+                },
+                'year': {
+                    orient: 'right',
+                    type: 'string',
+                    tickPadding: 0,
+                    innerTickSize: 8
+                }
+            };
+
+
+
+            parcoords
+                    .data(data)
+                    .composite("darker")
+                    .dimensions(dimensions)
+                    //.hideAxis(['name'])
+                    .render()
+                    .shadows()
+                    .reorderable()
+                    .interactive()
+                    .brushMode("1D-axes");  // enable brushing
+        });
+
+        var sltBrushMode = d3.select('#sltBrushMode')
+
+        sltBrushMode.selectAll('option')
+                .data(parcoords.brushModes())
+                .enter()
+                .append('option')
+                .text(function(d) { return d; });
+
+        sltBrushMode.on('change', function() {
+            parcoords.brushMode(this.value);
+            switch(this.value) {
+                case 'None':
+                    d3.select("#pStrums").style("visibility", "hidden");
+                    d3.select("#lblPredicate").style("visibility", "hidden");
+                    d3.select("#sltPredicate").style("visibility", "hidden");
+                    d3.select("#btnReset").style("visibility", "hidden");
+                    break;
+                case '2D-strums':
+                    d3.select("#pStrums").style("visibility", "visible");
+                    break;
+                default:
+                    d3.select("#pStrums").style("visibility", "hidden");
+                    d3.select("#lblPredicate").style("visibility", "visible");
+                    d3.select("#sltPredicate").style("visibility", "visible");
+                    d3.select("#btnReset").style("visibility", "visible");
+                    break;
+            }
+        });
+
+        sltBrushMode.property('value', '1D-axes');
+
+        d3.select('#btnReset').on('click', function() {parcoords.brushReset();})
+        d3.select('#sltPredicate').on('change', function() {
+            parcoords.brushPredicate(this.value);
+        });
+    </script>
+
+
+

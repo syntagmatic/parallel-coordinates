@@ -32,7 +32,6 @@ $.getJSON('http://www.reddit.com/.json?limit=100&jsonp=?', function(raw) {
 
   parcoords
     .data(data)
-    .detectDimensions()
     .dimensions(dimensions)
     .render()
     .brushMode("1D-axes");  // enable brushing

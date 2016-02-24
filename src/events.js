@@ -9,7 +9,6 @@ var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush", "
       debug: false
     },
     xscale = d3.scale.ordinal(),
-    yscale = {},
     dragging = {},
     line = d3.svg.line(),
     axis = d3.svg.axis().orient("left").ticks(5),
@@ -39,14 +38,16 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
     foregroundQueue.rate(d.value);
   })
   .on("dimensions", function(d) {
-    xscale.domain(__.dimensions);
+    __.dimensions = pc.applyDimensionDefaults(d3.keys(d.value));
+    xscale.domain(pc.getOrderedDimensionKeys());
+    pc.sortDimensions();
     if (flags.interactive){pc.render().updateAxes();}
   })
   .on("bundleDimension", function(d) {
-	  if (!__.dimensions.length) pc.detectDimensions();
-	  if (!(__.dimensions[0] in yscale)) pc.autoscale();
+	  if (!d3.keys(__.dimensions).length) pc.detectDimensions();
+	  pc.autoscale();
 	  if (typeof d.value === "number") {
-		  if (d.value < __.dimensions.length) {
+		  if (d.value < d3.keys(__.dimensions).length) {
 			  __.bundleDimension = __.dimensions[d.value];
 		  } else if (d.value < __.hideAxis.length) {
 			  __.bundleDimension = __.hideAxis[d.value];
@@ -56,9 +57,10 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
 	  }
 
 	  __.clusterCentroids = compute_cluster_centroids(__.bundleDimension);
+    if (flags.interactive){pc.render();}
   })
   .on("hideAxis", function(d) {
-	  if (!__.dimensions.length) pc.detectDimensions();
+  	pc.dimensions(pc.applyDimensionDefaults());
 	  pc.dimensions(without(__.dimensions, d.value));
   });
 
@@ -75,16 +77,20 @@ d3.rebind(pc, events, "on");
 // getter/setter with event firing
 function getset(obj,state,events)  {
   d3.keys(state).forEach(function(key) {
-    obj[key] = function(x) {
-      if (!arguments.length) {
-		return state[key];
-	}
-      var old = state[key];
-      state[key] = x;
-      side_effects[key].call(pc,{"value": x, "previous": old});
-      events[key].call(pc,{"value": x, "previous": old});
-      return obj;
-    };
+      obj[key] = function(x) {
+        if (!arguments.length) {
+          return state[key];
+        }
+        if (key === 'dimensions' && Object.prototype.toString.call(x) === '[object Array]') {
+          console.warn("pc.dimensions([]) is deprecated, use pc.dimensions({})");
+          x = pc.applyDimensionDefaults(x);
+        }
+        var old = state[key];
+        state[key] = x;
+        side_effects[key].call(pc,{"value": x, "previous": old});
+        events[key].call(pc,{"value": x, "previous": old});
+        return obj;
+      };
   });
 };
 
@@ -95,6 +101,9 @@ function extend(target, source) {
   return target;
 };
 
-function without(arr, item) {
-  return arr.filter(function(elem) { return item.indexOf(elem) === -1; })
+function without(arr, items) {
+  items.forEach(function (el) {
+    delete arr[el];
+  });
+  return arr;
 };
