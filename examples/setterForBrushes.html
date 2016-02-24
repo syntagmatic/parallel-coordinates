@@ -9,7 +9,7 @@
 <p>Demonstrates a parallel coordinates plot a pre-set 1D-axes brush.</p>
 </body>
 <script>
-var parcoords = d3.parcoords({nullValueSeparator: "bottom"})("#example")
+var pc = d3.parcoords({nullValueSeparator: "bottom"})("#example")
   .data([
     [0,-0,0,0,0,1],
     [1,-1,1,2,1,1],
@@ -20,7 +20,15 @@ var parcoords = d3.parcoords({nullValueSeparator: "bottom"})("#example")
   .render()
   .shadows()
   .createAxes()
+  .reorderable()
   .brushMode("1D-axes")
-  .brushExtents({"0": [2,3]});
-  
+  .brushExtents({"2": [3,4]});
+
+pc.brushReset();
+pc.brushExtents({"3": [3,6]});
+
+pc.brushExtents({"2": [3,12]});
+
+
+
 </script>
