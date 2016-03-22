@@ -126,6 +126,14 @@ Dimension attributes include:
 "yscale": Type of scale to use for the axis(log, linear, ordinal) 
 "index": Integer position for ordering dimensions on the x axis  
 
+<a name="parcoords_smoothness" href="#parcoords_smoothness">#</a> parcoords.<b>smoothness</b>(*double*)
+
+If *double* exists, polylines will be rendered with specified amount of curvature.
+NOTE: sylvester.js is a necessary dependency for this feature.
+
+```javascript
+parcoords.smoothness(.2);
+```
 
 <a name="parcoords_color" href="#parcoords_color">#</a> parcoords.<b>color</b>(*color*)
 
