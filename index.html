@@ -1,11 +1,11 @@
 <!doctype html>
 <title>Parallel Coordinates</title>
 <link rel="stylesheet" type="text/css" href="d3.parcoords.css">
-<script src="examples/lib/d3.min.js"></script>
-<script src="examples/lib/sylvester.js"></script>
+<script src="bower_components/d3/d3.min.js"></script>
+<script src="bower_components/sylvester/sylvester.js"></script>
 <script src="examples/lib/slickgrid/jquery-1.7.min.js"></script>
-<script src="examples/lib/underscore.js"></script>
-<script src="examples/lib/underscore.math.js"></script>
+<script src="bower_components/underscore/underscore.js"></script>
+<script src="bower_components/underscore.math/underscore.math.js"></script>
 <script src="d3.parcoords.js"></script>
 <link rel="stylesheet" type="text/css" href="style.css">
 <a href="https://github.com/syntagmatic/parallel-coordinates"><img style="position: absolute; top: 0; right: 0; border: 0;" src="forkme.png" alt="Fork me on GitHub"></a>
@@ -85,8 +85,8 @@ d3.csv('examples/data/cars.csv', function(data) {
       var center = width*1.5*(1+Math.sin(speed*t/1200)) + domain[0];
 
       pc1.yscale[dimension].brush.extent([
-        d3.max([center-width*0.01, domain[0]-width/400]),  
-        d3.min([center+width*1.01, domain[1]+width/100])  
+        d3.max([center-width*0.01, domain[0]-width/400]),
+        d3.min([center+width*1.01, domain[1]+width/100])
       ])(pc1.g()
           .filter(function(d) {
             return d == dimension;
@@ -226,7 +226,7 @@ var data3 = d3.range(-2*Math.PI,2*Math.PI,Math.PI/40)
 <div id="example-coloring-19" class="parcoords parcoords-coloring float" style="width:180px;height:76px"></div>
 <div style="clear:both"></div>
 <pre><a href="#" class="show-code" data-code="coloring-basic">Show code</a></pre>
-<script id="coloring-basic">var colors = d3.scale.category20b(); 
+<script id="coloring-basic">var colors = d3.scale.category20b();
 
 // create a chart in every element with class "parcoords-coloring"
 d3.selectAll(".parcoords-coloring")
@@ -311,8 +311,8 @@ d3.csv('examples/data/cars.csv', function(data) {
     .style("font-size", "14px");
 });
 
-// update color 
-function change_color(dimension) { 
+// update color
+function change_color(dimension) {
   pcz.svg.selectAll(".dimension")
     .style("font-weight", "normal")
     .filter(function(d) { return d == dimension; })
@@ -477,28 +477,28 @@ pc0 = d3.parcoords()("#example0")
 		d3.select("#smooth").text(this.value);
 		pc0.smoothness(this.value).render();
 	});
-	
+
 	// bundling strength slider
 	d3.select("#bundling").on("change", function() {
 		d3.select("#strength").text(this.value);
 		pc0.bundlingStrength(this.value).render();
 	});
-	
+
 	var select = d3.select("#bundleDimension").append("select").on("change", changeBundle);
-	
+
 	var options = select.selectAll('option')
 		.data(d3.keys(pc0.dimensions()));
-	
+
 	options
 		.enter()
 		.append("option")
 		.attr("value", function(d) {return d;})
 		.text(function(d) {return d;});
-	
+
 	function changeBundle() {
 		pc0.bundleDimension(this.value);
 	}
-	
+
 });
 </script>
 

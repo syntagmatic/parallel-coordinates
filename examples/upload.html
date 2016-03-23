@@ -41,7 +41,7 @@ body, html {
   color: #069;
 }
 </style>
-<script src="lib/d3.min.js"></script>
+<script src="../bower_components/d3/d3.min.js"></script>
 <script src="../d3.parcoords.js"></script>
 <script src="lib/divgrid.js"></script>
 <input type="file" id="uploader">
@@ -111,7 +111,7 @@ function parallelCoordinates(data) {
     var x = a[sortcol], y = b[sortcol];
     return (x == y ? 0 : (x > y ? 1 : -1));
   }
-  
+
   // click header to sort grid column
   grid.onSort.subscribe(function (e, args) {
     sortdir = args.sortAsc ? 1 : -1;
@@ -151,7 +151,7 @@ function parallelCoordinates(data) {
 };
 
 // CSV Uploader
-var uploader = document.getElementById("uploader");  
+var uploader = document.getElementById("uploader");
 var reader = new FileReader();
 
 reader.onload = function(e) {
@@ -163,7 +163,7 @@ reader.onload = function(e) {
   uploader.parentNode.removeChild(uploader);
 };
 
-uploader.addEventListener("change", handleFiles, false);  
+uploader.addEventListener("change", handleFiles, false);
 
 function handleFiles() {
   var file = this.files[0];
