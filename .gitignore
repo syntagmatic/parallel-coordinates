@@ -1,2 +1,5 @@
 node_modules
 .DS_store
+
+# Note, you'd want these on gh-pages branch
+bower_components
