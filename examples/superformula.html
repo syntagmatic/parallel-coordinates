@@ -2,19 +2,19 @@
 <meta charset="utf-8">
 <title>Superformula</title>
 <style>
- 
+
 path {
   stroke-width: 1.5px;
   stroke: #666;
   fill: #ddd;
 }
- 
+
 #controls {
   position: absolute;
   width: 240px;
   font: 10px sans-serif;
 }
- 
+
 #controls span,
 #controls label {
   position: relative;
@@ -23,22 +23,22 @@ path {
   display: inline-block;
   width: 20px;
 }
- 
+
 #controls button {
   font: 10px sans-serif;
   padding: 5px;
   width: 70px;
 }
- 
+
 </style>
 <div id="superformula"></div>
 <div id="example" class="parcoords" style="width:960px;height:320px"></div>
-<script src="lib/d3.min.js"></script>
+<script src="../bower_components/d3/d3.min.js"></script>
 <script src="../d3.parcoords.js"></script>
 <link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
 <script src="lib/superformula.js"></script>
 <script>
- 
+
 var types = {
   asterisk: {m: 12, n1: .3, n2: 0, n3: 10, a: 1, b: 1},
   bean: {m: 2, n1: 1, n2: 4, n3: 8, a: 1, b: 1},
@@ -68,10 +68,10 @@ var data = d3.entries(types).map(function(d) {
   val.key = d.key;
   return val;
 });
- 
+
 var format = d3.format(".4n"),
     scale = d3.scale.linear().domain([-10, 20, 1000]).range([0, 800, 1000]);
- 
+
 var svg = d3.select("#superformula").append("svg")
     .attr("width", 960)
     .attr("height", 500)
@@ -93,7 +93,7 @@ var parcoords = d3.parcoords()("#example")
 var shape = d3.superformula()
     .size(5000)
     .segments(3600);
- 
+
 var path = svg
     .selectAll("path")
     .data(d3.entries(types))

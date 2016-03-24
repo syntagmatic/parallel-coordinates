@@ -2,16 +2,13 @@
   "name": "d3.parcoords.js",
   "main": "d3.parcoords.js",
   "dependencies": {
-    "d3": "~3.4",
+    "d3": "~3.5",
     "d3.svg.multibrush": "~0.9.1",
     "sylvester": "~0.1.3"
   },
   "devDependencies": {
-    "vows": "~0.7",
-    "d3": "~3.4",
-    "jsdom": "~1.0",
-    "canvas": "~1.1",
-    "smash": "~0.0"
+    "underscore": "~1.3.1",
+    "underscore.math": "git://github.com/syntagmatic/underscore.math.git#cc29a2733b5cb34c5267fcf46d8dce86dce93a27"
   },
   "ignore": [
     ".git",
@@ -22,6 +19,7 @@
     "forkme.png",
     "src",
     "examples",
-    "test"
+    "test",
+    "bower_components"
   ]
 }

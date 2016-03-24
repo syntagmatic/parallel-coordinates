@@ -2,8 +2,8 @@
 <title>Axis-Config Example</title>
 <link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
 <link rel="stylesheet" type="text/css" href="style.css">
-<script src="lib/d3.min.js"></script>
-<script src="lib/d3.svg.multibrush.js"></script>
+<script src="../bower_components/d3/d3.min.js"></script>
+<script src="../bower_components/d3.svg.multibrush/d3.svg.multibrush.js"></script>
 <script src="../d3.parcoords.js"></script>
 <div id="example" class="parcoords" style="width:960px;height:200px;"></div>
 <p>This example demonstrates dimension configuration. The displacement axis is scaled logarithmically with a custom tickformat, the Power axis has a custom title, and the tick labels for year are on the right
@@ -118,6 +118,3 @@
             parcoords.brushPredicate(this.value);
         });
     </script>
-
-
-
