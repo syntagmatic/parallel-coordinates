@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "http-server": "^0.6.1",
+    "d3": "~3.5",
     "vows": "~0.7",
     "jsdom": "~1.0",
     "canvas": "~1.1",
