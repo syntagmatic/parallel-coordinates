@@ -339,13 +339,13 @@ pc.applyDimensionDefaults = function(dims) {
     newDims[k] = __.dimensions[k] ? __.dimensions[k] : {};
     //Set up defaults
     newDims[k].orient= newDims[k].orient ? newDims[k].orient : 'left';
-    newDims[k].ticks= newDims[k].ticks ? newDims[k].ticks : 5;
-    newDims[k].innerTickSize= newDims[k].innerTickSize ? newDims[k].innerTickSize : 6;
-    newDims[k].outerTickSize= newDims[k].outerTickSize ? newDims[k].outerTickSize : 0;
-    newDims[k].tickPadding= newDims[k].tickPadding ? newDims[k].tickPadding : 3;
+    newDims[k].ticks= newDims[k].ticks != null ? newDims[k].ticks : 5;
+    newDims[k].innerTickSize= newDims[k].innerTickSize != null ? newDims[k].innerTickSize : 6;
+    newDims[k].outerTickSize= newDims[k].outerTickSize != null ? newDims[k].outerTickSize : 0;
+    newDims[k].tickPadding= newDims[k].tickPadding != null ? newDims[k].tickPadding : 3;
     newDims[k].type= newDims[k].type ? newDims[k].type : types[k];
 
-    newDims[k].index = newDims[k].index ? newDims[k].index : currIndex;
+    newDims[k].index = newDims[k].index != null ? newDims[k].index : currIndex;
     currIndex++;
   });
   return newDims;
