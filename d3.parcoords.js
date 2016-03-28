@@ -132,8 +132,8 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
     if (d.value && d.value.length) {
         d.value.forEach(function(axis) {
             flipAxisAndUpdatePCP(axis);
-            pc.updateAxes(true);
         });
+        pc.updateAxes(true);
     }
   });
 
