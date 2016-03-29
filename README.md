@@ -6,7 +6,7 @@ An implementation of parallel coordinates in d3 as a [reusable chart](http://bos
 
 In order to obtain a linear history, please adhere to the [workflow](https://github.com/bbroeksema/writing/blob/master/parcoords-git-workflow.md) outlined by @bbroeksema.
 
-## Resources 
+## Resources
 
 ### Tutorials
 
@@ -61,7 +61,7 @@ Create the chart within a container. The selector can also be a [d3 selection](h
 
 Add data to the chart by passing in an array of *values*.
 
-A single value may be either an object or an array. All values should be the same format. 
+A single value may be either an object or an array. All values should be the same format.
 
 ```javascript
 // objects
@@ -98,8 +98,8 @@ If *dimensions* is specified, sets the quantitative dimensions to be visualized 
 
 ```javascript
 var dimensions = {
-	{"name": 
-		{	
+	{"name":
+		{
 			orient: 'right',
 			type: 'string',
 			tickPadding: 0,
@@ -123,7 +123,7 @@ Dimension attributes include:
 "innerTickSize": Length of the horizontal ticks in between the top and bottom  
 "outerTickSize": Length of the horizontal ticks at the top and bottom  
 "tickPadding": Pixels to pad the tick title from the innerTickSize  
-"yscale": Type of scale to use for the axis(log, linear, ordinal) 
+"yscale": Type of scale to use for the axis(log, linear, ordinal)
 "index": Integer position for ordering dimensions on the x axis  
 
 <a name="parcoords_smoothness" href="#parcoords_smoothness">#</a> parcoords.<b>smoothness</b>(*double*)
@@ -145,9 +145,28 @@ To set all lines to a transparent green:
 parcoords.color("rgba(0,200,0,0.3)");
 ```
 
-TODO: function example
+Function example
+
+```javascript
+parcoords.color(function(d) {
+    // d corresponds to the individual data object
+    if (d.x < 100)
+        return "red";
+    else
+        return "green";
+});
+```
 
 If no *color* is specified, then it returns the currently set color.
+
+<a name="parcoords_flipAxis" href="#parcoords_flipAxis">#</a>
+parcoords.<b>flipAxis</b>()
+
+Allows you to flip the axis without animation.
+
+```javascript
+parcoords.flipAxis(["x", "y"]);
+```
 
 <a name="parcoords_state" href="#parcoords_state">#</a> parcoords.<b>state</b>()
 
@@ -279,11 +298,11 @@ Change foreground context's [globalCompositeOperation](https://developer.mozilla
 
 <a name="parcoords_alpha" href="#parcoords_alpha">#</a> parcoords.<b>alpha</b>()
 
-Change the opacity of the polylines, also the foreground context's globalAlpha. 
+Change the opacity of the polylines, also the foreground context's globalAlpha.
 
 <a name="parcoords_autoscale" href="#parcoords_autoscale">#</a> parcoords.<b>autoscale</b>()
 
-Set the xscale, yscale, and canvas sizes. Usually this is called automatically, such as on render() or resize() events 
+Set the xscale, yscale, and canvas sizes. Usually this is called automatically, such as on render() or resize() events
 
 <a name="parcoords_mode" href="#parcoords_mode">#</a> parcoords.<b>mode</b>(*type*)
 
