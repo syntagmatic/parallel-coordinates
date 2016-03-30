@@ -57,6 +57,15 @@ Setup a new parallel coordinates chart.
 
 Create the chart within a container. The selector can also be a [d3 selection](https://github.com/mbostock/d3/wiki/Selections).
 
+<a name="parcoords_animationTime" href="#parcoords_animationTime">#</a> parcoords.<b>animationTime</b>(<i>milliseconds = 1100</i>)
+
+Allows you to set the time it takes for flipping an axis on double click.
+
+```javascript
+// Flipping an axis will take half a second
+parcoords.animationTime(500);
+```
+
 <a name="parcoords_data" href="#parcoords_data">#</a> parcoords.<b>data</b>([<i>values</i>])
 
 Add data to the chart by passing in an array of *values*.
@@ -159,13 +168,13 @@ parcoords.color(function(d) {
 
 If no *color* is specified, then it returns the currently set color.
 
-<a name="parcoords_flipAxis" href="#parcoords_flipAxis">#</a>
-parcoords.<b>flipAxis</b>()
+<a name="parcoords_flipAxes" href="#parcoords_flipAxes">#</a>
+parcoords.<b>flipAxes</b>()
 
-Allows you to flip the axis without animation.
+Allows you to flip axes without animation.
 
 ```javascript
-parcoords.flipAxis(["x", "y"]);
+parcoords.flipAxes(["x", "y"]);
 ```
 
 <a name="parcoords_state" href="#parcoords_state">#</a> parcoords.<b>state</b>()
