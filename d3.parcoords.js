@@ -21,7 +21,9 @@ d3.parcoords = function(config) {
     bundleDimension: null,
     smoothness: 0.0,
     showControlPoints: false,
-    hideAxis : []
+    hideAxis : [],
+    flipAxes: [],
+    animationTime: 1100 // How long it takes to flip the axis when you double click
   };
 
   extend(__, config);
@@ -124,8 +126,16 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
     if (flags.interactive){pc.render();}
   })
   .on("hideAxis", function(d) {
-  	pc.dimensions(pc.applyDimensionDefaults());
-	  pc.dimensions(without(__.dimensions, d.value));
+    pc.dimensions(pc.applyDimensionDefaults());
+    pc.dimensions(without(__.dimensions, d.value));
+  })
+  .on("flipAxes", function(d) {
+    if (d.value && d.value.length) {
+        d.value.forEach(function(axis) {
+            flipAxisAndUpdatePCP(axis);
+        });
+        pc.updateAxes(0);
+    }
   });
 
 // expose the state of the chart
@@ -274,21 +284,21 @@ pc.autoscale = function() {
 pc.scale = function(d, domain) {
   __.dimensions[d].yscale.domain(domain);
 
-	return this;
+  return this;
 };
 
 pc.flip = function(d) {
-	//__.dimensions[d].yscale.domain().reverse();					// does not work
+  //__.dimensions[d].yscale.domain().reverse();                               // does not work
   __.dimensions[d].yscale.domain(__.dimensions[d].yscale.domain().reverse()); // works
 
-	return this;
+  return this;
 };
 
 pc.commonScale = function(global, type) {
-	var t = type || "number";
-	if (typeof global === 'undefined') {
-		global = true;
-	}
+  var t = type || "number";
+  if (typeof global === 'undefined') {
+    global = true;
+  }
 
   // try to autodetect dimensions and create scales
   if (!d3.keys(__.dimensions).length) {
@@ -296,34 +306,34 @@ pc.commonScale = function(global, type) {
   }
   pc.autoscale();
 
-	// scales of the same type
-	var scales = d3.keys(__.dimensions).filter(function(p) {
-		return __.dimensions[p].type == t;
-	});
+  // scales of the same type
+  var scales = d3.keys(__.dimensions).filter(function(p) {
+    return __.dimensions[p].type == t;
+  });
 
-	if (global) {
-		var extent = d3.extent(scales.map(function(d,i) {
-				return __.dimensions[d].yscale.domain();
-			}).reduce(function(a,b) {
-				return a.concat(b);
-			}));
+  if (global) {
+    var extent = d3.extent(scales.map(function(d,i) {
+      return __.dimensions[d].yscale.domain();
+    }).reduce(function(a,b) {
+      return a.concat(b);
+    }));
 
-		scales.forEach(function(d) {
+    scales.forEach(function(d) {
       __.dimensions[d].yscale.domain(extent);
-		});
+    });
 
-	} else {
-		scales.forEach(function(d) {
+  } else {
+    scales.forEach(function(d) {
       __.dimensions[d].yscale.domain(d3.extent(__.data, function(d) { return +d[k]; }));
-		});
-	}
+    });
+  }
 
-	// update centroids
-	if (__.bundleDimension !== null) {
-		pc.bundleDimension(__.bundleDimension);
-	}
+  // update centroids
+  if (__.bundleDimension !== null) {
+    pc.bundleDimension(__.bundleDimension);
+  }
 
-	return this;
+  return this;
 };
 pc.detectDimensions = function() {
   pc.dimensions(pc.applyDimensionDefaults());
@@ -331,8 +341,8 @@ pc.detectDimensions = function() {
 };
 
 pc.applyDimensionDefaults = function(dims) {
-	var types = pc.detectDimensionTypes(__.data);
-	dims = dims ? dims : d3.keys(types);
+  var types = pc.detectDimensionTypes(__.data);
+  dims = dims ? dims : d3.keys(types);
   var newDims = {};
   var currIndex = 0;
   dims.forEach(function(k) {
@@ -674,7 +684,7 @@ function flipAxisAndUpdatePCP(dimension) {
 
   d3.select(this.parentElement)
     .transition()
-      .duration(1100)
+      .duration(__.animationTime)
       .call(axis.scale(__.dimensions[dimension].yscale));
 
   pc.render();
@@ -726,7 +736,7 @@ pc.createAxes = function() {
       .text(dimensionLabels)
       .on("dblclick", flipAxisAndUpdatePCP)
       .on("wheel", rotateLabels);
-  
+
   if (__.nullValueSeparator=="top") {
     pc.svg.append("line")
       .attr("x1", 0)
@@ -748,7 +758,7 @@ pc.createAxes = function() {
       .attr("fill", "none")
       .attr("shape-rendering", "crispEdges");
   }
-  
+
   flags.axes= true;
   return this;
 };
@@ -758,7 +768,11 @@ pc.removeAxes = function() {
   return this;
 };
 
-pc.updateAxes = function() {
+pc.updateAxes = function(animationTime) {
+  if (typeof animationTime === 'undefined') {
+    animationTime = __.animationTime;
+  }
+
   var g_data = pc.svg.selectAll(".dimension").data(pc.getOrderedDimensionKeys());
 
   // Enter
@@ -787,12 +801,12 @@ pc.updateAxes = function() {
   g_data.attr("opacity", 0);
   g_data.select(".axis")
     .transition()
-      .duration(1100)
+      .duration(animationTime)
       .each(function(d) { d3.select(this).call( pc.applyAxisConfig(axis, __.dimensions[d]) )
       });
   g_data.select(".label")
     .transition()
-      .duration(1100)
+      .duration(animationTime)
       .text(dimensionLabels)
       .attr("transform", "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")");
 
@@ -800,13 +814,13 @@ pc.updateAxes = function() {
   g_data.exit().remove();
 
   g = pc.svg.selectAll(".dimension");
-  g.transition().duration(1100)
+  g.transition().duration(animationTime)
     .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
     .style("opacity", 1);
 
   pc.svg.selectAll(".axis")
     .transition()
-      .duration(1100)
+      .duration(animationTime)
       .each(function(d) { d3.select(this).call( pc.applyAxisConfig(axis, __.dimensions[d]) );
       });
 
@@ -1269,7 +1283,7 @@ pc.brushMode = function(mode) {
       .attr("stroke-width", 2);
 
     drag
-      .on("drag", function(d, i) { 
+      .on("drag", function(d, i) {
         var ev = d3.event;
         i = i + 1;
         strum["p" + i][0] = Math.min(Math.max(strum.minX + 1, ev.x), strum.maxX);
@@ -1747,11 +1761,11 @@ pc.brushMode = function(mode) {
       .attr("class", "arc")
       .style("fill", "orange")
       .style("opacity", 0.5);
-    
+
     path
       .attr("d", arc.arc)
       .attr("transform", "translate(" + arc.p1[0] + "," + arc.p1[1] + ")");
-    		  
+
     line.enter()
       .append("line")
       .attr("id", "arc-" + id)
@@ -1766,20 +1780,20 @@ pc.brushMode = function(mode) {
       .attr("stroke-width", 2);
 
     drag
-      .on("drag", function(d, i) { 
+      .on("drag", function(d, i) {
         var ev = d3.event,
         	angle = 0;
-        
+
         i = i + 2;
-        
+
         arc["p" + i][0] = Math.min(Math.max(arc.minX + 1, ev.x), arc.maxX);
         arc["p" + i][1] = Math.min(Math.max(arc.minY, ev.y), arc.maxY);
-        
+
         angle = i === 3 ? arcs.startAngle(id) : arcs.endAngle(id);
-        
+
         if ((arc.startAngle < Math.PI && arc.endAngle < Math.PI && angle < Math.PI) ||
         		(arc.startAngle >= Math.PI && arc.endAngle >= Math.PI && angle >= Math.PI)) {
-	        
+
         	if (i === 2) {
 	        	arc.endAngle = angle;
 	        	arc.arc.endAngle(angle);
@@ -1787,9 +1801,9 @@ pc.brushMode = function(mode) {
 	        	arc.startAngle = angle;
 	        	arc.arc.startAngle(angle);
 	        }
-	        
+
         }
-        
+
         drawStrum(arc, i - 2);
       })
       .on("dragend", onDragEnd());
@@ -1893,39 +1907,39 @@ pc.brushMode = function(mode) {
       drawStrum(arc, 1);
     };
   }
-  
+
   // some helper functions
   function hypothenuse(a, b) {
 	  return Math.sqrt(a*a + b*b);
   }
-  
+
   var rad = (function() {
 	  var c = Math.PI / 180;
 	  return function(angle) {
 		  return angle * c;
 	  };
   })();
-  
+
   var deg = (function() {
 	  var c = 180 / Math.PI;
 	  return function(angle) {
 		  return angle * c;
-	  }; 
+	  };
   })();
-  
+
   // [0, 2*PI] -> [-PI/2, PI/2]
   var signedAngle = function(angle) {
 	  var ret = angle;
 	  if (angle > Math.PI) {
-		ret = angle - 1.5 * Math.PI; 
-		ret = angle - 1.5 * Math.PI; 
+		ret = angle - 1.5 * Math.PI;
+		ret = angle - 1.5 * Math.PI;
 	  } else {
 	  	ret = angle - 0.5 * Math.PI;
 	   	ret = angle - 0.5 * Math.PI;
 	  }
 	  return -ret;
   }
-  
+
   /**
    * angles are stored in radians from in [0, 2*PI], where 0 in 12 o'clock.
    * However, one can only select lines from 0 to PI, so we compute the
@@ -1935,16 +1949,16 @@ pc.brushMode = function(mode) {
   function containmentTest(arc) {
     var startAngle = signedAngle(arc.startAngle);
     var endAngle = signedAngle(arc.endAngle);
-    
+
     if (startAngle > endAngle) {
     	var tmp = startAngle;
     	startAngle = endAngle;
     	endAngle = tmp;
     }
-    
+
     // test if segment angle is contained in angle interval
     return function(a) {
-      
+
       if (a >= startAngle && a <= endAngle) {
         return true;
       }
@@ -2011,10 +2025,10 @@ pc.brushMode = function(mode) {
       if (arc && arc.p1[0] === arc.p2[0] && arc.p1[1] === arc.p2[1]) {
         removeStrum(arcs);
       }
-      
+
       if (arc) {
     	  var angle = arcs.startAngle(arcs.active);
-    	  
+
     	  arc.startAngle = angle;
           arc.endAngle = angle;
           arc.arc
@@ -2022,8 +2036,8 @@ pc.brushMode = function(mode) {
             .startAngle(angle)
             .endAngle(angle);
       }
-      
-      
+
+
       brushed = selected(arcs);
       arcs.active = undefined;
       __.brushed = brushed;
@@ -2065,16 +2079,16 @@ pc.brushMode = function(mode) {
 
       return arc.maxX - arc.minX;
     };
-    
+
     // returns angles in [-PI/2, PI/2]
     angle = function(p1, p2) {
         var a = p1[0] - p2[0],
         	b = p1[1] - p2[1],
         	c = hypothenuse(a, b);
-        
+
         return Math.asin(b/c);
     }
-    
+
     // returns angles in [0, 2 * PI]
     arcs.endAngle = function(id) {
     	var arc = arcs[id];
@@ -2083,30 +2097,30 @@ pc.brushMode = function(mode) {
         }
     	var sAngle = angle(arc.p1, arc.p2),
     		uAngle = -sAngle + Math.PI / 2;
-    	
+
     	if (arc.p1[0] > arc.p2[0]) {
     		uAngle = 2 * Math.PI - uAngle;
     	}
-    	
+
     	return uAngle;
     }
-    
+
     arcs.startAngle = function(id) {
     	var arc = arcs[id];
     	if (arc === undefined) {
             return undefined;
         }
-    	
+
     	var sAngle = angle(arc.p1, arc.p3),
     		uAngle = -sAngle + Math.PI / 2;
-    	
+
     	if (arc.p1[0] > arc.p3[0]) {
     		uAngle = 2 * Math.PI - uAngle;
     	}
-    	
+
     	return uAngle;
     }
-    
+
     arcs.length = function(id) {
     	var arc = arcs[id];
 
@@ -2117,7 +2131,7 @@ pc.brushMode = function(mode) {
         var a = arc.p1[0] - arc.p2[0],
         	b = arc.p1[1] - arc.p2[1],
         	c = hypothenuse(a, b);
-        	
+
         return(c);
     }
 
