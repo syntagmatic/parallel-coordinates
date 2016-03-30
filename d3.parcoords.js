@@ -22,7 +22,7 @@ d3.parcoords = function(config) {
     smoothness: 0.0,
     showControlPoints: false,
     hideAxis : [],
-    flipAxis: [],
+    flipAxes: [],
     animationTime: 1100 // How long it takes to flip the axis when you double click
   };
 
@@ -129,7 +129,7 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
     pc.dimensions(pc.applyDimensionDefaults());
     pc.dimensions(without(__.dimensions, d.value));
   })
-  .on("flipAxis", function(d) {
+  .on("flipAxes", function(d) {
     if (d.value && d.value.length) {
         d.value.forEach(function(axis) {
             flipAxisAndUpdatePCP(axis);
