@@ -6,7 +6,7 @@ An implementation of parallel coordinates in d3 as a [reusable chart](http://bos
 
 In order to obtain a linear history, please adhere to the [workflow](https://github.com/bbroeksema/writing/blob/master/parcoords-git-workflow.md) outlined by @bbroeksema.
 
-## Resources 
+## Resources
 
 ### Tutorials
 
@@ -57,11 +57,20 @@ Setup a new parallel coordinates chart.
 
 Create the chart within a container. The selector can also be a [d3 selection](https://github.com/mbostock/d3/wiki/Selections).
 
+<a name="parcoords_animationTime" href="#parcoords_animationTime">#</a> parcoords.<b>animationTime</b>(<i>milliseconds = 1100</i>)
+
+Allows you to set the time it takes for flipping an axis on double click.
+
+```javascript
+// Flipping an axis will take half a second
+parcoords.animationTime(500);
+```
+
 <a name="parcoords_data" href="#parcoords_data">#</a> parcoords.<b>data</b>([<i>values</i>])
 
 Add data to the chart by passing in an array of *values*.
 
-A single value may be either an object or an array. All values should be the same format. 
+A single value may be either an object or an array. All values should be the same format.
 
 ```javascript
 // objects
@@ -98,8 +107,8 @@ If *dimensions* is specified, sets the quantitative dimensions to be visualized 
 
 ```javascript
 var dimensions = {
-	{"name": 
-		{	
+	{"name":
+		{
 			orient: 'right',
 			type: 'string',
 			tickPadding: 0,
@@ -123,7 +132,7 @@ Dimension attributes include:
 "innerTickSize": Length of the horizontal ticks in between the top and bottom  
 "outerTickSize": Length of the horizontal ticks at the top and bottom  
 "tickPadding": Pixels to pad the tick title from the innerTickSize  
-"yscale": Type of scale to use for the axis(log, linear, ordinal) 
+"yscale": Type of scale to use for the axis(log, linear, ordinal)
 "index": Integer position for ordering dimensions on the x axis  
 
 <a name="parcoords_smoothness" href="#parcoords_smoothness">#</a> parcoords.<b>smoothness</b>(*double*)
@@ -145,9 +154,28 @@ To set all lines to a transparent green:
 parcoords.color("rgba(0,200,0,0.3)");
 ```
 
-TODO: function example
+Function example
+
+```javascript
+parcoords.color(function(d) {
+    // d corresponds to the individual data object
+    if (d.x < 100)
+        return "red";
+    else
+        return "green";
+});
+```
 
 If no *color* is specified, then it returns the currently set color.
+
+<a name="parcoords_flipAxes" href="#parcoords_flipAxes">#</a>
+parcoords.<b>flipAxes</b>()
+
+Allows you to flip axes without animation.
+
+```javascript
+parcoords.flipAxes(["x", "y"]);
+```
 
 <a name="parcoords_state" href="#parcoords_state">#</a> parcoords.<b>state</b>()
 
@@ -279,11 +307,11 @@ Change foreground context's [globalCompositeOperation](https://developer.mozilla
 
 <a name="parcoords_alpha" href="#parcoords_alpha">#</a> parcoords.<b>alpha</b>()
 
-Change the opacity of the polylines, also the foreground context's globalAlpha. 
+Change the opacity of the polylines, also the foreground context's globalAlpha.
 
 <a name="parcoords_autoscale" href="#parcoords_autoscale">#</a> parcoords.<b>autoscale</b>()
 
-Set the xscale, yscale, and canvas sizes. Usually this is called automatically, such as on render() or resize() events 
+Set the xscale, yscale, and canvas sizes. Usually this is called automatically, such as on render() or resize() events
 
 <a name="parcoords_mode" href="#parcoords_mode">#</a> parcoords.<b>mode</b>(*type*)
 

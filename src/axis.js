@@ -7,7 +7,7 @@ function flipAxisAndUpdatePCP(dimension) {
 
   d3.select(this.parentElement)
     .transition()
-      .duration(1100)
+      .duration(__.animationTime)
       .call(axis.scale(__.dimensions[dimension].yscale));
 
   pc.render();
@@ -59,7 +59,7 @@ pc.createAxes = function() {
       .text(dimensionLabels)
       .on("dblclick", flipAxisAndUpdatePCP)
       .on("wheel", rotateLabels);
-  
+
   if (__.nullValueSeparator=="top") {
     pc.svg.append("line")
       .attr("x1", 0)
@@ -81,7 +81,7 @@ pc.createAxes = function() {
       .attr("fill", "none")
       .attr("shape-rendering", "crispEdges");
   }
-  
+
   flags.axes= true;
   return this;
 };
@@ -91,7 +91,11 @@ pc.removeAxes = function() {
   return this;
 };
 
-pc.updateAxes = function() {
+pc.updateAxes = function(animationTime) {
+  if (typeof animationTime === 'undefined') {
+    animationTime = __.animationTime;
+  }
+
   var g_data = pc.svg.selectAll(".dimension").data(pc.getOrderedDimensionKeys());
 
   // Enter
@@ -120,12 +124,12 @@ pc.updateAxes = function() {
   g_data.attr("opacity", 0);
   g_data.select(".axis")
     .transition()
-      .duration(1100)
+      .duration(animationTime)
       .each(function(d) { d3.select(this).call( pc.applyAxisConfig(axis, __.dimensions[d]) )
       });
   g_data.select(".label")
     .transition()
-      .duration(1100)
+      .duration(animationTime)
       .text(dimensionLabels)
       .attr("transform", "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")");
 
@@ -133,13 +137,13 @@ pc.updateAxes = function() {
   g_data.exit().remove();
 
   g = pc.svg.selectAll(".dimension");
-  g.transition().duration(1100)
+  g.transition().duration(animationTime)
     .attr("transform", function(p) { return "translate(" + position(p) + ")"; })
     .style("opacity", 1);
 
   pc.svg.selectAll(".axis")
     .transition()
-      .duration(1100)
+      .duration(animationTime)
       .each(function(d) { d3.select(this).call( pc.applyAxisConfig(axis, __.dimensions[d]) );
       });
 
@@ -228,7 +232,7 @@ pc.reorderable = function() {
 pc.reorder = function(rowdata) {
   var firstDim = pc.getOrderedDimensionKeys()[0];
 
-	pc.sortDimensionsByRowData(rowdata);
+  pc.sortDimensionsByRowData(rowdata);
   // NOTE: this is relatively cheap given that:
   // number of dimensions < number of data items
   // Thus we check equality of order to prevent rerendering when this is the case.
@@ -256,7 +260,7 @@ pc.reorder = function(rowdata) {
 
 pc.sortDimensionsByRowData = function(rowdata) {
   var copy = __.dimensions;
-	var positionSortedKeys = d3.keys(__.dimensions).sort(function(a, b) {
+  var positionSortedKeys = d3.keys(__.dimensions).sort(function(a, b) {
     var pixelDifference = __.dimensions[a].yscale(rowdata[a]) - __.dimensions[b].yscale(rowdata[b]);
 
     // Array.sort is not necessarily stable, this means that if pixelDifference is zero
@@ -268,17 +272,17 @@ pc.sortDimensionsByRowData = function(rowdata) {
     return pixelDifference;
   });
   __.dimensions = {};
-	positionSortedKeys.forEach(function(p, i){
-		__.dimensions[p] = copy[p];
-		__.dimensions[p].index = i;
-	});
+  positionSortedKeys.forEach(function(p, i){
+    __.dimensions[p] = copy[p];
+    __.dimensions[p].index = i;
+  });
 }
 
 pc.sortDimensions = function() {
   var copy = __.dimensions;
   var positionSortedKeys = d3.keys(__.dimensions).sort(function(a, b) {
-  	return position(a) - position(b);
-	});
+    return position(a) - position(b);
+  });
   __.dimensions = {};
   positionSortedKeys.forEach(function(p, i){
     __.dimensions[p] = copy[p];
