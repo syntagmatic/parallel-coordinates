@@ -4,8 +4,8 @@ pc.detectDimensions = function() {
 };
 
 pc.applyDimensionDefaults = function(dims) {
-	var types = pc.detectDimensionTypes(__.data);
-	dims = dims ? dims : d3.keys(types);
+  var types = pc.detectDimensionTypes(__.data);
+  dims = dims ? dims : d3.keys(types);
   var newDims = {};
   var currIndex = 0;
   dims.forEach(function(k) {
@@ -25,9 +25,9 @@ pc.applyDimensionDefaults = function(dims) {
 };
 
 pc.getOrderedDimensionKeys = function(){
-	return d3.keys(__.dimensions).sort(function(x, y){
-		return d3.ascending(__.dimensions[x].index, __.dimensions[y].index);
-	});
+  return d3.keys(__.dimensions).sort(function(x, y){
+    return d3.ascending(__.dimensions[x].index, __.dimensions[y].index);
+  });
 };
 
 // a better "typeof" from this post: http://stackoverflow.com/questions/7390426/better-way-to-get-type-of-a-javascript-variable
@@ -38,8 +38,8 @@ pc.toType = function(v) {
 // try to coerce to number before returning type
 pc.toTypeCoerceNumbers = function(v) {
   if ((parseFloat(v) == v) && (v != null)) {
-	return "number";
-}
+    return "number";
+  }
   return pc.toType(v);
 };
 

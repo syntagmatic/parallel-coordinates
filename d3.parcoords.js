@@ -110,19 +110,19 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
     if (flags.interactive){pc.render().updateAxes();}
   })
   .on("bundleDimension", function(d) {
-	  if (!d3.keys(__.dimensions).length) pc.detectDimensions();
-	  pc.autoscale();
-	  if (typeof d.value === "number") {
-		  if (d.value < d3.keys(__.dimensions).length) {
-			  __.bundleDimension = __.dimensions[d.value];
-		  } else if (d.value < __.hideAxis.length) {
-			  __.bundleDimension = __.hideAxis[d.value];
-		  }
-	  } else {
-		  __.bundleDimension = d.value;
-	  }
+      if (!d3.keys(__.dimensions).length) pc.detectDimensions();
+      pc.autoscale();
+      if (typeof d.value === "number") {
+          if (d.value < d3.keys(__.dimensions).length) {
+              __.bundleDimension = __.dimensions[d.value];
+          } else if (d.value < __.hideAxis.length) {
+              __.bundleDimension = __.hideAxis[d.value];
+          }
+      } else {
+          __.bundleDimension = d.value;
+      }
 
-	  __.clusterCentroids = compute_cluster_centroids(__.bundleDimension);
+      __.clusterCentroids = compute_cluster_centroids(__.bundleDimension);
     if (flags.interactive){pc.render();}
   })
   .on("hideAxis", function(d) {
@@ -362,9 +362,9 @@ pc.applyDimensionDefaults = function(dims) {
 };
 
 pc.getOrderedDimensionKeys = function(){
-	return d3.keys(__.dimensions).sort(function(x, y){
-		return d3.ascending(__.dimensions[x].index, __.dimensions[y].index);
-	});
+  return d3.keys(__.dimensions).sort(function(x, y){
+    return d3.ascending(__.dimensions[x].index, __.dimensions[y].index);
+  });
 };
 
 // a better "typeof" from this post: http://stackoverflow.com/questions/7390426/better-way-to-get-type-of-a-javascript-variable
@@ -375,8 +375,8 @@ pc.toType = function(v) {
 // try to coerce to number before returning type
 pc.toTypeCoerceNumbers = function(v) {
   if ((parseFloat(v) == v) && (v != null)) {
-	return "number";
-}
+    return "number";
+  }
   return pc.toType(v);
 };
 
@@ -909,7 +909,7 @@ pc.reorderable = function() {
 pc.reorder = function(rowdata) {
   var firstDim = pc.getOrderedDimensionKeys()[0];
 
-	pc.sortDimensionsByRowData(rowdata);
+  pc.sortDimensionsByRowData(rowdata);
   // NOTE: this is relatively cheap given that:
   // number of dimensions < number of data items
   // Thus we check equality of order to prevent rerendering when this is the case.
@@ -937,7 +937,7 @@ pc.reorder = function(rowdata) {
 
 pc.sortDimensionsByRowData = function(rowdata) {
   var copy = __.dimensions;
-	var positionSortedKeys = d3.keys(__.dimensions).sort(function(a, b) {
+  var positionSortedKeys = d3.keys(__.dimensions).sort(function(a, b) {
     var pixelDifference = __.dimensions[a].yscale(rowdata[a]) - __.dimensions[b].yscale(rowdata[b]);
 
     // Array.sort is not necessarily stable, this means that if pixelDifference is zero
@@ -949,17 +949,17 @@ pc.sortDimensionsByRowData = function(rowdata) {
     return pixelDifference;
   });
   __.dimensions = {};
-	positionSortedKeys.forEach(function(p, i){
-		__.dimensions[p] = copy[p];
-		__.dimensions[p].index = i;
-	});
+  positionSortedKeys.forEach(function(p, i){
+    __.dimensions[p] = copy[p];
+    __.dimensions[p].index = i;
+  });
 }
 
 pc.sortDimensions = function() {
   var copy = __.dimensions;
   var positionSortedKeys = d3.keys(__.dimensions).sort(function(a, b) {
-  	return position(a) - position(b);
-	});
+    return position(a) - position(b);
+  });
   __.dimensions = {};
   positionSortedKeys.forEach(function(p, i){
     __.dimensions[p] = copy[p];
@@ -1283,7 +1283,7 @@ pc.brushMode = function(mode) {
       .attr("stroke-width", 2);
 
     drag
-      .on("drag", function(d, i) {
+      .on("drag", function(d, i) { 
         var ev = d3.event;
         i = i + 1;
         strum["p" + i][0] = Math.min(Math.max(strum.minX + 1, ev.x), strum.maxX);
@@ -1929,15 +1929,15 @@ pc.brushMode = function(mode) {
 
   // [0, 2*PI] -> [-PI/2, PI/2]
   var signedAngle = function(angle) {
-	  var ret = angle;
-	  if (angle > Math.PI) {
-		ret = angle - 1.5 * Math.PI;
-		ret = angle - 1.5 * Math.PI;
-	  } else {
-	  	ret = angle - 0.5 * Math.PI;
-	   	ret = angle - 0.5 * Math.PI;
-	  }
-	  return -ret;
+    var ret = angle;
+    if (angle > Math.PI) {
+      ret = angle - 1.5 * Math.PI;
+      ret = angle - 1.5 * Math.PI;
+    } else {
+      ret = angle - 0.5 * Math.PI;
+      ret = angle - 0.5 * Math.PI;
+    }
+    return -ret;
   }
 
   /**
@@ -2205,7 +2205,6 @@ pc.brushMode = function(mode) {
   };
 
 }());
-
 pc.interactive = function() {
   flags.interactive = true;
   return this;
