@@ -107,17 +107,16 @@ If *dimensions* is specified, sets the quantitative dimensions to be visualized 
 
 ```javascript
 var dimensions = {
-	{"name":
+	"name":
 		{
 			orient: 'right',
 			type: 'string',
 			tickPadding: 0,
 			innerTickSize: 8,
 			type: "string"
-		}
-	},
-	{"protein": {type:"number"}},
-	{"calcium": {type:"number"}};
+		},
+	"protein": {type:"number"},
+	"calcium": {type:"number"}};
 ```
 
 If no *dimensions* are specified, then it returns the currently set dimensions.
