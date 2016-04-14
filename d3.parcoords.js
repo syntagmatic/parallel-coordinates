@@ -480,9 +480,6 @@ pc.renderBrushed.queue = function() {
 pc.unbrush = function(d) {
   // Helper method to splice element from brushed
   var splice = function(element) {
-    if (!__.brushed) {
-      return;
-    }
     var index = __.brushed.indexOf(element);
     if (index > -1) {
       __.brushed.splice(index, 1);
@@ -493,19 +490,19 @@ pc.unbrush = function(d) {
   if (typeof d === 'undefined') {
     __.brushed = [];
   }
-  // If an argument is passed, then elements must be brushed
+  // If nothing has been brushed, then there's nothing to unbrush
   else if (!__.brushed) {
     return;
   }
 
-  // If an array is passed, then go through all the objects
+  // If an array is passed, then unbrush each object in array
   if (Array.isArray(d)) {
     for (var i = 0; i < d.length; ++i) {
       splice(d[i]);
     }
   }
 
-  // Just remove that one object
+  // Otherwise, just remove that one object
   else if (typeof d === 'object') {
     splice(d);
   }
@@ -528,14 +525,14 @@ pc.brush = function(d) {
     __.brushed = __.data.slice();
   }
 
-  // Insert each element in the array
+  // If an array is passed, then brush each object in array
   else if (Array.isArray(d)) {
     for (var i = 0; i < d.length; ++i) {
       push(d[i]);
     }
   }
 
-  // Insert the element
+  // Otherwise, just push that one object
   else {
     push(d);
   }
