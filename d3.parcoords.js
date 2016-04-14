@@ -260,23 +260,31 @@ pc.autoscale = function() {
   // xscale
   xscale.rangePoints([0, w()], 1);
 
+  // Retina display, etc.
+  var devicePixelRatio = window.devicePixelRatio || 1;
+
   // canvas sizes
   pc.selection.selectAll("canvas")
       .style("margin-top", __.margin.top + "px")
       .style("margin-left", __.margin.left + "px")
-      .attr("width", w()+2)
-      .attr("height", h()+2);
+      .style("width", (w()+2) + "px")
+      .style("height", (h()+2) + "px")
+      .attr("width", (w()+2) * devicePixelRatio)
+      .attr("height", (h()+2) * devicePixelRatio);
 
   // default styles, needs to be set when canvas width changes
   ctx.foreground.strokeStyle = __.color;
   ctx.foreground.lineWidth = 1.4;
   ctx.foreground.globalCompositeOperation = __.composite;
   ctx.foreground.globalAlpha = __.alpha;
+  ctx.foreground.scale(devicePixelRatio, devicePixelRatio);
   ctx.brushed.strokeStyle = __.brushedColor;
   ctx.brushed.lineWidth = 1.4;
   ctx.brushed.globalCompositeOperation = __.composite;
   ctx.brushed.globalAlpha = __.alpha;
+  ctx.brushed.scale(devicePixelRatio, devicePixelRatio);
   ctx.highlight.lineWidth = 3;
+  ctx.highlight.scale(devicePixelRatio, devicePixelRatio);
 
   return this;
 };
