@@ -107,7 +107,7 @@ pc.unbrush = function(d) {
   }
 
   // Just remove that one object
-  else {
+  else if (typeof d === 'object') {
     splice(d);
   }
 
