@@ -64,7 +64,7 @@ var pc = function(selection) {
 
   return pc;
 };
-var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush", "brushend", "axesreorder"].concat(d3.keys(__))),
+var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush", "brushend", "brushstart", "axesreorder"].concat(d3.keys(__))),
     w = function() { return __.width - __.margin.right - __.margin.left; },
     h = function() { return __.height - __.margin.top - __.margin.bottom; },
     flags = {
@@ -1182,6 +1182,7 @@ pc.brushMode = function(mode) {
       .y(__.dimensions[axis].yscale)
       .on("brushstart", function() {
 				if(d3.event.sourceEvent !== null) {
+                    events.brushstart.call(pc, __.brushed);
 					d3.event.sourceEvent.stopPropagation();
 				}
 			})
@@ -1671,6 +1672,7 @@ pc.brushMode = function(mode) {
       .y(__.dimensions[axis].yscale)
       .on("brushstart", function() {
 				if(d3.event.sourceEvent !== null) {
+                    events.brushstart.call(pc, __.brushed);
 					d3.event.sourceEvent.stopPropagation();
 				}
       })
