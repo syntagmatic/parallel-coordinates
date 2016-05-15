@@ -1183,7 +1183,6 @@ pc.brushMode = function(mode) {
       .y(__.dimensions[axis].yscale)
       .on("brushstart", function() {
 				if(d3.event.sourceEvent !== null) {
-                    events.brushstart.call(pc, __.brushed);
 					d3.event.sourceEvent.stopPropagation();
 				}
 			})
@@ -1704,6 +1703,18 @@ pc.brushMode = function(mode) {
     }
   }
 
+  //function brushExtents() {
+  //  var extents = {};
+  //  d3.keys(__.dimensions).forEach(function(d) {
+  //    var brush = brushes[d];
+  //    if (brush !== undefined && !brush.empty()) {
+  //      var extent = brush.extent();
+  //      extents[d] = extent;
+  //    }
+  //  });
+  //  return extents;
+  //}
+
   function brushFor(axis) {
     var brush = d3.svg.multibrush();
 
@@ -1711,7 +1722,6 @@ pc.brushMode = function(mode) {
       .y(__.dimensions[axis].yscale)
       .on("brushstart", function() {
 				if(d3.event.sourceEvent !== null) {
-                    events.brushstart.call(pc, __.brushed);
 					d3.event.sourceEvent.stopPropagation();
 				}
       })
