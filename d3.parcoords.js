@@ -1183,6 +1183,7 @@ pc.brushMode = function(mode) {
       .y(__.dimensions[axis].yscale)
       .on("brushstart", function() {
 				if(d3.event.sourceEvent !== null) {
+					events.brushstart.call(pc, __.brushed);
 					d3.event.sourceEvent.stopPropagation();
 				}
 			})
@@ -1722,6 +1723,7 @@ pc.brushMode = function(mode) {
       .y(__.dimensions[axis].yscale)
       .on("brushstart", function() {
 				if(d3.event.sourceEvent !== null) {
+                    events.brushstart.call(pc, __.brushed);
 					d3.event.sourceEvent.stopPropagation();
 				}
       })
