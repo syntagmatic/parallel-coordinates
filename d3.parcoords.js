@@ -1183,7 +1183,7 @@ pc.brushMode = function(mode) {
       .y(__.dimensions[axis].yscale)
       .on("brushstart", function() {
 				if(d3.event.sourceEvent !== null) {
-					events.brushstart.call(pc, __.brushed);
+                    events.brushstart.call(pc, __.brushed);
 					d3.event.sourceEvent.stopPropagation();
 				}
 			})
@@ -1654,16 +1654,54 @@ pc.brushMode = function(mode) {
     });
   };
 
-  function brushExtents() {
-    var extents = {};
-    d3.keys(__.dimensions).forEach(function(d) {
-      var brush = brushes[d];
-      if (brush !== undefined && !brush.empty()) {
-        var extent = brush.extent();
-        extents[d] = extent;
-      }
-    });
-    return extents;
+  function brushExtents(extents) {
+    if (typeof(extents) === 'undefined') {
+      extents = {};
+      d3.keys(__.dimensions).forEach(function (d) {
+        var brush = brushes[d];
+        if (brush !== undefined && !brush.empty()) {
+          var extent = brush.extent();
+          extents[d] = extent;
+        }
+      });
+      return extents;
+    }
+    else {
+      //first get all the brush selections
+      var brushSelections = {};
+      g.selectAll('.brush')
+          .each(function (d) {
+            brushSelections[d] = d3.select(this);
+
+          });
+
+      // loop over each dimension and update appropriately (if it was passed in through extents)
+      d3.keys(__.dimensions).forEach(function (d) {
+        if (extents[d] === undefined) {
+          return;
+        }
+
+        var brush = brushes[d];
+        if (brush !== undefined) {
+          //update the extent
+          brush.extent(extents[d]);
+
+          //redraw the brush
+          brushSelections[d]
+              .transition()
+              .duration(0)
+              .call(brush);
+
+          //fire some events
+          brush.event(brushSelections[d]);
+        }
+      });
+
+      //redraw the chart
+      pc.renderBrushed();
+
+      return pc;
+    }
   }
 
   function brushFor(axis) {
