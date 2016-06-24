@@ -84,7 +84,6 @@
       g.selectAll('.brush')
           .each(function (d) {
             brushSelections[d] = d3.select(this);
-
           });
 
       // loop over each dimension and update appropriately (if it was passed in through extents)
@@ -154,13 +153,17 @@
     	  selection
     	  .style("visibility", null)
           .attr("x", -15)
-          .attr("width", 30);
+          .attr("width", 30)
+          .style("fill", "rgba(255,255,255,0.25)")
+          .style("stroke", "rgba(0,0,0,0.6)");
       })
       .resizeAdaption(function(selection) {
     	 selection
     	   .selectAll("rect")
     	   .attr("x", -15)
-    	   .attr("width", 30);
+    	   .attr("width", 30)
+         .style("visibility", null)
+         .style("fill", "rgba(0,0,0,0.1)");
       });
 
     brushes[axis] = brush;
