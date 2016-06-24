@@ -2389,6 +2389,42 @@ function position(d) {
   var v = dragging[d];
   return v == null ? xscale(d) : v;
 }
+
+// Merges the canvases and SVG elements into one canvas element which is then passed into the callback
+// (so you can choose to save it to disk, etc.)
+pc.mergeParcoords = function(callback) {
+
+  // Create a canvas element to store the merged canvases
+  var mergedCanvas = document.createElement("canvas");
+  mergedCanvas.width = pc.canvas.foreground.clientWidth;
+  mergedCanvas.height = pc.canvas.foreground.clientHeight + 30;
+
+  // Give the canvas a white background
+  var context = mergedCanvas.getContext("2d");
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, mergedCanvas.width, mergedCanvas.height);
+
+  // Merge all the canvases
+  for (var key in pc.canvas) {
+    context.drawImage(pc.canvas[key], 0, 24);
+  }
+
+  // Add SVG elements to canvas
+  var DOMURL = window.URL || window.webkitURL || window;
+  var serializer = new XMLSerializer();
+  var svgStr = serializer.serializeToString(pc.selection.select("svg")[0][0]);
+
+  // Create a Data URI.
+  var src = 'data:image/svg+xml;base64,' + window.btoa(svgStr);
+  var img = new Image();
+  img.onload = function () {
+    context.drawImage(img, 0, 0);
+    if (typeof callback === "function") {
+      callback(mergedCanvas);
+    }
+  };
+  img.src = src;
+}
 pc.version = "0.7.0";
   // this descriptive text should live with other introspective methods
   pc.toString = function() { return "Parallel Coordinates: " + d3.keys(__.dimensions).length + " dimensions (" + d3.keys(__.data[0]).length + " total) , " + __.data.length + " rows"; };
