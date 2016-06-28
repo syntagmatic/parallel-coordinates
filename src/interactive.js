@@ -75,6 +75,8 @@ function position(d) {
 // Merges the canvases and SVG elements into one canvas element which is then passed into the callback
 // (so you can choose to save it to disk, etc.)
 pc.mergeParcoords = function(callback) {
+  // Retina display, etc.
+  var devicePixelRatio = window.devicePixelRatio || 1;
 
   // Create a canvas element to store the merged canvases
   var mergedCanvas = document.createElement("canvas");
@@ -88,7 +90,7 @@ pc.mergeParcoords = function(callback) {
 
   // Merge all the canvases
   for (var key in pc.canvas) {
-    context.drawImage(pc.canvas[key], 0, 24);
+    context.drawImage(pc.canvas[key], 0, 24, mergedCanvas.width, mergedCanvas.height - 30);
   }
 
   // Add SVG elements to canvas
