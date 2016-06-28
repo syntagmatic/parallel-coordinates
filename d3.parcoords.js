@@ -2398,8 +2398,10 @@ pc.mergeParcoords = function(callback) {
 
   // Create a canvas element to store the merged canvases
   var mergedCanvas = document.createElement("canvas");
-  mergedCanvas.width = pc.canvas.foreground.clientWidth;
-  mergedCanvas.height = pc.canvas.foreground.clientHeight + 30;
+  mergedCanvas.width = pc.canvas.foreground.clientWidth * devicePixelRatio
+  mergedCanvas.height = (pc.canvas.foreground.clientHeight + 30) * devicePixelRatio;
+  mergedCanvas.style.width = mergedCanvas.width / devicePixelRatio + "px";
+  mergedCanvas.style.height = mergedCanvas.height / devicePixelRatio + "px";
 
   // Give the canvas a white background
   var context = mergedCanvas.getContext("2d");
@@ -2408,7 +2410,7 @@ pc.mergeParcoords = function(callback) {
 
   // Merge all the canvases
   for (var key in pc.canvas) {
-    context.drawImage(pc.canvas[key], 0, 24, mergedCanvas.width, mergedCanvas.height - 30);
+    context.drawImage(pc.canvas[key], 0, 24 * devicePixelRatio, mergedCanvas.width, mergedCanvas.height - 30 * devicePixelRatio);
   }
 
   // Add SVG elements to canvas
@@ -2420,7 +2422,7 @@ pc.mergeParcoords = function(callback) {
   var src = 'data:image/svg+xml;base64,' + window.btoa(svgStr);
   var img = new Image();
   img.onload = function () {
-    context.drawImage(img, 0, 0);
+    context.drawImage(img, 0, 0, img.width * devicePixelRatio, img.height * devicePixelRatio);
     if (typeof callback === "function") {
       callback(mergedCanvas);
     }
