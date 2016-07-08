@@ -101,6 +101,10 @@ Renders the polylines.
 
 If no dimensions have been specified, it will attempt to <a href="#parcoords_detectDimensions">detect quantitative dimensions</a> based on the first data entry. If scales haven't been set, it will <a href="#parcoords_autoscale">autoscale</a> based on the <a href="https://github.com/mbostock/d3/wiki/Arrays#wiki-d3_extent">extent</a> for each dimension.
 
+<a name="parcoords_rotateLabels" href="#parcoords_rotateLabels">#</a> parcoords.<b>rotateLabels</b>(enabled = false)
+
+Whether scrolling on top of a label should result in the labels rotating.
+
 <a name="parcoords_dimensions" href="#parcoords_dimensions">#</a> parcoords.<b>dimensions</b>(*dimensions*)
 
 If *dimensions* is specified, sets the quantitative dimensions to be visualized and custom formatting. The format is an object of dimension objects. This will update the xscale domain, but will not trigger re-rendering of lines or axes.

@@ -23,7 +23,8 @@ d3.parcoords = function(config) {
     showControlPoints: false,
     hideAxis : [],
     flipAxes: [],
-    animationTime: 1100 // How long it takes to flip the axis when you double click
+    animationTime: 1100, // How long it takes to flip the axis when you double click
+    rotateLabels: false
   };
 
   extend(__, config);
@@ -699,6 +700,8 @@ function flipAxisAndUpdatePCP(dimension) {
 }
 
 function rotateLabels() {
+  if (!__.rotateLabels) return;
+  
   var delta = d3.event.deltaY;
   delta = delta < 0 ? -5 : delta;
   delta = delta > 0 ? 5 : delta;
