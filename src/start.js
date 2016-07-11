@@ -23,7 +23,8 @@ d3.parcoords = function(config) {
     showControlPoints: false,
     hideAxis : [],
     flipAxes: [],
-    animationTime: 1100 // How long it takes to flip the axis when you double click
+    animationTime: 1100, // How long it takes to flip the axis when you double click
+    rotateLabels: false
   };
 
   extend(__, config);
