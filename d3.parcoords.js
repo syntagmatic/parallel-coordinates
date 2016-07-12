@@ -60,6 +60,9 @@ var pc = function(selection) {
     .append("svg")
       .attr("width", __.width)
       .attr("height", __.height)
+      .style("font", "14px sans-serif")
+      .style("position", "absolute")
+
     .append("svg:g")
       .attr("transform", "translate(" + __.margin.left + "," + __.margin.top + ")");
 
@@ -734,7 +737,18 @@ pc.createAxes = function() {
   g.append("svg:g")
       .attr("class", "axis")
       .attr("transform", "translate(0,0)")
-      .each(function(d) { d3.select(this).call( pc.applyAxisConfig(axis, __.dimensions[d]) )
+      .each(function(d) {
+        var axisElement = d3.select(this).call( pc.applyAxisConfig(axis, __.dimensions[d]) );
+
+        axisElement.selectAll("path")
+            .style("fill", "none")
+            .style("stroke", "#222")
+            .style("shape-rendering", "crispEdges");
+
+        axisElement.selectAll("line")
+            .style("fill", "none")
+            .style("stroke", "#222")
+            .style("shape-rendering", "crispEdges");
       })
     .append("svg:text")
       .attr({
@@ -795,7 +809,18 @@ pc.updateAxes = function(animationTime) {
     .append("svg:g")
       .attr("class", "axis")
       .attr("transform", "translate(0,0)")
-      .each(function(d) { d3.select(this).call( pc.applyAxisConfig(axis, __.dimensions[d]) )
+      .each(function(d) {
+        var axisElement = d3.select(this).call( pc.applyAxisConfig(axis, __.dimensions[d]) );
+
+        axisElement.selectAll("path")
+            .style("fill", "none")
+            .style("stroke", "#222")
+            .style("shape-rendering", "crispEdges");
+
+        axisElement.selectAll("line")
+            .style("fill", "none")
+            .style("stroke", "#222")
+            .style("shape-rendering", "crispEdges");
       })
     .append("svg:text")
       .attr({
@@ -1236,15 +1261,26 @@ pc.brushMode = function(mode) {
 		if (!g) pc.createAxes();
 
 		// Add and store a brush for each axis.
-		g.append("svg:g")
+		var brush = g.append("svg:g")
 			.attr("class", "brush")
 			.each(function(d) {
 				d3.select(this).call(brushFor(d));
-			})
-			.selectAll("rect")
+			});
+
+		brush.selectAll("rect")
 				.style("visibility", null)
 				.attr("x", -15)
 				.attr("width", 30);
+
+		brush.selectAll("rect.background")
+				.style("fill", "transparent");
+
+		brush.selectAll("rect.extent")
+				.style("fill", "rgba(255,255,255,0.25)")
+				.style("stroke", "rgba(0,0,0,0.6)");
+
+		brush.selectAll(".resize rect")
+				.style("fill", "rgba(0,0,0,0.1)");
 
 		pc.brushExtents = brushExtents;
 		pc.brushReset = brushReset;
@@ -1675,7 +1711,6 @@ pc.brushMode = function(mode) {
       g.selectAll('.brush')
           .each(function (d) {
             brushSelections[d] = d3.select(this);
-
           });
 
       // loop over each dimension and update appropriately (if it was passed in through extents)
@@ -1745,13 +1780,17 @@ pc.brushMode = function(mode) {
     	  selection
     	  .style("visibility", null)
           .attr("x", -15)
-          .attr("width", 30);
+          .attr("width", 30)
+          .style("fill", "rgba(255,255,255,0.25)")
+          .style("stroke", "rgba(0,0,0,0.6)");
       })
       .resizeAdaption(function(selection) {
     	 selection
     	   .selectAll("rect")
     	   .attr("x", -15)
-    	   .attr("width", 30);
+    	   .attr("width", 30)
+         .style("visibility", null)
+         .style("fill", "rgba(0,0,0,0.1)");
       });
 
     brushes[axis] = brush;
@@ -1776,15 +1815,26 @@ pc.brushMode = function(mode) {
     if (!g) pc.createAxes();
 
     // Add and store a brush for each axis.
-    g.append("svg:g")
+    var brush = g.append("svg:g")
       .attr("class", "brush")
       .each(function(d) {
         d3.select(this).call(brushFor(d));
       })
-      .selectAll("rect")
+
+    brush.selectAll("rect")
         .style("visibility", null)
         .attr("x", -15)
         .attr("width", 30);
+
+    brush.selectAll("rect.background")
+        .style("fill", "transparent");
+
+    brush.selectAll("rect.extent")
+        .style("fill", "rgba(255,255,255,0.25)")
+        .style("stroke", "rgba(0,0,0,0.6)");
+
+    brush.selectAll(".resize rect")
+        .style("fill", "rgba(0,0,0,0.1)");
 
     pc.brushExtents = brushExtents;
     pc.brushReset = brushReset;
@@ -2341,6 +2391,46 @@ function position(d) {
   }
   var v = dragging[d];
   return v == null ? xscale(d) : v;
+}
+
+// Merges the canvases and SVG elements into one canvas element which is then passed into the callback
+// (so you can choose to save it to disk, etc.)
+pc.mergeParcoords = function(callback) {
+  // Retina display, etc.
+  var devicePixelRatio = window.devicePixelRatio || 1;
+
+  // Create a canvas element to store the merged canvases
+  var mergedCanvas = document.createElement("canvas");
+  mergedCanvas.width = pc.canvas.foreground.clientWidth * devicePixelRatio
+  mergedCanvas.height = (pc.canvas.foreground.clientHeight + 30) * devicePixelRatio;
+  mergedCanvas.style.width = mergedCanvas.width / devicePixelRatio + "px";
+  mergedCanvas.style.height = mergedCanvas.height / devicePixelRatio + "px";
+
+  // Give the canvas a white background
+  var context = mergedCanvas.getContext("2d");
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, mergedCanvas.width, mergedCanvas.height);
+
+  // Merge all the canvases
+  for (var key in pc.canvas) {
+    context.drawImage(pc.canvas[key], 0, 24 * devicePixelRatio, mergedCanvas.width, mergedCanvas.height - 30 * devicePixelRatio);
+  }
+
+  // Add SVG elements to canvas
+  var DOMURL = window.URL || window.webkitURL || window;
+  var serializer = new XMLSerializer();
+  var svgStr = serializer.serializeToString(pc.selection.select("svg")[0][0]);
+
+  // Create a Data URI.
+  var src = 'data:image/svg+xml;base64,' + window.btoa(svgStr);
+  var img = new Image();
+  img.onload = function () {
+    context.drawImage(img, 0, 0, img.width * devicePixelRatio, img.height * devicePixelRatio);
+    if (typeof callback === "function") {
+      callback(mergedCanvas);
+    }
+  };
+  img.src = src;
 }
 pc.version = "0.7.0";
   // this descriptive text should live with other introspective methods
