@@ -135,7 +135,7 @@ Dimension attributes include:
 "innerTickSize": Length of the horizontal ticks in between the top and bottom  
 "outerTickSize": Length of the horizontal ticks at the top and bottom  
 "tickPadding": Pixels to pad the tick title from the innerTickSize  
-"yscale": Type of scale to use for the axis(log, linear, ordinal)
+"yscale": Type of scale to use for the axis(log, linear, ordinal). Reference <a href="https://github.com/d3/d3-3.x-api-reference/blob/master/Quantitative-Scales.md">D3 Scales</a>
 "index": Integer position for ordering dimensions on the x axis  
 
 <a name="parcoords_smoothness" href="#parcoords_smoothness">#</a> parcoords.<b>smoothness</b>(*double*)
