@@ -697,7 +697,13 @@ function flipAxisAndUpdatePCP(dimension) {
   d3.select(this.parentElement)
     .transition()
       .duration(__.animationTime)
-      .call(axis.scale(__.dimensions[dimension].yscale));
+      .call(axis.scale(__.dimensions[dimension].yscale))
+      .call(axis.orient(__.dimensions[dimension].orient))
+      .call(axis.ticks(__.dimensions[dimension].ticks))
+      .call(axis.innerTickSize(__.dimensions[dimension].innerTickSize))
+      .call(axis.outerTickSize(__.dimensions[dimension].outerTickSize))
+      .call(axis.tickPadding(__.dimensions[dimension].tickPadding))
+      .call(axis.tickFormat(__.dimensions[dimension].tickFormat));
 
   pc.render();
 }
