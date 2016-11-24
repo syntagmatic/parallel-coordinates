@@ -116,8 +116,7 @@ var dimensions = {
 			orient: 'right',
 			type: 'string',
 			tickPadding: 0,
-			innerTickSize: 8,
-			type: "string"
+			innerTickSize: 8
 		},
 	"protein": {type:"number"},
 	"calcium": {type:"number"}};
