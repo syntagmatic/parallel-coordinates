@@ -61,7 +61,7 @@
             });
         });
       default:
-        throw "Unknown brush predicate " + __.brushPredicate;
+        throw new Error("Unknown brush predicate " + __.brushPredicate);
       }
     });
   };
