@@ -31,7 +31,7 @@ function brushPredicate(predicate) {
 
   predicate = String(predicate).toUpperCase();
   if (predicate !== "AND" && predicate !== "OR") {
-    throw "Invalid predicate " + predicate;
+    throw new Error("Invalid predicate " + predicate);
   }
 
   brush.predicate = predicate;
@@ -50,7 +50,7 @@ pc.brushMode = function(mode) {
   }
 
   if (pc.brushModes().indexOf(mode) === -1) {
-    throw "pc.brushmode: Unsupported brush mode: " + mode;
+    throw new Error("pc.brushmode: Unsupported brush mode: " + mode);
   }
 
   // Make sure that we don't trigger unnecessary events by checking if the mode
