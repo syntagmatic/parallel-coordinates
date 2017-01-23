@@ -1,5 +1,7 @@
 # Parallel Coordinates
 
+[![CDNJS](https://img.shields.io/cdnjs/v/parcoords.svg)](https://cdnjs.com/libraries/parcoords)
+
 An implementation of parallel coordinates in d3 as a [reusable chart](http://bost.ocks.org/mike/chart/)
 
 ## Contributing
