@@ -129,7 +129,7 @@ If no *dimensions* are specified, then it returns the currently set dimensions.
 Dimension attributes include:
 
 "title": String label for dimension  
-"type": Possible values include: String, Date and number. Detected types are automatically populated by <a href="#parcoords_detectDimensions">detectDimensions</a> using d3.parcoords.<strong>detectDimensionTypes</strong>.  
+"type": Possible values include: string, date and number. Detected types are automatically populated by <a href="#parcoords_detectDimensions">detectDimensions</a> using d3.parcoords.<strong>detectDimensionTypes</strong>.  
 "ticks": Number of horizontal ticks to include on y axis  
 "tickValues": Array of values to display for tick labels  
 "orient": Orientation of ticks and tickValues(left or right of axis)  
