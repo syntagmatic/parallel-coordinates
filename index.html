@@ -324,7 +324,7 @@ function change_color(dimension) {
 
 // return color function based on plot and dimension
 function zcolor(col, dimension) {
-  var z = zscore(_(col).pluck(dimension).map(parseFloat))
+  var z = zscore(_(col).pluck(dimension).map(parseFloat).filter(function(value) { return !Number.isNaN(value) }))
   return function(d) { return zcolorscale(z(d[dimension])) }
 };
 
