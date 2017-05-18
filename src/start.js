@@ -21,7 +21,10 @@ d3.parcoords = function(config) {
     bundleDimension: null,
     smoothness: 0.0,
     showControlPoints: false,
-    hideAxis : []
+    hideAxis : [],
+    flipAxes: [],
+    animationTime: 1100, // How long it takes to flip the axis when you double click
+    rotateLabels: false
   };
 
   extend(__, config);

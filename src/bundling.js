@@ -61,6 +61,22 @@ function compute_centroids(row) {
 	return centroids;
 }
 
+pc.compute_real_centroids = function(row) {
+	var realCentroids = [];
+
+	var p = d3.keys(__.dimensions);
+	var cols = p.length;
+	var a = 0.5;
+
+	for (var i = 0; i < cols; ++i) {
+		var x = position(p[i]);
+		var y = __.dimensions[p[i]].yscale(row[p[i]]);
+		realCentroids.push([x, y]);
+	}
+
+	return realCentroids;
+}
+
 function compute_control_points(centroids) {
 
 	var cols = centroids.length;

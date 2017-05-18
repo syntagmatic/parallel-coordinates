@@ -1,4 +1,4 @@
-var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush", "brushend", "axesreorder"].concat(d3.keys(__))),
+var events = d3.dispatch.apply(this,["render", "resize", "highlight", "brush", "brushend", "brushstart", "axesreorder"].concat(d3.keys(__))),
     w = function() { return __.width - __.margin.right - __.margin.left; },
     h = function() { return __.height - __.margin.top - __.margin.bottom; },
     flags = {
@@ -44,24 +44,32 @@ var side_effects = d3.dispatch.apply(this,d3.keys(__))
     if (flags.interactive){pc.render().updateAxes();}
   })
   .on("bundleDimension", function(d) {
-	  if (!d3.keys(__.dimensions).length) pc.detectDimensions();
-	  pc.autoscale();
-	  if (typeof d.value === "number") {
-		  if (d.value < d3.keys(__.dimensions).length) {
-			  __.bundleDimension = __.dimensions[d.value];
-		  } else if (d.value < __.hideAxis.length) {
-			  __.bundleDimension = __.hideAxis[d.value];
-		  }
-	  } else {
-		  __.bundleDimension = d.value;
-	  }
+      if (!d3.keys(__.dimensions).length) pc.detectDimensions();
+      pc.autoscale();
+      if (typeof d.value === "number") {
+          if (d.value < d3.keys(__.dimensions).length) {
+              __.bundleDimension = __.dimensions[d.value];
+          } else if (d.value < __.hideAxis.length) {
+              __.bundleDimension = __.hideAxis[d.value];
+          }
+      } else {
+          __.bundleDimension = d.value;
+      }
 
-	  __.clusterCentroids = compute_cluster_centroids(__.bundleDimension);
+      __.clusterCentroids = compute_cluster_centroids(__.bundleDimension);
     if (flags.interactive){pc.render();}
   })
   .on("hideAxis", function(d) {
-  	pc.dimensions(pc.applyDimensionDefaults());
-	  pc.dimensions(without(__.dimensions, d.value));
+    pc.dimensions(pc.applyDimensionDefaults());
+    pc.dimensions(without(__.dimensions, d.value));
+  })
+  .on("flipAxes", function(d) {
+    if (d.value && d.value.length) {
+        d.value.forEach(function(axis) {
+            flipAxisAndUpdatePCP(axis);
+        });
+        pc.updateAxes(0);
+    }
   });
 
 // expose the state of the chart

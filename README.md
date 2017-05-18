@@ -1,12 +1,14 @@
 # Parallel Coordinates
 
+[![CDNJS](https://img.shields.io/cdnjs/v/parcoords.svg)](https://cdnjs.com/libraries/parcoords)
+
 An implementation of parallel coordinates in d3 as a [reusable chart](http://bost.ocks.org/mike/chart/)
 
 ## Contributing
 
 In order to obtain a linear history, please adhere to the [workflow](https://github.com/bbroeksema/writing/blob/master/parcoords-git-workflow.md) outlined by @bbroeksema.
 
-## Resources 
+## Resources
 
 ### Tutorials
 
@@ -57,11 +59,20 @@ Setup a new parallel coordinates chart.
 
 Create the chart within a container. The selector can also be a [d3 selection](https://github.com/mbostock/d3/wiki/Selections).
 
+<a name="parcoords_animationTime" href="#parcoords_animationTime">#</a> parcoords.<b>animationTime</b>(<i>milliseconds = 1100</i>)
+
+Allows you to set the time it takes for flipping an axis on double click.
+
+```javascript
+// Flipping an axis will take half a second
+parcoords.animationTime(500);
+```
+
 <a name="parcoords_data" href="#parcoords_data">#</a> parcoords.<b>data</b>([<i>values</i>])
 
 Add data to the chart by passing in an array of *values*.
 
-A single value may be either an object or an array. All values should be the same format. 
+A single value may be either an object or an array. All values should be the same format.
 
 ```javascript
 // objects
@@ -92,23 +103,25 @@ Renders the polylines.
 
 If no dimensions have been specified, it will attempt to <a href="#parcoords_detectDimensions">detect quantitative dimensions</a> based on the first data entry. If scales haven't been set, it will <a href="#parcoords_autoscale">autoscale</a> based on the <a href="https://github.com/mbostock/d3/wiki/Arrays#wiki-d3_extent">extent</a> for each dimension.
 
+<a name="parcoords_rotateLabels" href="#parcoords_rotateLabels">#</a> parcoords.<b>rotateLabels</b>(enabled = false)
+
+Whether scrolling on top of a label should result in the labels rotating.
+
 <a name="parcoords_dimensions" href="#parcoords_dimensions">#</a> parcoords.<b>dimensions</b>(*dimensions*)
 
 If *dimensions* is specified, sets the quantitative dimensions to be visualized and custom formatting. The format is an object of dimension objects. This will update the xscale domain, but will not trigger re-rendering of lines or axes.
 
 ```javascript
 var dimensions = {
-	{"name": 
-		{	
+	"name":
+		{
 			orient: 'right',
 			type: 'string',
 			tickPadding: 0,
-			innerTickSize: 8,
-			type: "string"
-		}
-	},
-	{"protein": {type:"number"}},
-	{"calcium": {type:"number"}};
+			innerTickSize: 8
+		},
+	"protein": {type:"number"},
+	"calcium": {type:"number"}};
 ```
 
 If no *dimensions* are specified, then it returns the currently set dimensions.
@@ -116,16 +129,24 @@ If no *dimensions* are specified, then it returns the currently set dimensions.
 Dimension attributes include:
 
 "title": String label for dimension  
-"type": Possible values include: String, Date and number. Detected types are automatically populated by <a href="#parcoords_detectDimensions">detectDimensions</a> using d3.parcoords.<strong>detectDimensionTypes</strong>.  
+"type": Possible values include: string, date and number. Detected types are automatically populated by <a href="#parcoords_detectDimensions">detectDimensions</a> using d3.parcoords.<strong>detectDimensionTypes</strong>.  
 "ticks": Number of horizontal ticks to include on y axis  
 "tickValues": Array of values to display for tick labels  
 "orient": Orientation of ticks and tickValues(left or right of axis)  
 "innerTickSize": Length of the horizontal ticks in between the top and bottom  
 "outerTickSize": Length of the horizontal ticks at the top and bottom  
 "tickPadding": Pixels to pad the tick title from the innerTickSize  
-"yscale": Type of scale to use for the axis(log, linear, ordinal) 
+"yscale": Type of scale to use for the axis(log, linear, ordinal). Reference <a href="https://github.com/d3/d3-3.x-api-reference/blob/master/Quantitative-Scales.md">D3 Scales</a>
 "index": Integer position for ordering dimensions on the x axis  
 
+<a name="parcoords_smoothness" href="#parcoords_smoothness">#</a> parcoords.<b>smoothness</b>(*double*)
+
+If *double* exists, polylines will be rendered with specified amount of curvature.
+NOTE: sylvester.js is a necessary dependency for this feature.
+
+```javascript
+parcoords.smoothness(.2);
+```
 
 <a name="parcoords_color" href="#parcoords_color">#</a> parcoords.<b>color</b>(*color*)
 
@@ -137,9 +158,28 @@ To set all lines to a transparent green:
 parcoords.color("rgba(0,200,0,0.3)");
 ```
 
-TODO: function example
+Function example
+
+```javascript
+parcoords.color(function(d) {
+    // d corresponds to the individual data object
+    if (d.x < 100)
+        return "red";
+    else
+        return "green";
+});
+```
 
 If no *color* is specified, then it returns the currently set color.
+
+<a name="parcoords_flipAxes" href="#parcoords_flipAxes">#</a>
+parcoords.<b>flipAxes</b>()
+
+Allows you to flip axes without animation.
+
+```javascript
+parcoords.flipAxes(["x", "y"]);
+```
 
 <a name="parcoords_state" href="#parcoords_state">#</a> parcoords.<b>state</b>()
 
@@ -271,11 +311,11 @@ Change foreground context's [globalCompositeOperation](https://developer.mozilla
 
 <a name="parcoords_alpha" href="#parcoords_alpha">#</a> parcoords.<b>alpha</b>()
 
-Change the opacity of the polylines, also the foreground context's globalAlpha. 
+Change the opacity of the polylines, also the foreground context's globalAlpha.
 
 <a name="parcoords_autoscale" href="#parcoords_autoscale">#</a> parcoords.<b>autoscale</b>()
 
-Set the xscale, yscale, and canvas sizes. Usually this is called automatically, such as on render() or resize() events 
+Set the xscale, yscale, and canvas sizes. Usually this is called automatically, such as on render() or resize() events
 
 <a name="parcoords_mode" href="#parcoords_mode">#</a> parcoords.<b>mode</b>(*type*)
 

@@ -61,22 +61,71 @@
             });
         });
       default:
-        throw "Unknown brush predicate " + __.brushPredicate;
+        throw new Error("Unknown brush predicate " + __.brushPredicate);
       }
     });
   };
 
-  function brushExtents() {
-    var extents = {};
-    d3.keys(__.dimensions).forEach(function(d) {
-      var brush = brushes[d];
-      if (brush !== undefined && !brush.empty()) {
-        var extent = brush.extent();
-        extents[d] = extent;
-      }
-    });
-    return extents;
+  function brushExtents(extents) {
+    if (typeof(extents) === 'undefined') {
+      extents = {};
+      d3.keys(__.dimensions).forEach(function (d) {
+        var brush = brushes[d];
+        if (brush !== undefined && !brush.empty()) {
+          var extent = brush.extent();
+          extents[d] = extent;
+        }
+      });
+      return extents;
+    }
+    else {
+      //first get all the brush selections
+      var brushSelections = {};
+      g.selectAll('.brush')
+          .each(function (d) {
+            brushSelections[d] = d3.select(this);
+          });
+
+      // loop over each dimension and update appropriately (if it was passed in through extents)
+      d3.keys(__.dimensions).forEach(function (d) {
+        if (extents[d] === undefined) {
+          return;
+        }
+
+        var brush = brushes[d];
+        if (brush !== undefined) {
+          //update the extent
+          brush.extent(extents[d]);
+
+          //redraw the brush
+          brushSelections[d]
+              .transition()
+              .duration(0)
+              .call(brush);
+
+          //fire some events
+          brush.event(brushSelections[d]);
+        }
+      });
+
+      //redraw the chart
+      pc.renderBrushed();
+
+      return pc;
+    }
   }
+
+  //function brushExtents() {
+  //  var extents = {};
+  //  d3.keys(__.dimensions).forEach(function(d) {
+  //    var brush = brushes[d];
+  //    if (brush !== undefined && !brush.empty()) {
+  //      var extent = brush.extent();
+  //      extents[d] = extent;
+  //    }
+  //  });
+  //  return extents;
+  //}
 
   function brushFor(axis) {
     var brush = d3.svg.multibrush();
@@ -85,6 +134,7 @@
       .y(__.dimensions[axis].yscale)
       .on("brushstart", function() {
 				if(d3.event.sourceEvent !== null) {
+                    events.brushstart.call(pc, __.brushed);
 					d3.event.sourceEvent.stopPropagation();
 				}
       })
@@ -103,13 +153,17 @@
     	  selection
     	  .style("visibility", null)
           .attr("x", -15)
-          .attr("width", 30);
+          .attr("width", 30)
+          .style("fill", "rgba(255,255,255,0.25)")
+          .style("stroke", "rgba(0,0,0,0.6)");
       })
       .resizeAdaption(function(selection) {
     	 selection
     	   .selectAll("rect")
     	   .attr("x", -15)
-    	   .attr("width", 30);
+    	   .attr("width", 30)
+         .style("visibility", null)
+         .style("fill", "rgba(0,0,0,0.1)");
       });
 
     brushes[axis] = brush;
@@ -134,15 +188,26 @@
     if (!g) pc.createAxes();
 
     // Add and store a brush for each axis.
-    g.append("svg:g")
+    var brush = g.append("svg:g")
       .attr("class", "brush")
       .each(function(d) {
         d3.select(this).call(brushFor(d));
       })
-      .selectAll("rect")
+
+    brush.selectAll("rect")
         .style("visibility", null)
         .attr("x", -15)
         .attr("width", 30);
+
+    brush.selectAll("rect.background")
+        .style("fill", "transparent");
+
+    brush.selectAll("rect.extent")
+        .style("fill", "rgba(255,255,255,0.25)")
+        .style("stroke", "rgba(0,0,0,0.6)");
+
+    brush.selectAll(".resize rect")
+        .style("fill", "rgba(0,0,0,0.1)");
 
     pc.brushExtents = brushExtents;
     pc.brushReset = brushReset;

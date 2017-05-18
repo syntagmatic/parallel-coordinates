@@ -185,7 +185,7 @@
       case "OR":
         return ids.some(function(id) { return crossesStrum(d, id); });
       default:
-        throw "Unknown brush predicate " + __.brushPredicate;
+        throw new Error("Unknown brush predicate " + __.brushPredicate);
       }
     });
   }

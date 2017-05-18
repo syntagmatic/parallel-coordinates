@@ -1,0 +1,40 @@
+<!doctype html>
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+</head>
+<title>Download Parallel Coordinates Example</title>
+<link rel="stylesheet" type="text/css" href="../d3.parcoords.css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<script src="lib/d3.js"></script>
+<script src="../d3.parcoords.js"></script>
+<body>
+<div id="example" class="parcoords" style="width:500px;height:150px"></div>
+<p>Demonstrates the ability to download an image of the parallel coordinate.</p>
+<button onclick="downloadScreenshot()">Download screenshot</button>
+</body>
+<script>
+    var parcoords = d3.parcoords()("#example")
+    .data([
+        [0,-0,0,0,0,1],
+        [1,-1,1,2,1,1],
+        [2,-2,4,4,0.5,1],
+        [3,-3,9,6,0.33,1],
+        [4,-4,16,8,0.25,1]
+    ])
+    .render()
+    .createAxes();
+
+    function downloadScreenshot() {
+
+        var callback = function (canvas) {
+            // Download the image
+            var download = document.createElement("a");
+            download.href = canvas.toDataURL("image/png");
+            download.download = "parallel-coordinate.png";
+            download.click();
+        };
+        parcoords.mergeParcoords(callback);
+    }
+
+</script>
