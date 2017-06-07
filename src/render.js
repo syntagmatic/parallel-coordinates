@@ -77,3 +77,66 @@ pc.renderBrushed.queue = function() {
     brushedQueue([]); // This is needed to clear the currently brushed items
   }
 };
+
+pc.unbrush = function(d) {
+  // Helper method to splice element from brushed
+  var splice = function(element) {
+    var index = __.brushed.indexOf(element);
+    if (index > -1) {
+      __.brushed.splice(index, 1);
+    }
+  };
+
+  // If no argument is passed, then unbrush all
+  if (typeof d === 'undefined') {
+    __.brushed = [];
+  }
+  // If nothing has been brushed, then there's nothing to unbrush
+  else if (!__.brushed) {
+    return;
+  }
+
+  // If an array is passed, then unbrush each object in array
+  if (Array.isArray(d)) {
+    for (var i = 0; i < d.length; ++i) {
+      splice(d[i]);
+    }
+  }
+
+  // Otherwise, just remove that one object
+  else if (typeof d === 'object') {
+    splice(d);
+  }
+
+  pc.renderBrushed();
+};
+
+pc.brush = function(d) {
+  // Helper method to insert element into brushed
+  var push = function(element) {
+    var index = __.brushed.indexOf(element);
+    if (index === -1) {
+      __.brushed.push(element);
+    }
+  };
+
+  // If no argument is passed, then brush all
+  if (typeof d === 'undefined') {
+    // Create a copy of data
+    __.brushed = __.data.slice();
+  }
+
+  // If an array is passed, then brush each object in array
+  else if (Array.isArray(d)) {
+    for (var i = 0; i < d.length; ++i) {
+      push(d[i]);
+    }
+  }
+
+  // Otherwise, just push that one object
+  else {
+    push(d);
+  }
+
+  pc.renderBrushed();
+};
