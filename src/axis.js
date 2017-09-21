@@ -36,6 +36,10 @@ function dimensionLabels(d) {
   return __.dimensions[d].title ? __.dimensions[d].title : d;  // dimension display names
 }
 
+function dimensionLabelStyles(d) {
+  return __.dimensions[d].titlestyle ? __.dimensions[d].titlestyle : "";  // optional dimension display names styles
+}
+
 pc.createAxes = function() {
   if (g) pc.removeAxes();
 
@@ -73,7 +77,8 @@ pc.createAxes = function() {
         "y": 0,
         "transform": "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")",
         "x": 0,
-        "class": "label"
+        "class": "label",
+        "style": dimensionLabelStyles
       })
       .text(dimensionLabels)
       .on("dblclick", flipAxisAndUpdatePCP)
@@ -145,7 +150,8 @@ pc.updateAxes = function(animationTime) {
         "y": 0,
         "transform": "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")",
         "x": 0,
-        "class": "label"
+        "class": "label",
+        "style": dimensionLabelStyles
       })
       .text(dimensionLabels)
       .on("dblclick", flipAxisAndUpdatePCP)

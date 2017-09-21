@@ -6,17 +6,10 @@
 <script src="../d3.parcoords.js"></script>
 <body>
 <div id="example" class="parcoords" style="width:500px;height:150px"></div>
-<p>Demonstrates overriding dimension titles, except for 2 and 3.</p>
+<p>Demonstrates setting dimension titles and styles.</p>
 </body>
 <script>
-var parcoords = d3.parcoords({
-    dimensionTitles: {
-      0: "Zero",
-      1: "One",
-      4: "Four",
-      5: "Five"
-    }
-  })("#example")
+var parcoords = d3.parcoords()("#example")
   .data([
     [0,-0,0,0,0,3 ],
     [1,-1,1,2,1,6 ],
@@ -24,6 +17,14 @@ var parcoords = d3.parcoords({
     [3,-3,9,6,0.33,4],
     [4,-4,16,8,0.25,9]
   ])
+  .dimensions({
+	0:{title:'Zero', type:'number', titlestyle:"text-shadow: 0 1px 1px #5f5, 1px 0 1px #5f5, 0 -1px 1px #5f5, -1px 0 1px #5f5, 0 2px 1px #5f5, 2px 0 1px #5f5, 0 -2px 1px #5f5, -2px 0 1px #5f5"},
+	1:{title:'One', type:'number' },
+	2:{title:'', type:'number', titlestyle:"text-shadow: 0 1px 1px #f55, 1px 0 1px #f55, 0 -1px 1px #f55, -1px 0 1px #f55, 0 2px 1px #f55, 2px 0 1px #f55, 0 -2px 1px #f55, -2px 0 1px #f55"},
+	3:{title:'Three', type:'number', titlestyle:'font-weight: bold;' },
+	4:{title:'Four', type:'number' },
+  })
+  .autoscale()
   .render()
   .createAxes();
 </script>
