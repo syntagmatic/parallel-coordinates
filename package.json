@@ -18,19 +18,18 @@
     "url": "https://github.com/syntagmatic/parallel-coordinates.git"
   },
   "dependencies": {
-      "d3": "~3.5"
+    "d3": "~4.12"
   },
   "devDependencies": {
-    "http-server": "^0.6.1",
-    "vows": "~0.7",
-    "jsdom": "~1.0",
-    "canvas": "~1.1",
+    "http-server": "^0.11.1",
+    "vows": "~0.8",
+    "jsdom": "~11.6",
+    "canvas": "~1.6",
     "smash": "~0.0"
   },
   "scripts": {
     "prestart": "npm install",
     "start": "http-server -a localhost -p 8000 -c-1",
-
     "pretest": "npm install",
     "test": "vows; echo"
   },
