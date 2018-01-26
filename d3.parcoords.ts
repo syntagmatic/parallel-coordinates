@@ -1,12 +1,80 @@
-import { IContext, IPc, d3, IBar } from './d3.parcoords.d';
+import { $V, d3, IBar, IContext, IDim, IPc, IRenderQueue } from './d3.parcoords.d';
 
-export function parcoords(config) {
+export const renderQueue = (func => {
+    let _queue = [];                 // data to be rendered
+    let _rate = 10;                  // number of calls per frame
+    let _clear = function() {};      // clearing function
+    let _i = 0;                      // current iteration
+
+    const rq = function(data) {
+        if (data) rq.data(data);
+        rq.invalidate();
+        _clear();
+        rq.render();
+    } as IRenderQueue;
+
+    rq.render = function() {
+        _i = 0;
+        let valid = true;
+        rq.invalidate = function() { valid = false; };
+
+        function doFrame() {
+            if (!valid) return true;
+            if (_i > _queue.length) return true;
+
+            // Typical d3 behavior is to pass a data item *and* its index. As the
+            // render queue splits the original data set, we'll have to be slightly
+            // more carefull about passing the correct index with the data item.
+            const end = Math.min(_i + _rate, _queue.length);
+            for (let i = _i; i < end; i++) {
+                func(_queue[i], i);
+            }
+            _i += _rate;
+        }
+
+        d3.timer(doFrame);
+    };
+
+    rq.data = function(data) {
+        rq.invalidate();
+        _queue = data.slice(0);
+        return rq;
+    };
+
+    rq.rate = function(value): IRenderQueue|number {
+        if (!arguments.length) return _rate;
+        _rate = value;
+        return rq;
+    };
+
+    rq.remaining = function() {
+        return _queue.length - _i;
+    };
+
+    // clear the canvas
+    rq.clear = function(func) {
+        if (!arguments.length) {
+            _clear();
+            return rq;
+        }
+        _clear = func;
+        return rq;
+    };
+
+    rq.invalidate = function() {};
+
+    return rq;
+}) as IRenderQueue;
+
+d3['renderQueue'] = renderQueue;
+
+export const parcoords = config => {
     const __: IBar = {
         data: [],
         highlighted: [],
-        dimensions: {},
+        dimensions: {} as any,
         dimensionTitleRotation: 0,
-        brushed: false,
+        brushed: false as any,
         brushedColor: null,
         alphaOnBrushed: 0.0,
         mode: 'default',
@@ -78,13 +146,14 @@ export function parcoords(config) {
             reorderable: false,
             axes: false,
             interactive: false,
-            debug: false
+            debug: false,
+            shadows: undefined
         },
         xscale = d3.scale.ordinal(),
         dragging = {},
         line = d3.svg.line(),
         axis = d3.svg.axis().orient('left').ticks(5);
-        let g, // groups for axes, brushes
+    let g, // groups for axes, brushes
         ctx = {} as IContext,
         canvas = {},
         clusterCentroids = [];
@@ -355,10 +424,10 @@ export function parcoords(config) {
         return this;
     };
 
-    pc.applyDimensionDefaults = (dims) => {
+    pc.applyDimensionDefaults = (dims): IDim & any[] => {
         const types = pc.detectDimensionTypes(__.data);
         dims = dims ? dims : d3.keys(types);
-        const newDims = {};
+        const newDims: IDim & any[] = {} as any;
         let currIndex = 0;
         dims.forEach(function(k) {
             newDims[k] = __.dimensions[k] ? __.dimensions[k] : {};
@@ -449,8 +518,8 @@ export function parcoords(config) {
         __.data.forEach(path_foreground);
     };
 
-    const foregroundQueue = d3.renderQueue(path_foreground)
-        .rate(50)
+    const foregroundQueue = (d3.renderQueue(path_foreground)
+        .rate(50) as IRenderQueue)
         .clear(function() {
             pc.clear('foreground');
             pc.clear('highlight');
@@ -470,8 +539,8 @@ export function parcoords(config) {
         }
     };
 
-    const brushedQueue = d3.renderQueue(path_brushed)
-        .rate(50)
+    const brushedQueue = (d3.renderQueue(path_brushed)
+        .rate(50) as IRenderQueue)
         .clear(function() {
             pc.clear('brushed');
         });
@@ -533,7 +602,7 @@ export function parcoords(config) {
             // centroids on 'virtual' axes
             if (i < cols - 1) {
                 const cx = x + a * (position(p[i + 1]) - x);
-                const cy = y + a * (__.dimensions[p[i + 1]].yscale(row[p[i + 1]]) - y);
+                let cy = y + a * (__.dimensions[p[i + 1]].yscale(row[p[i + 1]]) - y);
                 if (__.bundleDimension !== null) {
                     const leftCentroid = __.clusterCentroids.get(__.dimensions[__.bundleDimension].yscale(row[__.bundleDimension])).get(p[i]);
                     const rightCentroid = __.clusterCentroids.get(__.dimensions[__.bundleDimension].yscale(row[__.bundleDimension])).get(p[i + 1]);
@@ -561,7 +630,7 @@ export function parcoords(config) {
         }
 
         return realCentroids;
-    }
+    };
 
     function compute_control_points(centroids) {
 
@@ -586,7 +655,9 @@ export function parcoords(config) {
 
         return cps;
 
-    };pc.shadows = function() {
+    };
+
+    pc.shadows = function() {
         flags.shadows = true;
         pc.alphaOnBrushed(0.1);
         pc.render();
@@ -595,7 +666,7 @@ export function parcoords(config) {
 
 // draw dots with radius r on the axis line where data intersects
     pc.axisDots = function(r) {
-        const r = r || 0.1;
+        r = r || 0.1;
         const ctx = pc.ctx.marks;
         const startAngle = 0;
         const endAngle = 2 * Math.PI;
@@ -620,7 +691,7 @@ export function parcoords(config) {
         ctx.moveTo(cps[0].e(1), cps[0].e(2));
         for (let i = 1; i < cps.length; i += 3) {
             if (__.showControlPoints) {
-                for (const j = 0; j < 3; j++) {
+                for (let j = 0; j < 3; j++) {
                     ctx.fillRect(cps[i + j].e(1), cps[i + j].e(2), 2, 2);
                 }
             }
@@ -2426,13 +2497,13 @@ export function parcoords(config) {
 
 // Merges the canvases and SVG elements into one canvas element which is then passed into the callback
 // (so you can choose to save it to disk, etc.)
-    pc.mergeParcoords = function(callback) {
+    pc.mergeParcoords = (callback?: (canvas: any) => IPc): string => {
         // Retina display, etc.
         const devicePixelRatio = window.devicePixelRatio || 1;
 
         // Create a canvas element to store the merged canvases
         const mergedCanvas = document.createElement('canvas');
-        mergedCanvas.width = pc.canvas.foreground.clientWidth * devicePixelRatio
+        mergedCanvas.width = pc.canvas.foreground.clientWidth * devicePixelRatio;
         mergedCanvas.height = (pc.canvas.foreground.clientHeight + 30) * devicePixelRatio;
         mergedCanvas.style.width = mergedCanvas.width / devicePixelRatio + 'px';
         mergedCanvas.style.height = mergedCanvas.height / devicePixelRatio + 'px';
@@ -2448,7 +2519,7 @@ export function parcoords(config) {
         }
 
         // Add SVG elements to canvas
-        const DOMURL = window.URL || window.webkitURL || window;
+        const DOMURL = window.URL || window['webkitURL'] || window;
         const serializer = new XMLSerializer();
         const svgStr = serializer.serializeToString(pc.selection.select('svg')[0][0]);
 
@@ -2462,78 +2533,13 @@ export function parcoords(config) {
             }
         };
         img.src = src;
-    }
+        return svgStr;
+    };
     pc.version = '0.7.0';
     // this descriptive text should live with other introspective methods
     pc.toString = function() { return 'Parallel Coordinates: ' + d3.keys(__.dimensions).length + ' dimensions (' + d3.keys(__.data[0]).length + ' total) , ' + __.data.length + ' rows'; };
 
     return pc;
 };
-
-d3.renderQueue = (function(func) {
-    const _queue = [],                  // data to be rendered
-        _rate = 10,                   // number of calls per frame
-        _clear = function() {},       // clearing function
-        _i = 0;                       // current iteration
-
-    const rq = function(data) {
-        if (data) rq.data(data);
-        rq.invalidate();
-        _clear();
-        rq.render();
-    };
-
-    rq.render = function() {
-        _i = 0;
-        const valid = true;
-        rq.invalidate = function() { valid = false; };
-
-        function doFrame() {
-            if (!valid) return true;
-            if (_i > _queue.length) return true;
-
-            // Typical d3 behavior is to pass a data item *and* its index. As the
-            // render queue splits the original data set, we'll have to be slightly
-            // more carefull about passing the correct index with the data item.
-            const end = Math.min(_i + _rate, _queue.length);
-            for (let i = _i; i < end; i++) {
-                func(_queue[i], i);
-            }
-            _i += _rate;
-        }
-
-        d3.timer(doFrame);
-    };
-
-    rq.data = function(data) {
-        rq.invalidate();
-        _queue = data.slice(0);
-        return rq;
-    };
-
-    rq.rate = function(value) {
-        if (!arguments.length) return _rate;
-        _rate = value;
-        return rq;
-    };
-
-    rq.remaining = function() {
-        return _queue.length - _i;
-    };
-
-    // clear the canvas
-    rq.clear = function(func) {
-        if (!arguments.length) {
-            _clear();
-            return rq;
-        }
-        _clear = func;
-        return rq;
-    };
-
-    rq.invalidate = function() {};
-
-    return rq;
-});
 
 d3['parcoords'] = parcoords;

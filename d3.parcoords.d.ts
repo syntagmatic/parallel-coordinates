@@ -1,6 +1,6 @@
 interface ID3 extends IPc {
     keys: (a: any) => any[];
-    entries: (s: string[]) => any[];
+    entries: (s: any[]) => any[];
     select: (s: string) => any;
     dispatch: {apply: Function};
     scale: ID3 | (() => ID3) | any;
@@ -8,10 +8,25 @@ interface ID3 extends IPc {
     domain: (a: any) => ID3;
     range: (a: any) => ID3;
     svg: ID3Svg;
-    rebind: (this: Function, thisArg: any, ...argArray: any[]) => any;
-    extent(data: any|((d) => void), f?: (d) => void): ID3;
+    rebind: (this: ID3, thisArg: any, ...argArray: any[]) => any;
+
+    extent(data: any | ((d) => void), f?: (d) => void): ID3;
+
     rangePoints: (a: any) => ID3;
     time: ID3;
+    ascending: (idx0, idx1) => number;
+    timer: (doFrame) => ID3;
+
+    renderQueue: IRenderQueue;
+
+    map: () => IMap;
+    min: (a: number[]) => number;
+}
+
+interface IMap {
+    has: (k) => boolean;
+    set: (k, v) => void;
+    get: (k) => typeof k;
 }
 
 interface ID3Svg {
@@ -22,6 +37,7 @@ interface ID3Svg {
 }
 
 export declare const d3: ID3;
+export declare const $V;
 
 export interface IArc {
     active?: string;
@@ -35,11 +51,12 @@ export interface IArc {
 export interface IPc {
     selection: any;
     svg: any;
-    applyDimensionDefaults: (arg?: any[]) => {};
+    applyDimensionDefaults: (arg?: any[]) => IDim & any[];
     resize: () => void;
     getOrderedDimensionKeys: () => void;
     sortDimensions: () => void;
-    render: () => IPc;
+    render: {default?: IPc['default'], (): IPc, queue?: () => void};
+    'default': () => void;
     updateAxes: (axes?: number) => IPc;
     autoscale: () => IPc;
     detectDimensions: () => IPc;
@@ -49,29 +66,66 @@ export interface IPc {
     scale: (d, domain) => IPc;
     flip: (d) => IPc;
     commonScale: (global, type) => IPc;
-    bundleDimension:
+    detectDimensionTypes: (dim) => any;
+    bundleDimension: (dim) => any;
+    toType: (o: any) => string;
+    toTypeCoerceNumbers: (v: any) => string;
+    renderBrushed: {(): IPc, 'default'?: () => void, queue?: () => void};
+    clear: (s: 'foreground' | 'highlight' | 'brushed') => void;
+    version: string;
+    // Merges the canvases and SVG elements into one canvas element
+    mergeParcoords: (callback?: (canvas: any) => void) => string;
+    canvas: IContext;
+    compute_real_centroids: (row) => number[];
+    shadows: () => IPc;
+    // draw dots with radius r on the axis line where data intersects
+    axisDots: (r) => IPc;
+    ctx: IContext;
+    alphaOnBrushed: (n: number) => void;
+}
+
+interface IDim {
+    title?: string;
+    orient?: 'left' | 'right';
+    ticks?: number;
+    innerTickSize?: number;
+    outerTickSize?: number;
+    tickPadding?: number;
+    type?: string;
+    index?: number;
+    yscale?: {
+        (n): number;
+        domain: {
+            (): IDim['yscale']['domain'][]
+            (dom): number,
+            reverse: () => IDim
+        }
+    };
 }
 
 export interface IContext {
     foreground: I;
     brushed: I;
     highlight: I;
+    marks;
 }
 
 interface I {
     globalCompositeOperation: string;
-    globalAlpha: string;
+    globalAlpha: number;
     strokeStyle: string;
     lineWidth: number;
     scale: (x: number, y: number) => void;
+    clientWidth: number;
+    clientHeight: number;
 }
 
 export interface IBar {
     data: any[];
     highlighted: any[];
-    dimensions: {};
+    dimensions: Array<IDim>;
     dimensionTitleRotation: 0;
-    brushed: false;
+    brushed: any[];
     brushedColor: null;
     alphaOnBrushed: 0.0;
     mode: 'default';
@@ -85,7 +139,6 @@ export interface IBar {
     composite: 'source-over';
     alpha: 0.7;
     bundlingStrength: 0.5;
-    bundleDimension: null;
     smoothness: 0.0;
     showControlPoints: false;
     hideAxis: any[];
@@ -93,7 +146,17 @@ export interface IBar {
     animationTime: 1100; // How long it takes to flip the axis when you double click
     rotateLabels: false;
     clusterCentroids?: any;
-    alpha?: number;
-    bundleDimension?: (a?) => any[]; // returns: `types`
-    detectDimensionTypes?: (dim) => any;
+    // alpha?: number;
+    bundleDimension?: any;
+}
+
+export interface IRenderQueue {
+    (p): IRenderQueue;
+
+    data: (data: any) => void;
+    invalidate: () => void;
+    render: () => void;
+    rate: (data) => IRenderQueue | number;
+    remaining: () => number;
+    clear: (func) => IRenderQueue;
 }
