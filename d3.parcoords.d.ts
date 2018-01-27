@@ -1,42 +1,6 @@
-interface ID3 extends IPc {
-    keys: (a: any) => any[];
-    entries: (s: any[]) => any[];
-    select: (s: string) => any;
-    dispatch: {apply: Function};
-    scale: ID3 | (() => ID3) | any;
-    ordinal: ID3 | (() => ID3);
-    domain: (a: any) => ID3;
-    range: (a: any) => ID3;
-    svg: ID3Svg;
-    rebind: (this: ID3, thisArg: any, ...argArray: any[]) => any;
+import { ScaleOrdinal } from 'd3-scale'
+import { Axis } from 'd3-axis';
 
-    extent(data: any | ((d) => void), f?: (d) => void): ID3;
-
-    rangePoints: (a: any) => ID3;
-    time: ID3;
-    ascending: (idx0, idx1) => number;
-    timer: (doFrame) => ID3;
-
-    renderQueue: IRenderQueue;
-
-    map: () => IMap;
-    min: (a: number[]) => number;
-}
-
-interface IMap {
-    has: (k) => boolean;
-    set: (k, v) => void;
-    get: (k) => typeof k;
-}
-
-interface ID3Svg {
-    line: () => ID3Svg;
-    axis: () => ID3Svg;
-    orient: (s: string) => ID3Svg;
-    ticks: (n: number) => ID3Svg;
-}
-
-export declare const d3: ID3;
 export declare const $V;
 
 export interface IArc {
@@ -49,11 +13,13 @@ export interface IArc {
 }
 
 export interface IPc {
+    on(this: IPc, name: string, fn: Function);
     selection: any;
     svg: any;
     applyDimensionDefaults: (arg?: any[]) => IDim & any[];
     resize: () => void;
-    getOrderedDimensionKeys: () => void;
+    getOrderedDimensionKeys: () => any;
+    /*^Selection<GElement, NewDatum, PElement, PDatum>*/
     sortDimensions: () => void;
     render: {default?: IPc['default'], (): IPc, queue?: () => void};
     'default': () => void;
@@ -74,7 +40,7 @@ export interface IPc {
     clear: (s: 'foreground' | 'highlight' | 'brushed') => void;
     version: string;
     // Merges the canvases and SVG elements into one canvas element
-    mergeParcoords: (callback?: (canvas: any) => void) => string;
+    mergeParcoords: (callback?: (canvas: any) => IPc) => string;
     canvas: IContext;
     compute_real_centroids: (row) => number[];
     shadows: () => IPc;
@@ -82,6 +48,32 @@ export interface IPc {
     axisDots: (r) => IPc;
     ctx: IContext;
     alphaOnBrushed: (n: number) => void;
+    intersection: (a: IPoint, b: IPoint, c: IPoint, d: IPoint) => {x: number, y: number};
+    unhighlight: () => IPc;
+    highlight: (data) => IPc;
+    reorderable: () => void;
+    brushable: () => void;
+    createAxes: () => void;
+    brushReset(strums?): (() => void)|IPc;
+    xscale: ScaleOrdinal<string, Range>;
+    interactive: () => IPc;
+    g: () => any
+    /*GElement*/
+    ;
+    removeAxes: () => void;
+    applyAxisConfig: (axis, dim) => any;
+    brushMode: (mode?: string) => string | IPc;
+    brushModes: () => string[];
+    reorder: (rowdata) => void;
+    sortDimensionsByRowData: (rowdata) => void;
+    adjacent_pairs: (arr) => any[];
+    brushPredicate: (predicate: string) => string | IPc;
+    brushExtents: (extents) => {};
+}
+
+interface IPoint {
+    x: number;
+    y: number;
 }
 
 interface IDim {
@@ -100,7 +92,9 @@ interface IDim {
             (dom): number,
             reverse: () => IDim
         }
+        rangePoints: 'function' | string;
     };
+    tickFormat: Axis<any>['tickFormat'];
 }
 
 export interface IContext {
@@ -108,9 +102,14 @@ export interface IContext {
     brushed: I;
     highlight: I;
     marks;
+
+    // [index: string]: IContext;
 }
 
 interface I {
+    clearRect: (x: number, y: number, w: number, h: number) => void;
+    fillRect: (x: number, y: number, w: number, h: number) => void;
+    fillStyle: string;
     globalCompositeOperation: string;
     globalAlpha: number;
     strokeStyle: string;
@@ -148,6 +147,7 @@ export interface IBar {
     clusterCentroids?: any;
     // alpha?: number;
     bundleDimension?: any;
+    brushPredicate?: IPc['brushPredicate'];
 }
 
 export interface IRenderQueue {
@@ -159,4 +159,17 @@ export interface IRenderQueue {
     rate: (data) => IRenderQueue | number;
     remaining: () => number;
     clear: (func) => IRenderQueue;
+}
+
+export interface ICanvas extends IContext {
+
+}
+
+export interface IArc {
+
+}
+
+export interface IStrNum extends IArguments {
+    active: string;
+    width: (id) => number;
 }

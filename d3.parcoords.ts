@@ -1,4 +1,8 @@
-import { $V, d3, IBar, IContext, IDim, IPc, IRenderQueue } from './d3.parcoords.d';
+import * as d3 from 'd3';
+import { Map } from 'd3-collection';
+
+import { $V, IArc, IBar, ICanvas, IContext, IDim, IPc, IRenderQueue, IStrNum } from './d3.parcoords.d';
+
 
 export const renderQueue = (func => {
     let _queue = [];                 // data to be rendered
@@ -41,7 +45,7 @@ export const renderQueue = (func => {
         return rq;
     };
 
-    rq.rate = function(value): IRenderQueue|number {
+    rq.rate = function(value): IRenderQueue | number {
         if (!arguments.length) return _rate;
         _rate = value;
         return rq;
@@ -149,13 +153,14 @@ export const parcoords = config => {
             debug: false,
             shadows: undefined
         },
-        xscale = d3.scale.ordinal(),
+        xscale = d3.scaleOrdinal(),
         dragging = {},
-        line = d3.svg.line(),
-        axis = d3.svg.axis().orient('left').ticks(5);
+        line = d3.line(),
+        axis = d3.axis().orient('left').ticks(5);
+
     let g, // groups for axes, brushes
         ctx = {} as IContext,
-        canvas = {},
+        canvas = {} as ICanvas,
         clusterCentroids = [];
 
 // side effects for setters
@@ -518,7 +523,7 @@ export const parcoords = config => {
         __.data.forEach(path_foreground);
     };
 
-    const foregroundQueue = (d3.renderQueue(path_foreground)
+    const foregroundQueue = (renderQueue(path_foreground)
         .rate(50) as IRenderQueue)
         .clear(function() {
             pc.clear('foreground');
@@ -539,7 +544,7 @@ export const parcoords = config => {
         }
     };
 
-    const brushedQueue = (d3.renderQueue(path_brushed)
+    const brushedQueue = (renderQueue(path_brushed)
         .rate(50) as IRenderQueue)
         .clear(function() {
             pc.clear('brushed');
@@ -555,11 +560,11 @@ export const parcoords = config => {
 
     function compute_cluster_centroids(d) {
 
-        const clusterCentroids = d3.map();
-        const clusterCounts = d3.map();
+        const clusterCentroids = d3.map<Map<number>>();
+        const clusterCounts = d3.map<number>();
         // determine clusterCounts
-        __.data.forEach(function(row) {
-            const scaled = __.dimensions[d].yscale(row[d]);
+        __.data.forEach((row) => {
+            const scaled = __.dimensions[d].yscale(row[d]) as any as string;
             if (!clusterCounts.has(scaled)) {
                 clusterCounts.set(scaled, 0);
             }
@@ -567,11 +572,11 @@ export const parcoords = config => {
             clusterCounts.set(scaled, count + 1);
         });
 
-        __.data.forEach(function(row) {
-            d3.keys(__.dimensions).map(function(p, i) {
-                const scaled = __.dimensions[d].yscale(row[d]);
+        __.data.forEach((row) => {
+            d3.keys(__.dimensions).map((p, i) => {
+                const scaled = __.dimensions[d].yscale(row[d]) as any as string;
                 if (!clusterCentroids.has(scaled)) {
-                    const map = d3.map();
+                    const map = d3.map<number>();
                     clusterCentroids.set(scaled, map);
                 }
                 if (!clusterCentroids.get(scaled).has(p)) {
@@ -672,7 +677,7 @@ export const parcoords = config => {
         const endAngle = 2 * Math.PI;
         ctx.globalAlpha = d3.min([1 / Math.pow(__.data.length, 1 / 2), 1]);
         __.data.forEach(function(d) {
-            d3.entries(__.dimensions).forEach(function(p, i) {
+            d3.entries(__.dimensions).forEach(function(p: any, i) {
                 ctx.beginPath();
                 ctx.arc(position(p), __.dimensions[p.key].yscale(d[p]), r, startAngle, endAngle);
                 ctx.stroke();
@@ -802,7 +807,7 @@ export const parcoords = config => {
     function rotateLabels() {
         if (!__.rotateLabels) return;
 
-        const delta = d3.event.deltaY;
+        let delta = d3.event.deltaY;
         delta = delta < 0 ? -5 : delta;
         delta = delta > 0 ? 5 : delta;
 
@@ -963,7 +968,7 @@ export const parcoords = config => {
         if (flags.brushable) pc.brushable();
         if (flags.reorderable) pc.reorderable();
         if (pc.brushMode() !== 'None') {
-            const mode = pc.brushMode();
+            const mode = pc.brushMode() as string;
             pc.brushMode('None');
             pc.brushMode(mode);
         }
@@ -1001,8 +1006,9 @@ export const parcoords = config => {
                 })
                 .on('dragend', function(d) {
                     // Let's see if the order has changed and send out an event if so.
-                    const i = 0,
-                        j = __.dimensions[d].index,
+                    let i = 0,
+                        j = __.dimensions[d].index;
+                    let
                         elem = this,
                         parent = this.parentElement;
 
@@ -1049,7 +1055,7 @@ export const parcoords = config => {
         // NOTE: this is relatively cheap given that:
         // number of dimensions < number of data items
         // Thus we check equality of order to prevent rerendering when this is the case.
-        const reordered = false;
+        let reordered = false;
         reordered = firstDim !== pc.getOrderedDimensionKeys()[0];
 
         if (reordered) {
@@ -1084,7 +1090,7 @@ export const parcoords = config => {
             } // else
             return pixelDifference;
         });
-        __.dimensions = {};
+        __.dimensions = {} as IDim[];
         positionSortedKeys.forEach(function(p, i) {
             __.dimensions[p] = copy[p];
             __.dimensions[p].index = i;
@@ -1096,7 +1102,7 @@ export const parcoords = config => {
         const positionSortedKeys = d3.keys(__.dimensions).sort(function(a, b) {
             return position(a) - position(b);
         });
-        __.dimensions = {};
+        __.dimensions = {} as IDim[];
         positionSortedKeys.forEach(function(p, i) {
             __.dimensions[p] = copy[p];
             __.dimensions[p].index = i;
@@ -1109,7 +1115,6 @@ export const parcoords = config => {
         for (let i = 0; i < arr.length - 1; i++) {
             ret.push([arr[i], arr[i + 1]]);
         }
-        ;
         return ret;
     };
 
@@ -1140,7 +1145,7 @@ export const parcoords = config => {
         pc.renderBrushed();
     }
 
-    function brushPredicate(predicate) {
+    function brushPredicate(predicate: string): string | IPc {
         if (!arguments.length) { return brush.predicate; }
 
         predicate = String(predicate).toUpperCase();
@@ -1158,7 +1163,7 @@ export const parcoords = config => {
         return Object.getOwnPropertyNames(brush.modes);
     };
 
-    pc.brushMode = function(mode) {
+    pc.brushMode = function(mode: string): string | IPc {
         if (arguments.length === 0) {
             return brush.mode;
         }
@@ -1194,7 +1199,7 @@ export const parcoords = config => {
 // brush mode: 1D-Axes
 
     (function() {
-        const brushes = {};
+        let brushes = {};
 
         function is_brushed(p) {
             return !brushes[p].empty();
@@ -1303,7 +1308,7 @@ export const parcoords = config => {
         }
 
         function brushFor(axis) {
-            const brush = d3.svg.brush();
+            const brush = d3.brush();
 
             brush
                 .y(__.dimensions[axis].yscale)
@@ -1326,7 +1331,7 @@ export const parcoords = config => {
 
         function brushReset(dimension) {
             if (dimension === undefined) {
-                __.brushed = false;
+                __.brushed = false as any;
                 if (g) {
                     g.selectAll('.brush')
                         .each(function(d) {
@@ -1401,8 +1406,8 @@ export const parcoords = config => {
 // bl.ocks.org/syntagmatic/5441022
 
     (function() {
-        const strums = {},
-            strumRect;
+        const strums = {} as IStrNum;
+        let strumRect;
 
         function drawStrum(strum, activePoint) {
             const svg = pc.selection.select('svg').select('g#strums'),
@@ -1492,28 +1497,28 @@ export const parcoords = config => {
             return dims;
         }
 
-        function onDragStart() {
+        function onDragStart(args: IArguments) {
             // First we need to determine between which two axes the sturm was started.
             // This will determine the freedom of movement, because a strum can
             // logically only happen between two axes, so no movement outside these axes
             // should be allowed.
             return function() {
-                const p = d3.mouse(strumRect[0][0]),
-                    dims,
+                const p = d3.mouse(strumRect[0][0]);
+                let dims,
                     strum;
 
                 p[0] = p[0] - __.margin.left;
                 p[1] = p[1] - __.margin.top;
 
-                dims = dimensionsForPoint(p),
-                    strum = {
-                        p1: p,
-                        dims: dims,
-                        minX: xscale(dims.left),
-                        maxX: xscale(dims.right),
-                        minY: 0,
-                        maxY: h()
-                    };
+                dims = dimensionsForPoint(p);
+                strum = {
+                    p1: p,
+                    dims: dims,
+                    minX: xscale(dims.left),
+                    maxX: xscale(dims.right),
+                    minY: 0,
+                    maxY: h()
+                };
 
                 strums[dims.i] = strum;
                 strums.active = dims.i;
@@ -1524,7 +1529,7 @@ export const parcoords = config => {
             };
         }
 
-        function onDrag() {
+        function onDrag(args: IArguments) {
             return function() {
                 const ev = d3.event,
                     strum = strums[strums.active];
@@ -1559,14 +1564,12 @@ export const parcoords = config => {
             };
         }
 
-        function selected() {
-            const ids = Object.getOwnPropertyNames(strums),
-                brushed = __.data;
+        function selected(args: IArguments) {
+            let ids = Object.getOwnPropertyNames(strums);
+            const brushed = __.data;
 
             // Get the ids of the currently active strums.
-            ids = ids.filter(function(d) {
-                return !isNaN(d);
-            });
+            ids = ids.filter((d: any) => !isNaN(d));
 
             function crossesStrum(d, id) {
                 const strum = strums[id],
@@ -1593,7 +1596,7 @@ export const parcoords = config => {
             });
         }
 
-        function removeStrum() {
+        function removeStrum(args: IArguments) {
             const strum = strums[strums.active],
                 svg = pc.selection.select('svg').select('g#strums');
 
@@ -1603,10 +1606,10 @@ export const parcoords = config => {
             svg.selectAll('circle#strum-' + strum.dims.i).remove();
         }
 
-        function onDragEnd() {
+        function onDragEnd(args?: IArguments) {
             return function() {
-                const brushed = __.data,
-                    strum = strums[strums.active];
+                let brushed = __.data;
+                const strum = strums[strums.active];
 
                 // Okay, somewhat unexpected, but not totally unsurprising, a mousclick is
                 // considered a drag without move. So we have to deal with that case
@@ -1622,11 +1625,9 @@ export const parcoords = config => {
             };
         }
 
-        function brushReset(strums) {
+        function brushReset(strums): () => void {
             return function() {
-                const ids = Object.getOwnPropertyNames(strums).filter(function(d) {
-                    return !isNaN(d);
-                });
+                const ids = Object.getOwnPropertyNames(strums).filter((d: any) => !isNaN(d));
 
                 ids.forEach(function(d) {
                     strums.active = d;
@@ -1657,9 +1658,7 @@ export const parcoords = config => {
             };
 
             pc.on('axesreorder.strums', function() {
-                const ids = Object.getOwnPropertyNames(strums).filter(function(d) {
-                    return !isNaN(d);
-                });
+                const ids = Object.getOwnPropertyNames(strums).filter((d: any) => !isNaN(d));
 
                 // Checks if the first dimension is directly left of the second dimension.
                 function consecutive(first, second) {
@@ -1691,7 +1690,7 @@ export const parcoords = config => {
                 .attr('transform', 'translate(' + __.margin.left + ',' + __.margin.top + ')');
 
             // Install the required brushReset function
-            pc.brushReset = brushReset(strums);
+            pc.brushReset = brushReset(strums) as IPc['brushReset'];
 
             drag
                 .on('dragstart', onDragStart(strums))
@@ -1728,13 +1727,13 @@ export const parcoords = config => {
     }());
 
 // brush mode: 1D-Axes with multiple extents
-// requires d3.svg.multibrush
+// requires d3.multibrush
 
     (function() {
-        if (typeof d3.svg.multibrush !== 'function') {
+        if (typeof d3.multibrush !== 'function') {
             return;
         }
-        const brushes = {};
+        let brushes = {};
 
         function is_brushed(p) {
             return !brushes[p].empty();
@@ -1857,7 +1856,7 @@ export const parcoords = config => {
         //}
 
         function brushFor(axis) {
-            const brush = d3.svg.multibrush();
+            const brush = d3.multibrush();
 
             brush
                 .y(__.dimensions[axis].yscale)
@@ -1871,9 +1870,9 @@ export const parcoords = config => {
                     brushUpdated(selected());
                 })
                 .on('brushend', function() {
-                    // d3.svg.multibrush clears extents just before calling 'brushend'
+                    // d3.multibrush clears extents just before calling 'brushend'
                     // so we have to update here again.
-                    // This fixes issue #103 for now, but should be changed in d3.svg.multibrush
+                    // This fixes issue #103 for now, but should be changed in d3.multibrush
                     // to avoid unnecessary computation.
                     brushUpdated(selected());
                     events.brushend.call(pc, __.brushed);
@@ -1900,7 +1899,7 @@ export const parcoords = config => {
         }
 
         function brushReset(dimension) {
-            __.brushed = false;
+            __.brushed = false as any;
             if (g) {
                 g.selectAll('.brush')
                     .each(function(d) {
@@ -1959,8 +1958,8 @@ export const parcoords = config => {
 // code based on 2D.strums.js
 
     (function() {
-        const arcs = {},
-            strumRect;
+        const arcs: IArc = {};
+        let strumRect;
 
         function drawStrum(arc, activePoint) {
             const svg = pc.selection.select('svg').select('g#arcs'),
@@ -1997,15 +1996,15 @@ export const parcoords = config => {
 
             drag
                 .on('drag', function(d, i) {
-                    const ev = d3.event,
-                        angle = 0;
+                    const ev = d3.event;
+                    let angle = 0;
 
                     i = i + 2;
 
                     arc['p' + i][0] = Math.min(Math.max(arc.minX + 1, ev.x), arc.maxX);
                     arc['p' + i][1] = Math.min(Math.max(arc.minY, ev.y), arc.maxY);
 
-                    angle = i === 3 ? arcs.startAngle(id) : arcs.endAngle(id);
+                    angle = i === 3 ? arcs.startAngle(id) as number : arcs.endAngle(id) as number;
 
                     if ((arc.startAngle < Math.PI && arc.endAngle < Math.PI && angle < Math.PI) ||
                         (arc.startAngle >= Math.PI && arc.endAngle >= Math.PI && angle >= Math.PI)) {
@@ -2073,34 +2072,34 @@ export const parcoords = config => {
             return dims;
         }
 
-        function onDragStart() {
+        function onDragStart(args: IArguments | IArc) {
             // First we need to determine between which two axes the arc was started.
             // This will determine the freedom of movement, because a arc can
             // logically only happen between two axes, so no movement outside these axes
             // should be allowed.
             return function() {
-                const p = d3.mouse(strumRect[0][0]),
-                    dims,
+                const p = d3.mouse(strumRect[0][0]);
+                let dims,
                     arc;
 
                 p[0] = p[0] - __.margin.left;
                 p[1] = p[1] - __.margin.top;
 
-                dims = dimensionsForPoint(p),
-                    arc = {
-                        p1: p,
-                        dims: dims,
-                        minX: xscale(dims.left),
-                        maxX: xscale(dims.right),
-                        minY: 0,
-                        maxY: h(),
-                        startAngle: undefined,
-                        endAngle: undefined,
-                        arc: d3.svg.arc().innerRadius(0)
-                    };
+                dims = dimensionsForPoint(p);
+                arc = {
+                    p1: p,
+                    dims: dims,
+                    minX: xscale(dims.left),
+                    maxX: xscale(dims.right),
+                    minY: 0,
+                    maxY: h(),
+                    startAngle: undefined,
+                    endAngle: undefined,
+                    arc: d3.arc().innerRadius(0)
+                };
 
                 arcs[dims.i] = arc;
-                arcs.active = dims.i;
+                (arcs as IArc).active = dims.i;
 
                 // Make sure that the point is within the bounds
                 arc.p1[0] = Math.min(Math.max(arc.minX, p[0]), arc.maxX);
@@ -2109,17 +2108,17 @@ export const parcoords = config => {
             };
         }
 
-        function onDrag() {
+        function onDrag(arg?) {
             return function() {
                 const ev = d3.event,
-                    arc = arcs[arcs.active];
+                    arc = arcs[(arcs as IArc).active];
 
                 // Make sure that the point is within the bounds
                 arc.p2[0] = Math.min(Math.max(arc.minX + 1, ev.x - __.margin.left), arc.maxX);
                 arc.p2[1] = Math.min(Math.max(arc.minY, ev.y - __.margin.top), arc.maxY);
                 arc.p3 = arc.p2.slice();
-//      console.log(arcs.angle(arcs.active));
-//      console.log(signedAngle(arcs.unsignedAngle(arcs.active)));
+//      console.log(arcs.angle((arcs as IArc).active));
+//      console.log(signedAngle(arcs.unsignedAngle((arcs as IArc).active)));
                 drawStrum(arc, 1);
             };
         }
@@ -2145,7 +2144,7 @@ export const parcoords = config => {
 
         // [0, 2*PI] -> [-PI/2, PI/2]
         const signedAngle = function(angle) {
-            const ret = angle;
+            let ret = angle;
             if (angle > Math.PI) {
                 ret = angle - 1.5 * Math.PI;
                 ret = angle - 1.5 * Math.PI;
@@ -2163,8 +2162,8 @@ export const parcoords = config => {
          * are 12 and 6 o'clock respectively.
          */
         function containmentTest(arc) {
-            const startAngle = signedAngle(arc.startAngle);
-            const endAngle = signedAngle(arc.endAngle);
+            let startAngle = signedAngle(arc.startAngle);
+            let endAngle = signedAngle(arc.endAngle);
 
             if (startAngle > endAngle) {
                 const tmp = startAngle;
@@ -2174,23 +2173,16 @@ export const parcoords = config => {
 
             // test if segment angle is contained in angle interval
             return function(a) {
-
-                if (a >= startAngle && a <= endAngle) {
-                    return true;
-                }
-
-                return false;
+                return a >= startAngle && a <= endAngle;
             };
         }
 
-        function selected() {
-            const ids = Object.getOwnPropertyNames(arcs),
+        function selected(args: IArc) {
+            let ids = Object.getOwnPropertyNames(arcs),
                 brushed = __.data;
 
             // Get the ids of the currently active arcs.
-            ids = ids.filter(function(d) {
-                return !isNaN(d);
-            });
+            ids = ids.filter((d: any) => !isNaN(d));
 
             function crossesStrum(d, id) {
                 const arc = arcs[id],
@@ -2220,21 +2212,21 @@ export const parcoords = config => {
             });
         }
 
-        function removeStrum() {
-            const arc = arcs[arcs.active],
+        function removeStrum(arg?) {
+            const arc = arcs[(arcs as IArc).active],
                 svg = pc.selection.select('svg').select('g#arcs');
 
-            delete arcs[arcs.active];
-            arcs.active = undefined;
+            delete arcs[(arcs as IArc).active];
+            (arcs as IArc).active = undefined;
             svg.selectAll('line#arc-' + arc.dims.i).remove();
             svg.selectAll('circle#arc-' + arc.dims.i).remove();
             svg.selectAll('path#arc-' + arc.dims.i).remove();
         }
 
-        function onDragEnd() {
+        function onDragEnd(arg?) {
             return function() {
-                const brushed = __.data,
-                    arc = arcs[arcs.active];
+                let brushed = __.data;
+                const arc = arcs[(arcs as IArc).active];
 
                 // Okay, somewhat unexpected, but not totally unsurprising, a mousclick is
                 // considered a drag without move. So we have to deal with that case
@@ -2243,19 +2235,19 @@ export const parcoords = config => {
                 }
 
                 if (arc) {
-                    const angle = arcs.startAngle(arcs.active);
+                    const angle = arcs.startAngle((arcs as IArc).active);
 
                     arc.startAngle = angle;
                     arc.endAngle = angle;
                     arc.arc
-                        .outerRadius(arcs.length(arcs.active))
+                        .outerRadius(arcs.length((arcs as IArc).active))
                         .startAngle(angle)
                         .endAngle(angle);
                 }
 
 
                 brushed = selected(arcs);
-                arcs.active = undefined;
+                (arcs as IArc).active = undefined;
                 __.brushed = brushed;
                 pc.renderBrushed();
                 events.brushend.call(pc, __.brushed);
@@ -2264,12 +2256,10 @@ export const parcoords = config => {
 
         function brushReset(arcs) {
             return function() {
-                const ids = Object.getOwnPropertyNames(arcs).filter(function(d) {
-                    return !isNaN(d);
-                });
+                const ids = Object.getOwnPropertyNames(arcs).filter((d: any) => !isNaN(d));
 
                 ids.forEach(function(d) {
-                    arcs.active = d;
+                    (arcs as IArc).active = d;
                     removeStrum(arcs);
                 });
                 onDragEnd(arcs)();
@@ -2281,7 +2271,7 @@ export const parcoords = config => {
 
             // Map of current arcs. arcs are stored per segment of the PC. A segment,
             // being the area between two axes. The left most area is indexed at 0.
-            arcs.active = undefined;
+            (arcs as IArc).active = undefined;
             // Returns the width of the PC segment where currently a arc is being
             // placed. NOTE: even though they are evenly spaced in our current
             // implementation, we keep for when non-even spaced segments are supported as
@@ -2297,13 +2287,13 @@ export const parcoords = config => {
             };
 
             // returns angles in [-PI/2, PI/2]
-            angle = function(p1, p2) {
+            const angle = function(p1, p2) {
                 const a = p1[0] - p2[0],
                     b = p1[1] - p2[1],
                     c = hypothenuse(a, b);
 
                 return Math.asin(b / c);
-            }
+            };
 
             // returns angles in [0, 2 * PI]
             arcs.endAngle = function(id) {
@@ -2311,15 +2301,15 @@ export const parcoords = config => {
                 if (arc === undefined) {
                     return undefined;
                 }
-                const sAngle = angle(arc.p1, arc.p2),
-                    uAngle = -sAngle + Math.PI / 2;
+                const sAngle = angle(arc.p1, arc.p2);
+                let uAngle = -sAngle + Math.PI / 2;
 
                 if (arc.p1[0] > arc.p2[0]) {
                     uAngle = 2 * Math.PI - uAngle;
                 }
 
                 return uAngle;
-            }
+            };
 
             arcs.startAngle = function(id) {
                 const arc = arcs[id];
@@ -2327,8 +2317,8 @@ export const parcoords = config => {
                     return undefined;
                 }
 
-                const sAngle = angle(arc.p1, arc.p3),
-                    uAngle = -sAngle + Math.PI / 2;
+                const sAngle = angle(arc.p1, arc.p3);
+                let uAngle = -sAngle + Math.PI / 2;
 
                 if (arc.p1[0] > arc.p3[0]) {
                     uAngle = 2 * Math.PI - uAngle;
@@ -2352,9 +2342,7 @@ export const parcoords = config => {
             }
 
             pc.on('axesreorder.arcs', function() {
-                const ids = Object.getOwnPropertyNames(arcs).filter(function(d) {
-                    return !isNaN(d);
-                });
+                const ids = Object.getOwnPropertyNames(arcs).filter((d: any) => !isNaN(d));
 
                 // Checks if the first dimension is directly left of the second dimension.
                 function consecutive(first, second) {
@@ -2369,7 +2357,7 @@ export const parcoords = config => {
                 if (ids.length > 0) { // We have some arcs, which might need to be removed.
                     ids.forEach(function(d) {
                         const dims = arcs[d].dims;
-                        arcs.active = d;
+                        (arcs as IArc).active = d;
                         // If the two dimensions of the current arc are not next to each other
                         // any more, than we'll need to remove the arc. Otherwise we keep it.
                         if (!consecutive(dims.left, dims.right)) {
@@ -2386,7 +2374,7 @@ export const parcoords = config => {
                 .attr('transform', 'translate(' + __.margin.left + ',' + __.margin.top + ')');
 
             // Install the required brushReset function
-            pc.brushReset = brushReset(arcs);
+            pc.brushReset = brushReset(arcs) as IPc['brushReset'];
 
             drag
                 .on('dragstart', onDragStart(arcs))
@@ -2464,7 +2452,8 @@ export const parcoords = config => {
 
         __.highlighted = data;
         pc.clear('highlight');
-        d3.selectAll([canvas.foreground, canvas.brushed]).classed('faded', true);
+        d3.selectAll([canvas.foreground, canvas.brushed] as any)
+            .classed('faded', true);
         data.forEach(path_highlight);
         events.highlight.call(this, data);
         return this;
@@ -2474,18 +2463,17 @@ export const parcoords = config => {
     pc.unhighlight = function() {
         __.highlighted = [];
         pc.clear('highlight');
-        d3.selectAll([canvas.foreground, canvas.brushed]).classed('faded', false);
+        d3.selectAll([canvas.foreground, canvas.brushed] as any)
+            .classed('faded', false);
         return this;
     };
 
 // calculate 2d intersection of line a->b with line c->d
 // points are objects with x and y properties
-    pc.intersection = function(a, b, c, d) {
-        return {
-            x: ((a.x * b.y - a.y * b.x) * (c.x - d.x) - (a.x - b.x) * (c.x * d.y - c.y * d.x)) / ((a.x - b.x) * (c.y - d.y) - (a.y - b.y) * (c.x - d.x)),
-            y: ((a.x * b.y - a.y * b.x) * (c.y - d.y) - (a.y - b.y) * (c.x * d.y - c.y * d.x)) / ((a.x - b.x) * (c.y - d.y) - (a.y - b.y) * (c.x - d.x))
-        };
-    };
+    pc.intersection = (a, b, c, d) => ({
+        x: ((a.x * b.y - a.y * b.x) * (c.x - d.x) - (a.x - b.x) * (c.x * d.y - c.y * d.x)) / ((a.x - b.x) * (c.y - d.y) - (a.y - b.y) * (c.x - d.x)),
+        y: ((a.x * b.y - a.y * b.x) * (c.y - d.y) - (a.y - b.y) * (c.x * d.y - c.y * d.x)) / ((a.x - b.x) * (c.y - d.y) - (a.y - b.y) * (c.x - d.x))
+    });
 
     function position(d) {
         if (xscale.range().length === 0) {
