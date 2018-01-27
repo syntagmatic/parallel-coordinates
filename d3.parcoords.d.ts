@@ -14,6 +14,7 @@ export interface IArc {
 
 export interface IPc {
     on(this: IPc, name: string, fn: Function);
+
     selection: any;
     svg: any;
     applyDimensionDefaults: (arg?: any[]) => IDim & any[];
@@ -54,7 +55,9 @@ export interface IPc {
     reorderable: () => void;
     brushable: () => void;
     createAxes: () => void;
-    brushReset(strums?): (() => void)|IPc;
+
+    brushReset(strums?): (() => void) | IPc;
+
     xscale: ScaleOrdinal<string, Range>;
     interactive: () => IPc;
     g: () => any
@@ -170,6 +173,24 @@ export interface IArc {
 }
 
 export interface IStrNum extends IArguments {
-    active: string;
-    width: (id) => number;
+    active?: number|string;
+    width?: (id) => number;
+    p1?: [number, number];
+    p2?: number[];
+    dims?: IDimension;
+
+    minX?: Range | number;
+    maxX?: Range | number;
+    minY?: Range | number;
+    maxY?: Range | number;
+}
+
+export interface IDimension {
+    i: -1 | number;
+    left: string;
+    right: string;
+}
+
+export interface IOrigin {
+    __origin__?: Range;
 }

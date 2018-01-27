@@ -1,7 +1,10 @@
 import * as d3 from 'd3';
 import { Map } from 'd3-collection';
 
-import { $V, IArc, IBar, ICanvas, IContext, IDim, IPc, IRenderQueue, IStrNum } from './d3.parcoords.d';
+import {
+    $V, IArc, IBar, ICanvas, IContext, IDim, IPc,
+    IRenderQueue, IStrNum, IDimension, IOrigin
+} from './d3.parcoords.d';
 
 
 export const renderQueue = (func => {
@@ -143,8 +146,8 @@ export const parcoords = config => {
         return pc;
     } as any as IPc;
     const events = d3.dispatch.apply(this, ['render', 'resize', 'highlight', 'brush', 'brushend', 'brushstart', 'axesreorder'].concat(d3.keys(__))),
-        w = function() { return __.width - __.margin.right - __.margin.left; },
-        h = function() { return __.height - __.margin.top - __.margin.bottom; },
+        w = function(): number { return __.width - __.margin.right - __.margin.left; },
+        h = function(): number { return __.height - __.margin.top - __.margin.bottom; },
         flags = {
             brushable: false,
             reorderable: false,
@@ -153,10 +156,11 @@ export const parcoords = config => {
             debug: false,
             shadows: undefined
         },
-        xscale = d3.scaleOrdinal(),
+        xscale = d3.scaleOrdinal<Range>(),
         dragging = {},
         line = d3.line(),
         axis = d3.axis().orient('left').ticks(5);
+        // TODO: `d3.axisLeft().ticks(5)`
 
     let g, // groups for axes, brushes
         ctx = {} as IContext,
@@ -282,27 +286,28 @@ export const parcoords = config => {
 
                 // special case if single value
                 if (extent[0] === extent[1]) {
-                    return d3.scale.ordinal()
+                    return d3.scaleOrdinal()
                         .domain([extent[0]])
-                        .rangePoints(getRange());
+                        .range(getRange());
                 }
 
-                return d3.time.scale()
+                return d3.scaleTime()
                     .domain(extent)
                     .range(getRange());
             },
             'number': function(k) {
-                const extent = d3.extent(__.data, function(d) { return +d[k]; });
+                const extent = d3.extent<number>(__.data, (d: any): any => +d[k] );
+                console.assert(typeof extent === 'number');
 
                 // special case if single value
                 if (extent[0] === extent[1]) {
-                    return d3.scale.ordinal()
+                    return d3.scaleOrdinal()
                         .domain([extent[0]])
-                        .rangePoints(getRange());
+                        .range(getRange());
                 }
 
-                return d3.scale.linear()
-                    .domain(extent)
+                return d3.scaleLinear()
+                    .domain(extent as [number, number])
                     .range(getRange());
             },
             'string': function(k) {
@@ -326,9 +331,9 @@ export const parcoords = config => {
                     return counts[a] - counts[b];
                 });
 
-                return d3.scale.ordinal()
+                return d3.scaleOrdinal()
                     .domain(domain)
-                    .rangePoints(getRange());
+                    .range(getRange());
             }
         };
 
@@ -340,6 +345,7 @@ export const parcoords = config => {
 
         // xscale
         xscale.rangePoints([0, w()], 1);
+        // TODO: Fix `xscale.range([0, w()]).padding(1);`
 
         // Retina display, etc.
         const devicePixelRatio = window.devicePixelRatio || 1;
@@ -991,11 +997,11 @@ export const parcoords = config => {
         if (!g) pc.createAxes();
 
         g.style('cursor', 'move')
-            .call(d3.behavior.drag()
-                .on('dragstart', function(d) {
+            .call(d3.drag()
+                .on('dragstart', function(this: IOrigin & Element, d: string) {
                     dragging[d] = this.__origin__ = xscale(d);
                 })
-                .on('drag', function(d) {
+                .on('drag', function(this: IOrigin & Element, d: string) {
                     dragging[d] = Math.min(w(), Math.max(0, this.__origin__ += d3.event.dx));
                     pc.sortDimensions();
                     xscale.domain(pc.getOrderedDimensionKeys());
@@ -1004,7 +1010,7 @@ export const parcoords = config => {
                         return 'translate(' + position(d) + ')';
                     });
                 })
-                .on('dragend', function(d) {
+                .on('dragend', function(this: IOrigin & Element, d: string) {
                     // Let's see if the order has changed and send out an event if so.
                     let i = 0,
                         j = __.dimensions[d].index;
@@ -1310,6 +1316,7 @@ export const parcoords = config => {
         function brushFor(axis) {
             const brush = d3.brush();
 
+            // TODO: `d3.brushY()` ?
             brush
                 .y(__.dimensions[axis].yscale)
                 .on('brushstart', function() {
@@ -1415,7 +1422,7 @@ export const parcoords = config => {
                 points = [strum.p1, strum.p2],
                 line = svg.selectAll('line#strum-' + id).data([strum]),
                 circles = svg.selectAll('circle#strum-' + id).data(points),
-                drag = d3.behavior.drag();
+                drag = d3.drag();
 
             line.enter()
                 .append('line')
@@ -1469,8 +1476,8 @@ export const parcoords = config => {
                 .call(drag);
         }
 
-        function dimensionsForPoint(p) {
-            const dims = { i: -1, left: undefined, right: undefined };
+        function dimensionsForPoint(p): IDimension {
+            const dims: IDimension = { i: -1, left: undefined, right: undefined };
             d3.keys(__.dimensions).some(function(dim, i) {
                 if (xscale(dim) < p[0]) {
                     const next = d3.keys(__.dimensions)[pc.getOrderedDimensionKeys().indexOf(dim) + 1];
@@ -1504,8 +1511,8 @@ export const parcoords = config => {
             // should be allowed.
             return function() {
                 const p = d3.mouse(strumRect[0][0]);
-                let dims,
-                    strum;
+                let dims: IDimension,
+                    strum: Partial<IStrNum>;
 
                 p[0] = p[0] - __.margin.left;
                 p[1] = p[1] - __.margin.top;
@@ -1524,7 +1531,7 @@ export const parcoords = config => {
                 strums.active = dims.i;
 
                 // Make sure that the point is within the bounds
-                strum.p1[0] = Math.min(Math.max(strum.minX, p[0]), strum.maxX);
+                strum.p1[0] = Math.min(Math.max(strum.minX as number, p[0]), strum.maxX as number);
                 strum.p2 = strum.p1.slice();
             };
         }
@@ -1556,11 +1563,7 @@ export const parcoords = config => {
                     y1 = m1 * x + b1,
                     y2 = m2 * x + b2;
 
-                if (y > Math.min(y1, y2) && y < Math.max(y1, y2)) {
-                    return true;
-                }
-
-                return false;
+                return y > Math.min(y1, y2) && y < Math.max(y1, y2);
             };
         }
 
@@ -1638,7 +1641,7 @@ export const parcoords = config => {
         }
 
         function install() {
-            const drag = d3.behavior.drag();
+            const drag = d3.drag();
 
             // Map of current strums. Strums are stored per segment of the PC. A segment,
             // being the area between two axes. The left most area is indexed at 0.
@@ -1671,7 +1674,7 @@ export const parcoords = config => {
                 }
 
                 if (ids.length > 0) { // We have some strums, which might need to be removed.
-                    ids.forEach(function(d) {
+                    ids.forEach((d: string) => {
                         const dims = strums[d].dims;
                         strums.active = d;
                         // If the two dimensions of the current strum are not next to each other
@@ -1967,7 +1970,7 @@ export const parcoords = config => {
                 points = [arc.p2, arc.p3],
                 line = svg.selectAll('line#arc-' + id).data([{ p1: arc.p1, p2: arc.p2 }, { p1: arc.p1, p2: arc.p3 }]),
                 circles = svg.selectAll('circle#arc-' + id).data(points),
-                drag = d3.behavior.drag(),
+                drag = d3.drag(),
                 path = svg.selectAll('path#arc-' + id).data([arc]);
 
             path.enter()
@@ -2267,7 +2270,7 @@ export const parcoords = config => {
         }
 
         function install() {
-            const drag = d3.behavior.drag();
+            const drag = d3.drag();
 
             // Map of current arcs. arcs are stored per segment of the PC. A segment,
             // being the area between two axes. The left most area is indexed at 0.
@@ -2478,6 +2481,7 @@ export const parcoords = config => {
     function position(d) {
         if (xscale.range().length === 0) {
             xscale.rangePoints([0, w()], 1);
+            // TODO: Fix `xscale.range([0, w()]).padding(1);`
         }
         const v = dragging[d];
         return v == null ? xscale(d) : v;
