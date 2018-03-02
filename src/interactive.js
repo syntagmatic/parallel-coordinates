@@ -22,6 +22,9 @@ pc.resize = function() {
   if (flags.brushable) pc.brushReset();
 
   // scales
+  d3.keys(__.dimensions).forEach(function(k) {
+    delete __.dimensions[k].yscale;
+  });
   pc.autoscale();
 
   // axes, destroys old brushes.
