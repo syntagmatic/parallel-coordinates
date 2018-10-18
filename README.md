@@ -4,6 +4,8 @@
 
 An implementation of parallel coordinates in d3 as a [reusable chart](http://bost.ocks.org/mike/chart/)
 
+This library is under only sporadic development by contributors using an outdated version of d3. Consider using this [d3.v5 ES6 port by BigFatDog](https://github.com/BigFatDog/parcoords-es) for a more modern approach.
+
 ## Contributing
 
 In order to obtain a linear history, please adhere to the [workflow](https://github.com/bbroeksema/writing/blob/master/parcoords-git-workflow.md) outlined by @bbroeksema.
