@@ -24,7 +24,7 @@
     "http-server": "^0.6.1",
     "vows": "~0.7",
     "jsdom": "~1.0",
-    "canvas": "~1.1",
+    "canvas": "~2.6",
     "smash": "~0.0"
   },
   "scripts": {
