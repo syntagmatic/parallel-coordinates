@@ -662,7 +662,21 @@ function getNullPosition() {
 };
 
 function single_path(d, ctx) {
-	d3.entries(__.dimensions).forEach(function(p, i) {  //p isn't really p
+	var dimensions = d3.entries(__.dimensions);
+
+	if (dimensions.length === 1) {
+		// draw a short horizontal line when we have only a single dimension
+		dimensions.forEach(function(p, i) {  //p isn't really p
+			if (typeof d[p.key] =='undefined') {
+				return; // null value
+			}
+			ctx.moveTo(position(p.key)-p.value.tickPadding, __.dimensions[p.key].yscale(d[p.key]));
+			ctx.lineTo(position(p.key)+p.value.tickPadding, __.dimensions[p.key].yscale(d[p.key]));
+		});
+		return;
+	}
+
+	dimensions.forEach(function(p, i) {  //p isn't really p
 		if (i == 0) {
 			ctx.moveTo(position(p.key), typeof d[p.key] =='undefined' ? getNullPosition() : __.dimensions[p.key].yscale(d[p.key]));
 		} else {
@@ -741,6 +755,10 @@ function dimensionLabels(d) {
   return __.dimensions[d].title ? __.dimensions[d].title : d;  // dimension display names
 }
 
+function dimensionLabelStyles(d) {
+  return __.dimensions[d].titlestyle ? __.dimensions[d].titlestyle : "";  // optional dimension display names styles
+}
+
 pc.createAxes = function() {
   if (g) pc.removeAxes();
 
@@ -778,7 +796,8 @@ pc.createAxes = function() {
         "y": 0,
         "transform": "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")",
         "x": 0,
-        "class": "label"
+        "class": "label",
+        "style": dimensionLabelStyles
       })
       .text(dimensionLabels)
       .on("dblclick", flipAxisAndUpdatePCP)
@@ -850,7 +869,8 @@ pc.updateAxes = function(animationTime) {
         "y": 0,
         "transform": "translate(0,-5) rotate(" + __.dimensionTitleRotation + ")",
         "x": 0,
-        "class": "label"
+        "class": "label",
+        "style": dimensionLabelStyles
       })
       .text(dimensionLabels)
       .on("dblclick", flipAxisAndUpdatePCP)
@@ -1213,9 +1233,13 @@ pc.brushMode = function(mode) {
 						.transition()
 						.duration(0)
 						.call(brush);
-
-					//fire some events
-					brush.event(brushSelections[d]);
+				}
+			});
+			
+			//now all brush extents have been updated: fire some events
+			d3.keys(brushes).forEach(function(d) {
+				if (brushes[d] !== undefined || extents[d] === undefined) {
+					brushes[d].event(brushSelections[d]);
 				}
 			});
 
@@ -1751,9 +1775,13 @@ pc.brushMode = function(mode) {
               .transition()
               .duration(0)
               .call(brush);
-
-          //fire some events
-          brush.event(brushSelections[d]);
+        }
+      });
+	  
+	  //now all brush extents have been updated: fire some events
+      d3.keys(brushes).forEach(function(d) {
+        if (brushes[d] !== undefined || extents[d] === undefined) {
+          brushes[d].event(brushSelections[d]);
         }
       });
 

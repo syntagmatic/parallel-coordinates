@@ -18,7 +18,7 @@
     "url": "https://github.com/syntagmatic/parallel-coordinates.git"
   },
   "dependencies": {
-      "d3": "~3.5"
+    "d3": "~3.5"
   },
   "devDependencies": {
     "http-server": "^0.6.1",
@@ -30,7 +30,6 @@
   "scripts": {
     "prestart": "npm install",
     "start": "http-server -a localhost -p 8000 -c-1",
-
     "pretest": "npm install",
     "test": "vows; echo"
   },
