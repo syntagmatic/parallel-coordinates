@@ -1213,9 +1213,13 @@ pc.brushMode = function(mode) {
 						.transition()
 						.duration(0)
 						.call(brush);
-
-					//fire some events
-					brush.event(brushSelections[d]);
+				}
+			});
+			
+			//now all brush extents have been updated: fire some events
+			d3.keys(brushes).forEach(function(d) {
+				if (brushes[d] !== undefined || extents[d] === undefined) {
+					brushes[d].event(brushSelections[d]);
 				}
 			});
 
@@ -1751,9 +1755,13 @@ pc.brushMode = function(mode) {
               .transition()
               .duration(0)
               .call(brush);
-
-          //fire some events
-          brush.event(brushSelections[d]);
+        }
+      });
+	  
+	  //now all brush extents have been updated: fire some events
+      d3.keys(brushes).forEach(function(d) {
+        if (brushes[d] !== undefined || extents[d] === undefined) {
+          brushes[d].event(brushSelections[d]);
         }
       });
 
